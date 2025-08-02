@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <!-- CREATE -->
+    <include file="/db/changelog/create/sequence/initial_create_d_sequence.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_order.xml" relativeToChangelogFile="false"/>
+
+<!--    <include file="/db/changelog/create/table/initial_create_business_units.xml" relativeToChangelogFile="false"/>-->
+
+    <!-- v.8.0.1 -->
+<!--    <include file="config/liquibase/changelog/v_8_0_1/initial_modify_specialists.xml" relativeToChangelogFile="false"/>-->
+
+    <!-- dictionaries -->
+<!--    <include file="config/liquibase/changelog/initial_fill_dictionaries.xml" relativeToChangelogFile="false"/>-->
+
+    <!--    modify dictionaries-->
+<!--    <include file="config/liquibase/changelog/v_0_0_1/modify_data_vacancy_reasons_2.xml" relativeToChangelogFile="false"/>-->
+
+</databaseChangeLog>
