@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: afa-devicer-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: afa-devicer-backend
+  template:
+    metadata:
+      labels:
+        app: afa-devicer-backend
+    spec:
+      containers:
+        - name: afa-devicer-backend
+          image: alex4doorow/afa-devicer-backend:latest
+          ports:
+            - containerPort: 8000

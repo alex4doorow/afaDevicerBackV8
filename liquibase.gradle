@@ -1,0 +1,55 @@
+import org.gradle.internal.os.OperatingSystem
+
+configurations {
+    liquibase
+}
+
+dependencies {
+    liquibase "org.liquibase.ext:liquibase-hibernate6:4.25.1"
+    liquibase "ch.qos.logback:logback-classic"
+}
+
+if (OperatingSystem.current().isWindows()) { // Если текущая операционная система - Windows
+    task pathingLiquibaseJar(type: Jar) { // Создаем задачу для сборки JAR
+        dependsOn configurations.liquibase // Зависимость от liquibase
+
+        doFirst { // Код, который выполняется перед остальной частью задачи
+            manifest { // Создаем манифест
+                attributes 'Class-Path': sourceSets.main.runtimeClasspath.plus(configurations.liquibase)
+                        .collect {
+                            it.toURL().toString().replaceFirst(/file:\/+/, '/') // Создаем Class-Path атрибут манифеста
+                        }.join(' ')
+            }
+        }
+    }
+}
+
+task liquibaseDiffChangelog() {
+    dependsOn 'compileJava'
+
+    doLast {
+        tasks.create('liquibaseDiffChangelogExec', JavaExec) {
+            group = "liquibase"
+
+            classpath sourceSets.main.runtimeClasspath
+            classpath configurations.liquibase
+
+            main = "liquibase.integration.commandline.Main"
+
+            // Задаем аргументы для main class
+            args "--changeLogFile=src/main/resources/db/changelog/" + buildTimestamp() + "_changelog.xml"
+            args "--referenceUrl=hibernate:spring:com.afa.devicer.back.entities?dialect=org.hibernate.dialect.PostgreSQLDialect"
+            args "--username=postgres"
+            args "--password=postgres"
+            args "--url=jdbc:postgresql://localhost:5432/devicer-test"
+            args "--driver=org.postgresql.Driver"
+            args "diffChangeLog"
+        }.exec()
+    }
+}
+
+static def buildTimestamp() { // Функция для создания временной метки
+    def date = new Date() // Получаем текущую дату и время
+    def formattedDate = date.format('yyyyMMddHHmmss') // Форматируем дату
+    return formattedDate // Возвращаем форматированную дату
+}

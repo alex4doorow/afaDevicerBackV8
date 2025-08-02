@@ -1,0 +1,195 @@
+buildscript {
+
+	repositories {
+		mavenCentral()
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+	}
+	dependencies {
+		classpath("org.jfrog.buildinfo:build-info-extractor-gradle:latest.release")
+		classpath("de.undercouch:gradle-download-task:4.0.0")
+		classpath("gradle.plugin.com.github.ksoichiro:gradle-console-reporter:0.6.3")
+	}
+}
+
+plugins {
+	id 'org.springframework.boot' version '3.5.4'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id "com.palantir.git-version" version "0.12.3"
+	id "com.google.osdetector" version "1.7.0"
+	id "org.sonarqube" version "5.0.0.4638"
+	id "pmd"
+	id "jacoco"
+	id "java"
+}
+
+apply plugin: "maven-publish"
+apply plugin: "io.spring.dependency-management"
+//apply plugin: "com.jfrog.artifactory"
+//apply plugin: "de.undercouch.download"
+//apply plugin: "com.github.ksoichiro.console.reporter"
+apply plugin: "application"
+
+apply from: "utils.gradle"
+apply from: "commonDeps.gradle"
+apply from: "liquibase.gradle"
+
+group = 'com.afa.devicer'
+version = '8.0.1-SNAPSHOT'
+
+isRelease = isRelease()
+
+sourceSets {
+	integrationTest {
+		java {
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
+			srcDir file("src/integration-test/java")
+		}
+		resources.srcDir file("src/integration-test/resources")
+	}
+}
+
+wrapper {
+	gradleVersion = "8.7"
+	distributionUrl = distributionUrl.replace("bin", "all")
+}
+
+repositories {
+	mavenCentral()
+	if (isRelease) {
+		println "It is a release build"
+	}
+	else {
+		println "It is a snapshot build"
+	}
+}
+
+springBoot {
+	buildInfo()
+}
+
+configurations {
+	all {
+		exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+	}
+	integrationTestImplementation.extendsFrom testImplementation
+	integrationTestRuntime.extendsFrom testRuntime
+}
+
+compileJava {
+	options.encoding = "UTF-8"
+	options.incremental = true
+	options.fork = true
+	options.compilerArgs += "-Xlint:deprecation"
+	options.debugOptions.debugLevel = "source,lines,vars"
+}
+
+compileTestJava {
+	options.debugOptions.debugLevel = "source,lines,vars"
+}
+
+tasks.register('integrationTest', Test) {
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+test {
+	// for JUnit 5
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+
+	jacoco {
+		enabled = true
+		includeNoLocationClasses = true
+		excludes = ["jdk.internal.*"]
+	}
+}
+
+jacocoTestReport {
+	dependsOn test
+	finalizedBy check
+
+	reports {
+		xml.required = true
+		csv.required = false
+		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it,
+					exclude: [
+							"com/afa/devicer/back/components**",
+							"com/afa/devicer/back/controllers/internal**",
+							"com/afa/devicer/back/dto**",
+							"com/afa/devicer/back/entities**",
+							"com/afa/devicer/back/exceptions**",
+							"com/afa/devicer/back/security**",
+							"com/afa/devicer/back/utils**",
+							"com/afa/devicer/back/BackOfficeApplication**",
+							"com/afa/devicer/back/BackOfficeConfig**"
+					])
+		}))
+	}
+}
+
+jacoco {
+	toolVersion = "0.8.9"
+}
+
+pmd {
+	consoleOutput = true
+	toolVersion = "7.2.0"
+	rulesMinimumPriority = 5
+	ruleSetFiles = files("pmd-ruleset.xml")
+}
+/*
+sonarqube {
+	properties {
+		property "sonar.projectBaseDir", "${projectDir}"
+		property "sonar.projectKey", "devicer-back-office"
+		property "sonar.host.url", "http://ams3.sonarqube.litota.tech"
+		property "sonar.sources", "src/main/java"
+		property "sonar.tests", "src/test/java"
+		property "sonar.java.binaries", "build/classes/java/main"
+		property "sonar.java.test.binaries", "build/classes/java/test"
+	}
+}
+*/
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.postgresql:postgresql:42.7.7'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+task getVersion {
+	doLast {
+		println project.version
+	}
+}

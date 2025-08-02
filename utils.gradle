@@ -1,0 +1,37 @@
+def getMinorVersion() {
+    println("Project version details: ${versionDetails().version}")
+    String branchName = branch()
+
+    if (isRelease()) {
+        return versionDetails().commitDistance
+    } else {
+        def asanaTicketId = validateBranchName(branchName)
+        def timestamp = System.currentTimeMillis()
+
+        return timestamp + '-' + asanaTicketId
+    }
+}
+
+def validateBranchName(String branchName) {
+    println(branchName)
+    return System.currentTimeMillis()
+}
+
+def getValueFromEnvOrProperty(String key) {
+    return System.getenv(key) ?: project.findProperty(key)
+}
+
+def branch() {
+    return project.findProperty("branchName") ?: versionDetails().branchName
+}
+
+def isRelease() {
+    return branch() == 'main' || branch() == 'origin/main'
+}
+
+ext {
+    getMinorVersion = this.&getMinorVersion
+    validateBranchName = this.&validateBranchName
+    getValueFromEnvOrProperty = this.&getValueFromEnvOrProperty
+    isRelease = this.&isRelease
+}
