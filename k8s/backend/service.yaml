@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: afa-devicer-backend-service
+spec:
+  selector:
+    app: afa-devicer-backend
+  ports:
+    - port: 80
+      targetPort: 8000
+  type: LoadBalancer
