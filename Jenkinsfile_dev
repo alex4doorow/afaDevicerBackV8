@@ -7,11 +7,16 @@ pipeline {
     }
 
     environment {
-        JAR_NAME = 'afaDevicerBackV8-0.0.1-SNAPSHOT.jar'
+        BRUNCH_NAME = 'dev'
         DOCKER_IMAGE = 'alex4doorow/afa-devicer-backend:latest'
+        POSTGRES_PROTOCOL = credentials('POSTGRES_PROTOCOL')
+        POSTGRES_HOST = credentials('POSTGRES_HOST')
+        POSTGRES_PORT = credentials('POSTGRES_PORT')
         POSTGRES_DB = credentials('POSTGRES_DB')
         POSTGRES_USER = credentials('POSTGRES_USER')
         POSTGRES_PASSWORD = credentials('POSTGRES_PASSWORD')
+        KEYCLOAK_URL = credentials('KEYCLOAK_URL')
+        KEYCLOAK_REALM = credentials('KEYCLOAK_REALM')
     }
 
     stages {
@@ -31,7 +36,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/alex4doorow/afaDevicerBackV8.git', credentialsId: 'github-token'
+                git branch: "${env.BRUNCH_NAME}", url: 'https://github.com/alex4doorow/afaDevicerBackV8.git', credentialsId: 'github-token'
             }
         }
 
@@ -72,9 +77,14 @@ pipeline {
                     docker run -d \
                       -p 8000:8000 \
                       --name afa-devicer-backend \
+                      -e POSTGRES_PROTOCOL=$POSTGRES_PROTOCOL \
+                      -e POSTGRES_HOST=$POSTGRES_HOST \
+                      -e POSTGRES_PORT=$POSTGRES_PORT \
                       -e POSTGRES_DB=$POSTGRES_DB \
                       -e POSTGRES_USER=$POSTGRES_USER \
                       -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+                      -e KEYCLOAK_URL=$KEYCLOAK_URL \
+                      -e KEYCLOAK_REALM=$KEYCLOAK_REALM \
                       $DOCKER_IMAGE
                 '''
             }

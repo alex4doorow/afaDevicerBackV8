@@ -21,6 +21,11 @@ public enum DevicerErrors {
     KEYCLOAK_PRINCIPAL_IS_NULL("Keycloak принципал равен null"),
     KEYCLOAK_PRINCIPAL_INVALID("Keycloak принципал имеет некорректное значение <{0}>"),
 
+    PERSON_IS_DEACTIVATED("Пользователь <{0}> деактивирован"),
+    PERSON_CONTACT_PHONE_IS_INVALID("Значение номера телефона введено некорректно: <{0}>"),
+    PERSON_CONTACT_EMAIL_IS_INVALID("Значение email введено некорректно: <{0}>"),
+
+
     S3_ERROR("Сервис S3, {0}, ошибка {1}")
     ;
 

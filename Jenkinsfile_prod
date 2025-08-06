@@ -1,0 +1,93 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'jdk21'
+        gradle 'gradle8'
+    }
+
+    environment {
+        BRUNCH_NAME = 'main'
+        DOCKER_IMAGE = 'alex4doorow/afa-devicer-backend:latest'
+        POSTGRES_PROTOCOL = credentials('POSTGRES_PROTOCOL')
+        POSTGRES_HOST = credentials('POSTGRES_HOST')
+        POSTGRES_PORT = credentials('POSTGRES_PORT')
+        POSTGRES_DB = credentials('POSTGRES_DB')
+        POSTGRES_USER = credentials('POSTGRES_USER')
+        POSTGRES_PASSWORD = credentials('POSTGRES_PASSWORD')
+        KEYCLOAK_URL = credentials('KEYCLOAK_URL')
+        KEYCLOAK_REALM = credentials('KEYCLOAK_REALM')
+    }
+
+    stages {
+
+        stage('Get Version') {
+            steps {
+                 script {
+                        // Запуск Gradle задачи для получения версии
+                        sh 'chmod +x ./gradlew'
+                        def versionFromGradle = sh(script: './gradlew getVersion', returnStdout: true).trim()
+                        def versionLines = versionFromGradle.readLines()
+                        def VERSION = versionLines.find { it ==~ /\d+\.\d+\.\d+(-SNAPSHOT)?/ }
+                        env.VERSION = VERSION
+                    }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                git branch: "${env.BRUNCH_NAME}", url: 'https://github.com/alex4doorow/afaDevicerBackV8.git', credentialsId: 'github-token'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'chmod +x ./gradlew'
+                sh './gradlew build -x test -x pmdMain -x pmdTest -x pmdIntegrationTest'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                script {
+                        echo "VERSION: ${env.VERSION}"
+                        echo "DOCKER_IMAGE: ${env.DOCKER_IMAGE}"
+                }
+                sh "docker build --build-arg VERSION=${env.VERSION} -t ${env.DOCKER_IMAGE} ."
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    script {
+                        sh """
+                            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                            docker push "${env.DOCKER_IMAGE}"
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Docker Run') {
+            steps {
+                sh '''
+                    docker rm -f afa-devicer-backend || true
+                    docker run -d \
+                      -p 8000:8000 \
+                      --name afa-devicer-backend \
+                      -e POSTGRES_PROTOCOL=$POSTGRES_PROTOCOL \
+                      -e POSTGRES_HOST=$POSTGRES_HOST \
+                      -e POSTGRES_PORT=$POSTGRES_PORT \
+                      -e POSTGRES_DB=$POSTGRES_DB \
+                      -e POSTGRES_USER=$POSTGRES_USER \
+                      -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+                      -e KEYCLOAK_URL=$KEYCLOAK_URL \
+                      -e KEYCLOAK_REALM=$KEYCLOAK_REALM \
+                      $DOCKER_IMAGE
+                '''
+            }
+        }
+    }
+}

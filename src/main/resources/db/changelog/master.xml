@@ -6,6 +6,9 @@
 
     <!-- CREATE -->
     <include file="/db/changelog/create/sequence/initial_create_d_sequence.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_person.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_employee.xml" relativeToChangelogFile="false"/>
+
     <include file="/db/changelog/create/table/initial_create_bp_order.xml" relativeToChangelogFile="false"/>
 
 <!--    <include file="/db/changelog/create/table/initial_create_business_units.xml" relativeToChangelogFile="false"/>-->
