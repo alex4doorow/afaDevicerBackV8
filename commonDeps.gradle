@@ -9,8 +9,8 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-log4j2"
 
     // Keycloak
-//    implementation "org.springframework.boot:spring-boot-starter-security"
-//    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 
     implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '3.5.4') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-netty'
