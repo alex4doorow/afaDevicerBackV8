@@ -7,6 +7,7 @@ pipeline {
     }
 
     environment {
+        BRUNCH_NAME = 'dev'
         DOCKER_IMAGE = 'alex4doorow/afa-devicer-backend:latest'
         POSTGRES_PROTOCOL = credentials('POSTGRES_PROTOCOL')
         POSTGRES_HOST = credentials('POSTGRES_HOST')
@@ -35,7 +36,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'dev', url: 'https://github.com/alex4doorow/afaDevicerBackV8.git', credentialsId: 'github-token'
+                git branch: "${env.BRUNCH_NAME}", url: 'https://github.com/alex4doorow/afaDevicerBackV8.git', credentialsId: 'github-token'
             }
         }
 
