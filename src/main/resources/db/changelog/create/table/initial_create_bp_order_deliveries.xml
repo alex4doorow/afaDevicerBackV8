@@ -1,0 +1,84 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="al (generated)" id="1718023010060_bp_order_deliveries_1">
+        <createTable tableName="bp_order_deliveries">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_order_deliveries"/>
+            </column>
+
+            <column name="order_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="price" type="NUMERIC(15, 4)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="customer_price" type="NUMERIC(15, 4)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="seller_price" type="NUMERIC(15, 4)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="supplier_price" type="NUMERIC(15, 4)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="delivery_type" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="delivery_price_type" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="payment_delivery_type" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="address_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="recipient_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="annotation" type="TEXT"/>
+            <column name="track_code" type="TEXT"/>
+
+            <column name="rec_status" type="CHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_added" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_added" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_modified" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1718023010060_bp_order_deliveries_2">
+        <createIndex indexName="idx_bp_order_deliveries_order_id" tableName="bp_order_deliveries">
+            <column name="order_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1718023010060_bp_order_deliveries_3">
+        <addForeignKeyConstraint baseColumnNames="user_added" baseTableName="bp_order_deliveries" constraintName="fk_bp_order_deliveries_user_added" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_persons" validate="true"/>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1718023010060_bp_order_deliveries_4">
+        <addForeignKeyConstraint baseColumnNames="order_id" baseTableName="bp_order_deliveries" constraintName="fk_bp_order_deliveries_order_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_orders" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="address_id" baseTableName="bp_order_deliveries" constraintName="fk_bp_order_deliveries_address_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_addresses" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="bp_order_deliveries" constraintName="fk_bp_order_deliveries_recipient_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_persons" validate="true"/>
+    </changeSet>
+
+</databaseChangeLog>

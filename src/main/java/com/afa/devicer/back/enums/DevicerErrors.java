@@ -21,7 +21,11 @@ public enum DevicerErrors {
     KEYCLOAK_PRINCIPAL_IS_NULL("Keycloak принципал равен null"),
     KEYCLOAK_PRINCIPAL_INVALID("Keycloak принципал имеет некорректное значение <{0}>"),
 
-    PERSON_IS_DEACTIVATED("Пользователь <{0}> деактивирован"),
+    WRONG_USER("Пользователь сервиса с Keycloak UUID <{0}> не найден в БД"),
+    USER_IS_DEACTIVATED("Пользователь <{0}> деактивирован, доступ запрещен"),
+    USER_MUST_BE_EMPLOYEE("Пользователь должен быть сотрудником компании для данной операции"),
+    USER_EMPLOYEE_INVALID("Для данного сотрудника операция запрещена"),
+
     PERSON_CONTACT_PHONE_IS_INVALID("Значение номера телефона введено некорректно: <{0}>"),
     PERSON_CONTACT_EMAIL_IS_INVALID("Значение email введено некорректно: <{0}>"),
 

@@ -1,0 +1,32 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="al (generated)" id="1754837442376_bp_product_descriptions_1">
+        <createTable tableName="bp_product_descriptions">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_product_descriptions"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="meta_title" type="TEXT"/>
+            <column name="meta_keyword" type="TEXT"/>
+            <column name="meta_description" type="TEXT"/>
+            <column name="description" type="TEXT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_product_descriptions_2">
+        <createIndex indexName="idx_bp_product_descriptions_product_id" tableName="bp_product_descriptions">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_product_descriptions_3">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="bp_product_descriptions" constraintName="fk_bp_product_descriptions_product_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_products" validate="true"/>
+    </changeSet>
+
+</databaseChangeLog>

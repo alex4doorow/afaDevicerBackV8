@@ -1,27 +1,23 @@
-package com.afa.devicer.back.entities.orders;
+package com.afa.devicer.back.entities.dictionaries;
 
-import com.afa.devicer.back.entities.customers.Customer;
 import com.afa.devicer.back.entities.people.Person;
-import com.afa.devicer.back.enums.OrderStatusTypes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "bp_orders",
-        indexes = {
-                @Index(name = "uq_bp_orders_order_num", columnList = "order_num")
-        })
+@Table(name = "bp_addresses")
 @SuppressWarnings({"PMD.TooManyFields", "PMD.AvoidDuplicateLiterals", "PMD.LawOfDemeter"})
-public class Order {
+public class Address {
 
     @Id
     @NotNull
@@ -30,31 +26,34 @@ public class Order {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "order_num", nullable = false)
-    private Long orderNum;
-
-    @Column(name = "order_date", nullable = false)
-    private LocalDate orderDate;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "type_id", nullable = false)
+    @ToString.Exclude
+    @JsonIgnore
+    private AddressType type;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "country_id", nullable = false)
     @ToString.Exclude
     @JsonIgnore
-    private Customer customer;
+    private Country country;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL)
-    @EqualsAndHashCode.Exclude
-    private Set<OrderCrm> crms;
+    @Column(name = "post_code", length = 6)
+    private String postCode;
 
-    @NotNull
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private OrderStatusTypes status;
+    @Column(name = "street")
+    private String street;
 
-    @NotNull
-    @Column(name = "rec_status", nullable = false)
-    private Character recStatus;
+    @Column(name = "house",  length = 128)
+    private String house;
+
+    @Column(name = "flat",  length = 128)
+    private String flat;
+
+    @Column(name = "address")
+    private String addressLine;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)

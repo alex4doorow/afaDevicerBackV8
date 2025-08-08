@@ -1,0 +1,49 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="al (generated)" id="1754720641025_d_countries_1">
+        <createTable tableName="d_countries">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="d_countriesPK"/>
+            </column>
+            <column name="iso_code_2" type="VARCHAR(2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="iso_code_3" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="isd_code" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rec_status" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_added" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_modified" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754720641025_d_countries_3">
+        <createIndex unique="true" indexName="uq_countries_iso_code_2" tableName="d_countries">
+            <column name="iso_code_2"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754720641025_d_countries_4">
+        <createIndex unique="true" indexName="uq_countries_iso_code_3" tableName="d_countries">
+            <column name="iso_code_3"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754720641025_d_countries_5">
+        <createIndex indexName="idx_countries_isd_code" tableName="d_countries">
+            <column name="isd_code"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

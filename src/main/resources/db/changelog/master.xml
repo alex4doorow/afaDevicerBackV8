@@ -6,12 +6,43 @@
 
     <!-- CREATE -->
     <include file="/db/changelog/create/sequence/initial_create_d_sequence.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_bp_person.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_bp_employee.xml" relativeToChangelogFile="false"/>
+    <!-- DICTIONARIES -->
+    <include file="/db/changelog/create/table/initial_create_d_countries.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_d_manufactures.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_d_stock_statuses.xml" relativeToChangelogFile="false"/>
 
-    <include file="/db/changelog/create/table/initial_create_bp_order.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_d_contact_types.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_d_address_types.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_d_customer_types.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_d_order_types.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_d_order_advert_types.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_d_order_source_types.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_d_order_payment_types.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_d_order_email_statuses.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_d_product_categories.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_d_sys_stores.xml" relativeToChangelogFile="false"/>
 
-<!--    <include file="/db/changelog/create/table/initial_create_business_units.xml" relativeToChangelogFile="false"/>-->
+    <!-- BUSINESS TABLES -->
+    <include file="/db/changelog/create/table/initial_create_bp_products.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_product_descriptions.xml" relativeToChangelogFile="false"/>
+
+    <include file="/db/changelog/create/table/initial_create_bp_persons.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_employees.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_addresses.xml" relativeToChangelogFile="false"/>
+
+    <include file="/db/changelog/create/table/initial_create_bp_companies.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_customers.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_customer_addresses.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_customer_contacts.xml" relativeToChangelogFile="false"/>
+
+    <include file="/db/changelog/create/table/initial_create_bp_orders.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_order_crms.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_order_deliveries.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_order_items.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_order_status_history.xml" relativeToChangelogFile="false"/>
+
+    <!-- DICTIONARIES DATA -->
+    <include file="/db/changelog/create/data/initial_fill_dictionaries.xml" relativeToChangelogFile="false"/>
 
     <!-- v.8.0.1 -->
 <!--    <include file="config/liquibase/changelog/v_8_0_1/initial_modify_specialists.xml" relativeToChangelogFile="false"/>-->

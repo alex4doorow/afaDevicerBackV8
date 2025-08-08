@@ -1,4 +1,4 @@
-package com.afa.devicer.back.entities.people;
+package com.afa.devicer.back.entities.companies;
 
 import com.afa.devicer.back.entities.dictionaries.Country;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,18 +10,17 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "bp_persons",
-        indexes = {
-                @Index(name = "idx_bp_persons_keycloak_uuid", columnList = "keycloak_uuid")
-        })
-public class Person {
+@Table(name = "bp_companies", indexes = {
+        @Index(name = "idx_bp_companies_inn", columnList = "inn"),
+        @Index(name = "idx_bp_companies_short_name", columnList = "short_name"),
+})
+@SuppressWarnings({"PMD.TooManyFields", "PMD.AvoidDuplicateLiterals", "PMD.LawOfDemeter"})
+public class Company {
 
     @Id
     @NotNull
@@ -30,19 +29,6 @@ public class Person {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "keycloak_uuid")
-    private UUID keycloakUuid;
-
-    @NotNull
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
-
-    @Column(name = "last_name")
-    private String lastName;
-
-    @Column(name = "middle_name")
-    private String middleName;
-
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id", nullable = false)
@@ -50,19 +36,21 @@ public class Person {
     @JsonIgnore
     private Country country;
 
-    @Column(name = "birth_date")
-    private LocalDate birthDate;
+    @Column(name = "inn", length = 12)
+    private String inn;
+
+    @NotNull
+    @Column(name = "short_name", nullable = false)
+    private String shortName;
+
+    @Column(name = "long_name")
+    private String longName;
 
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
     @Column(name = "email")
     private String email;
-
-//    @NotNull
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "person", cascade = CascadeType.ALL)
-//    @EqualsAndHashCode.Exclude
-//    private List<PersonContact> contacts = new ArrayList<>();
 
     @NotNull
     @Column(name = "rec_status", nullable = false)
@@ -74,17 +62,4 @@ public class Person {
 
     @Column(name = "date_modified", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateModified;
-
-    public String getFullName() {
-        return (lastName + " " + firstName + " " + middleName).trim();
-    }
-
-    public String getShortName() {
-        final String firstInitial = firstName.isEmpty() ? "" : firstName.charAt(0) + ".";
-        return (lastName + " " + firstInitial).trim();
-    }
-
-    public Boolean getDeactivated() {
-        return Character.valueOf('D').equals(recStatus);
-    }
 }

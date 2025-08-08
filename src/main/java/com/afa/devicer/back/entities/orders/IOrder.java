@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public interface IOrder extends JpaRepository<Order, UUID>, JpaSpecificationExecutor<Order> {
 
+
 //    List<Vacancy> findAllByProject(VacancyProject project);
 //    Optional<Vacancy> findFirstByProjectIdOrderByInternalIdDesc(UUID projectId);
 }

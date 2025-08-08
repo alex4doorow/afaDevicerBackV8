@@ -1,0 +1,64 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="al (generated)" id="1718023010060_bp_order_crms_1">
+        <createTable tableName="bp_order_crms">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_order_crms"/>
+            </column>
+
+            <column name="order_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="crm" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="crm_status" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_crm_id" type="TEXT"/>
+            <column name="parent_crm_code" type="TEXT"/>
+
+            <column name="rec_status" type="CHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_added" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_added" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_modified" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1718023010060_bp_order_crms_2">
+        <createIndex indexName="idx_bp_order_crms_order_id" tableName="bp_order_crms">
+            <column name="order_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1718023010060_bp_order_crms_3">
+        <createIndex indexName="idx_bp_order_crms_parent_crm_id" tableName="bp_order_crms">
+            <column name="parent_crm_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1718023010060_bp_order_crms_4">
+        <createIndex indexName="idx_bp_order_crms_parent_crm_code" tableName="bp_order_crms">
+            <column name="parent_crm_code"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1718023010060_bp_order_crms_5">
+        <addForeignKeyConstraint baseColumnNames="user_added" baseTableName="bp_order_crms" constraintName="fk_bp_order_crms_user_added" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_persons" validate="true"/>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1718023010060_bp_order_crms_6">
+        <addForeignKeyConstraint baseColumnNames="order_id" baseTableName="bp_order_crms" constraintName="fk_bp_order_crms_order_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_orders" validate="true"/>
+    </changeSet>
+
+</databaseChangeLog>

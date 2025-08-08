@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="al (generated)" id="1754895885460_bp_order_items_1">
+        <createTable tableName="bp_order_items">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_order_items"/>
+            </column>
+            <column name="order_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="numeric(15, 4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="discount_rate" type="numeric(15, 4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="numeric(15, 4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount_supplier" type="numeric(15, 4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rec_status" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_added" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_added" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_modified" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754895885460_bp_order_items_2">
+        <createIndex indexName="idx_bp_order_items_order_id" tableName="bp_order_items">
+            <column name="order_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754895885460_bp_order_items_3">
+        <createIndex indexName="idx_bp_order_items_product_id" tableName="bp_order_items">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754895885460_bp_order_items_4">
+        <addForeignKeyConstraint baseColumnNames="order_id" baseTableName="bp_order_items" constraintName="fk_bp_order_items_order_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_orders" validate="true"/>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754895885460_bp_order_items_5">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="bp_order_items" constraintName="fk_bp_order_items_product_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_products" validate="true"/>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754895885460_bp_order_items_6">
+        <addForeignKeyConstraint baseColumnNames="user_added" baseTableName="bp_order_items" constraintName="fk_bp_order_items_user_added" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_persons" validate="true"/>
+    </changeSet>
+
+</databaseChangeLog>

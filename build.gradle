@@ -145,19 +145,6 @@ pmd {
 	rulesMinimumPriority = 5
 	ruleSetFiles = files("pmd-ruleset.xml")
 }
-/*
-sonarqube {
-	properties {
-		property "sonar.projectBaseDir", "${projectDir}"
-		property "sonar.projectKey", "devicer-back-office"
-		property "sonar.host.url", "http://ams3.sonarqube.litota.tech"
-		property "sonar.sources", "src/main/java"
-		property "sonar.tests", "src/test/java"
-		property "sonar.java.binaries", "build/classes/java/main"
-		property "sonar.java.test.binaries", "build/classes/java/test"
-	}
-}
-*/
 
 java {
 	toolchain {

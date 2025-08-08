@@ -1,0 +1,65 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="al (generated)" id="1754837442376_bp_products_1">
+        <createTable tableName="bp_products">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_products"/>
+            </column>
+            <column name="sku" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="short_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="long_name" type="TEXT"/>
+            <column name="image_url" type="VARCHAR(255)"/>
+            <column name="quantity" type="INTEGER"/>
+            <column name="minimum" type="INTEGER"/>
+            <column name="price" type="numeric(15, 2)"/>
+            <column name="product_category_id" type="BIGINT"/>
+            <column name="manufacture_id" type="BIGINT"/>
+            <column name="stock_status_id" type="BIGINT"/>
+            <column name="date_available" type="date"/>
+            <column name="weight" type="numeric(15, 2)"/>
+            <column name="weight_class" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="length" type="numeric(15, 2)"/>
+            <column name="height" type="numeric(15, 2)"/>
+            <column name="length_class" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="width" type="numeric(15, 2)"/>
+            <column name="composite" type="BOOLEAN"/>
+            <column name="deactivated" type="BOOLEAN"/>
+            <column name="sort_key" type="INTEGER"/>
+            <column name="rec_status" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_added" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_modified" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_products_2">
+        <createIndex indexName="idx_bp_products_sku" tableName="bp_products">
+            <column name="sku"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_products_3">
+        <addForeignKeyConstraint baseColumnNames="manufacture_id" baseTableName="bp_products" constraintName="fk_bp_products_manufacture_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="d_manufactures" validate="true"/>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_products_4">
+        <addForeignKeyConstraint baseColumnNames="product_category_id" baseTableName="bp_products" constraintName="fk_bp_products_product_category_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="d_product_categories" validate="true"/>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_products_5">
+        <addForeignKeyConstraint baseColumnNames="stock_status_id" baseTableName="bp_products" constraintName="fk_bp_products_stock_status_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="d_stock_statuses" validate="true"/>
+    </changeSet>
+
+</databaseChangeLog>

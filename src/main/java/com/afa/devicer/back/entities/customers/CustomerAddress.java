@@ -1,27 +1,26 @@
-package com.afa.devicer.back.entities.orders;
+package com.afa.devicer.back.entities.customers;
 
-import com.afa.devicer.back.entities.customers.Customer;
+import com.afa.devicer.back.entities.dictionaries.Address;
 import com.afa.devicer.back.entities.people.Person;
-import com.afa.devicer.back.enums.OrderStatusTypes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Set;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "bp_orders",
+@Table(name = "bp_customer_addresses",
         indexes = {
-                @Index(name = "uq_bp_orders_order_num", columnList = "order_num")
+                @Index(name = "idx_bp_customer_addresses_customer_id", columnList = "customer_id"),
+                @Index(name = "idx_bp_customer_addresses_address_id", columnList = "address_id")
         })
-@SuppressWarnings({"PMD.TooManyFields", "PMD.AvoidDuplicateLiterals", "PMD.LawOfDemeter"})
-public class Order {
+public class CustomerAddress {
 
     @Id
     @NotNull
@@ -30,12 +29,6 @@ public class Order {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "order_num", nullable = false)
-    private Long orderNum;
-
-    @Column(name = "order_date", nullable = false)
-    private LocalDate orderDate;
-
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
@@ -43,14 +36,12 @@ public class Order {
     @JsonIgnore
     private Customer customer;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL)
-    @EqualsAndHashCode.Exclude
-    private Set<OrderCrm> crms;
-
     @NotNull
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private OrderStatusTypes status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id", nullable = false)
+    @ToString.Exclude
+    @JsonIgnore
+    private Address address;
 
     @NotNull
     @Column(name = "rec_status", nullable = false)
@@ -64,6 +55,7 @@ public class Order {
     private Person userAdded;
 
     @NotNull
+    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 

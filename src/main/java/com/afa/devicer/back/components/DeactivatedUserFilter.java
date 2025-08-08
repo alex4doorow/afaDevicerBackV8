@@ -97,7 +97,7 @@ public class DeactivatedUserFilter implements Filter {
 
     private void validatePersonDeactivated(final Person person) {
         if (Boolean.TRUE.equals(person.getDeactivated())) {
-            throw new DevicerException(DevicerErrors.PERSON_IS_DEACTIVATED, person.getFullName());
+            throw new DevicerException(DevicerErrors.USER_IS_DEACTIVATED, person.getFullName());
         }
     }
 }

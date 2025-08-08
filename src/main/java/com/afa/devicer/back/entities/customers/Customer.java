@@ -1,27 +1,27 @@
-package com.afa.devicer.back.entities.orders;
+package com.afa.devicer.back.entities.customers;
 
-import com.afa.devicer.back.entities.customers.Customer;
+import com.afa.devicer.back.entities.companies.Company;
+import com.afa.devicer.back.entities.dictionaries.CustomerType;
 import com.afa.devicer.back.entities.people.Person;
-import com.afa.devicer.back.enums.OrderStatusTypes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Set;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "bp_orders",
+@Table(name = "bp_customers",
         indexes = {
-                @Index(name = "uq_bp_orders_order_num", columnList = "order_num")
+                @Index(name = "uq_bp_customers_type_id", columnList = "type_id")
         })
-@SuppressWarnings({"PMD.TooManyFields", "PMD.AvoidDuplicateLiterals", "PMD.LawOfDemeter"})
-public class Order {
+public class Customer {
 
     @Id
     @NotNull
@@ -30,27 +30,32 @@ public class Order {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "order_num", nullable = false)
-    private Long orderNum;
-
-    @Column(name = "order_date", nullable = false)
-    private LocalDate orderDate;
-
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "type_id", nullable = false)
     @ToString.Exclude
     @JsonIgnore
-    private Customer customer;
+    private CustomerType type;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    @ToString.Exclude
+    @JsonIgnore
+    private Company company;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_id")
+    @ToString.Exclude
+    @JsonIgnore
+    private Person person;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
-    private Set<OrderCrm> crms;
+    private Set<CustomerAddress> addresses;
 
-    @NotNull
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private OrderStatusTypes status;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    private Set<CustomerContact> contacts;
 
     @NotNull
     @Column(name = "rec_status", nullable = false)
@@ -64,6 +69,7 @@ public class Order {
     private Person userAdded;
 
     @NotNull
+    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 

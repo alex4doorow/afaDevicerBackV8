@@ -1,22 +1,17 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
-    <changeSet author="al (generated)" id="1754490607044_bp_person_1">
-        <createTable tableName="bp_person">
+
+    <changeSet author="al (generated)" id="1754651614171_d_product_categories_1">
+        <createTable tableName="d_product_categories">
             <column name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_person"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_d_product_categories"/>
             </column>
-            <column name="keycloak_uuid" type="UUID"/>
-            <column name="first_name" type="VARCHAR(256)">
+            <column name="group_type" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_name" type="VARCHAR(256)"/>
-            <column name="middle_name" type="VARCHAR(256)"/>
-            <column name="iso_code_3" type="VARCHAR(3)"/>
-            <column name="birth_date" type="date"/>
-            <column name="phone_number" type="VARCHAR(256)">
+            <column name="name" type="TEXT">
                 <constraints nullable="false"/>
             </column>
-            <column name="email" type="VARCHAR(256)"/>
             <column name="rec_status" type="CHAR(1)">
                 <constraints nullable="false"/>
             </column>
@@ -26,9 +21,5 @@
             <column name="date_modified" type="TIMESTAMP WITH TIME ZONE"/>
         </createTable>
     </changeSet>
-    <changeSet author="al (generated)" id="1754490607044_bp_person_3">
-        <createIndex indexName="idx_bp_person_keycloak_uuid" tableName="bp_person">
-            <column name="keycloak_uuid"/>
-        </createIndex>
-    </changeSet>
+
 </databaseChangeLog>
