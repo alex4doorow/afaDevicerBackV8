@@ -41,7 +41,7 @@ task liquibaseDiffChangelog() {
             args "--referenceUrl=hibernate:spring:com.afa.devicer.back.entities?dialect=org.hibernate.dialect.PostgreSQLDialect"
             args "--username=postgres"
             args "--password=postgres"
-            args "--url=jdbc:postgresql://localhost:5432/devicer-test"
+            args "--url=jdbc:postgresql://localhost:5432/devicer-v8-test"
             args "--driver=org.postgresql.Driver"
             args "diffChangeLog"
         }.exec()
