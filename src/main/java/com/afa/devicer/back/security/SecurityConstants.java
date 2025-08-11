@@ -7,4 +7,5 @@ public class SecurityConstants {
     protected static final String ROLE_PREFIX = "ROLE_";
     protected static final String GROUPS = "groups";
     protected static final String MASK = "/**";
+    protected static final String MASK_HTML = ".html";
 }

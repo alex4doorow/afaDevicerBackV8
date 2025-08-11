@@ -10,7 +10,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-@Schema(description = "vacancies response")
+@Schema(description = "order response")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderPagedResponse extends BasePagedResponse {
 

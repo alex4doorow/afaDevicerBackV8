@@ -8,9 +8,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface IPerson extends JpaRepository<Person, UUID> {
+public interface IPerson extends JpaRepository<Person, Long> {
 
     Optional<Person> findByKeycloakUuid(UUID keycloakUuid);
+
+    Optional<Person> findByPhoneNumber(String phoneNumber);
 
     @Query("SELECT p FROM Person p WHERE p.keycloakUuid = :keycloakUuid AND p.id <> :id")
     Optional<Person> findByKeycloakUuidExcludingId(@Param("keycloakUuid") UUID keycloakUuid, @Param("id") Long id);

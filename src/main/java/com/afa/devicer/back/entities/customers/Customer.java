@@ -1,8 +1,9 @@
 package com.afa.devicer.back.entities.customers;
 
 import com.afa.devicer.back.entities.companies.Company;
-import com.afa.devicer.back.entities.dictionaries.CustomerType;
 import com.afa.devicer.back.entities.people.Person;
+import com.afa.devicer.back.enums.CustomerTypes;
+import com.afa.devicer.back.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -31,11 +32,9 @@ public class Customer {
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "type_id", nullable = false)
-    @ToString.Exclude
-    @JsonIgnore
-    private CustomerType type;
+    @Column(name = "customer_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CustomerTypes type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
@@ -58,8 +57,9 @@ public class Customer {
     private Set<CustomerContact> contacts;
 
     @NotNull
+    @Builder.Default
     @Column(name = "rec_status", nullable = false)
-    private Character recStatus;
+    private Character recStatus = DefaultConstants.ACTIVE;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)

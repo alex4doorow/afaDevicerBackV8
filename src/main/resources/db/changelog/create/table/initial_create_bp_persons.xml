@@ -12,7 +12,9 @@
             </column>
             <column name="last_name" type="VARCHAR(255)"/>
             <column name="middle_name" type="VARCHAR(255)"/>
-            <column name="country_id" type="UUID"/>
+            <column name="country_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
             <column name="birth_date" type="date"/>
             <column name="phone_number" type="VARCHAR(255)">
                 <constraints nullable="false"/>
@@ -35,6 +37,12 @@
     </changeSet>
 
     <changeSet author="al (generated)" id="1754490607044_bp_persons_3">
+        <createIndex indexName="uq_bp_persons_phone_number" tableName="bp_persons" unique="true">
+            <column name="phone_number"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754490607044_bp_persons_4">
         <addForeignKeyConstraint baseColumnNames="country_id" baseTableName="bp_persons" constraintName="fk_bp_persons_country_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="d_countries" validate="true"/>
     </changeSet>
 

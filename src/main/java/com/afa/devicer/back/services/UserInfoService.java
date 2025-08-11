@@ -4,6 +4,8 @@ import com.afa.devicer.back.components.CacheConstants;
 import com.afa.devicer.back.dto.UserInfoDbModel;
 import com.afa.devicer.back.dto.UserInfoDto;
 import com.afa.devicer.back.entities.people.IPerson;
+import com.afa.devicer.back.entities.people.Person;
+import com.afa.devicer.back.entities.people.Person_;
 import com.afa.devicer.back.enums.DevicerErrors;
 import com.afa.devicer.back.exceptions.DevicerException;
 import com.afa.devicer.back.utils.DefaultConstants;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -62,6 +65,17 @@ public class UserInfoService {
         return user;
     }
 
+
+
+    public Person findByIdOrThrow(final Long id) {
+        return findByIdOptional(id).orElseThrow(() ->
+                new DevicerException(DevicerErrors.DB_ENTITY_NOT_FOUND, Person_.class_, id)
+        );
+    }
+
+    private Optional<Person> findByIdOptional(final Long id) {
+        return iPerson.findById(id);
+    }
 
     @SuppressWarnings({"PMD.PreserveStackTrace"})
     private void validatePrincipal(final Jwt principal) {

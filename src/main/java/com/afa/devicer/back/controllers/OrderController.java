@@ -1,7 +1,10 @@
 package com.afa.devicer.back.controllers;
 
+import com.afa.devicer.back.dto.orders.OrderDto;
 import com.afa.devicer.back.dto.orders.OrderPagedFilter;
 import com.afa.devicer.back.dto.orders.OrderPagedResponse;
+import com.afa.devicer.back.dto.orders.OrderSaveRequest;
+import com.afa.devicer.back.mappers.OrderMapper;
 import com.afa.devicer.back.services.OrderService;
 import com.afa.devicer.back.services.UserInfoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,25 +18,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.afa.devicer.back.controllers.internal.ControllerConstants.ORDERS;
 import static com.afa.devicer.back.controllers.internal.ControllerConstants.ROLE_ADMIN;
 
+@Slf4j
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping(ORDERS)
 @Tag(name = "Orders", description = "Orders controller")
-@SuppressWarnings({"PMD.ExcessiveImports"})
-@Slf4j
 public class OrderController {
 
     private final UserInfoService userInfoService;
     private final OrderService service;
+    private final OrderMapper mapper;
 
     @GetMapping()
     @Secured({ROLE_ADMIN})
@@ -44,6 +44,18 @@ public class OrderController {
             @NotNull @Valid final OrderPagedFilter filter
     ) {
         return ResponseEntity.ok(service.getFiltered(userInfoService.fillUserInfo(principal), filter));
+    }
+
+    @PostMapping()
+    @Secured({ROLE_ADMIN})
+    @Operation(summary = "Сохранить заявку нового заказа")
+    public ResponseEntity<OrderDto> create(
+            @AuthenticationPrincipal final Jwt principal,
+            @NotNull @Valid @RequestBody final OrderSaveRequest request
+    ) {
+        return ResponseEntity.ok(
+                mapper.fromOrder(service.create(userInfoService.fillUserInfo(principal), request))
+        );
     }
 
     /*

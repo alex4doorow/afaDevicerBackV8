@@ -29,6 +29,16 @@ public enum DevicerErrors {
     PERSON_CONTACT_PHONE_IS_INVALID("Значение номера телефона введено некорректно: <{0}>"),
     PERSON_CONTACT_EMAIL_IS_INVALID("Значение email введено некорректно: <{0}>"),
 
+    // customer
+    CUSTOMER_COMPANY_TYPE_FORBIDDEN("Тип клиента требует ввода данных по компании <{0}>"),
+    CUSTOMER_PERSON_TYPE_FORBIDDEN("Тип клиента требует ввода данных по персоне <{0}>"),
+    CUSTOMER_COMPANY_TYPE_MUST_NULL("Тип клиента требует отсутствия ввода данных по компании <{0}>"),
+    CUSTOMER_PERSON_TYPE_MUST_NULL("Тип клиента требует отсутствия ввода данных по персоне <{0}>"),
+
+    CUSTOMER_COMPANY_BY_INN_EXIST("Компания с таким ИНН уже существует <{0}>"),
+    // order
+
+
 
     S3_ERROR("Сервис S3, {0}, ошибка {1}")
     ;

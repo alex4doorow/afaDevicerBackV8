@@ -1,8 +1,10 @@
 package com.afa.devicer.back.entities.orders;
 
 import com.afa.devicer.back.entities.customers.Customer;
+import com.afa.devicer.back.entities.dictionaries.ProductCategory;
 import com.afa.devicer.back.entities.people.Person;
-import com.afa.devicer.back.enums.OrderStatusTypes;
+import com.afa.devicer.back.enums.*;
+import com.afa.devicer.back.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +20,9 @@ import java.util.Set;
 @Entity
 @Table(name = "bp_orders",
         indexes = {
-                @Index(name = "uq_bp_orders_order_num", columnList = "order_num")
+                @Index(name = "uq_bp_orders_order_num", columnList = "order_num",  unique = true),
+                @Index(name = "indx_bp_orders_customer_id", columnList = "customer_id"),
+                @Index(name = "indx_bp_orders_order_type", columnList = "order_type")
         })
 @SuppressWarnings({"PMD.TooManyFields", "PMD.AvoidDuplicateLiterals", "PMD.LawOfDemeter"})
 public class Order {
@@ -35,6 +39,38 @@ public class Order {
 
     @Column(name = "order_date", nullable = false)
     private LocalDate orderDate;
+
+    @NotNull
+    @Column(name = "order_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderTypes type;
+
+    @NotNull
+    @Column(name = "source_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderSourceTypes sourceType;
+
+    @NotNull
+    @Column(name = "advert_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderAdvertTypes advertType;
+
+    @NotNull
+    @Column(name = "payment_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderPaymentTypes paymentType;
+
+    @NotNull
+    @Column(name = "store", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private StoreTypes store;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_category_id", nullable = false)
+    @ToString.Exclude
+    @JsonIgnore
+    private ProductCategory productCategory;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,7 +90,7 @@ public class Order {
 
     @NotNull
     @Column(name = "rec_status", nullable = false)
-    private Character recStatus;
+    private Character recStatus = DefaultConstants.ACTIVE;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)

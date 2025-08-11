@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .requestMatchers(ControllerConstants.ACTUATOR + SecurityConstants.MASK).permitAll()
                 .requestMatchers(ControllerConstants.API_DOCS + SecurityConstants.MASK).permitAll()
                 .requestMatchers(ControllerConstants.SWAGGER + SecurityConstants.MASK).permitAll()
+                .requestMatchers(ControllerConstants.SWAGGER + SecurityConstants.MASK_HTML).permitAll()
                 .anyRequest().authenticated()
         );
         return http.build();

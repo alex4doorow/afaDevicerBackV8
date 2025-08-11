@@ -4,10 +4,13 @@ import com.afa.devicer.back.dto.UserInfoDto;
 import com.afa.devicer.back.dto.orders.OrderDto;
 import com.afa.devicer.back.dto.orders.OrderPagedFilter;
 import com.afa.devicer.back.dto.orders.OrderPagedResponse;
+import com.afa.devicer.back.dto.orders.OrderSaveRequest;
 import com.afa.devicer.back.entities.orders.IOrder;
 import com.afa.devicer.back.entities.orders.Order;
 import com.afa.devicer.back.entities.orders.Order_;
+import com.afa.devicer.back.entities.people.Person;
 import com.afa.devicer.back.mappers.OrderMapper;
+import com.afa.devicer.back.validators.OrderServiceValidator;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,10 @@ import java.util.List;
 public class OrderService {
     
     private final IOrder iOrder;
+
+    private final UserInfoService userInfoService;
+
+    private final OrderServiceValidator validator;
 
     private final OrderMapper mapper;
 
@@ -50,6 +57,21 @@ public class OrderService {
                 page.hasPrevious(), page.hasNext(),
                 orderDtos);
 
+    }
+
+    @Transactional
+    public Order create(final UserInfoDto userInfo, final OrderSaveRequest request) {
+
+        validator.validateOrderCreating(request);
+
+        final Person originator = userInfoService.findByIdOrThrow(userInfo.getPersonId());
+
+        final Order order = new Order();
+        order.setOrderNum(request.getOrderNum());
+
+
+        order.setUserAdded(originator);
+        return iOrder.save(order);
     }
 
     @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity", "PMD.UnusedFormalParameter"})

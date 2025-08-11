@@ -1,22 +1,16 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet author="al (generated)" id="1754651614171_fill_dictionaries_1">
-        <sql splitStatements="false">
-            INSERT INTO d_sys_stores (id, code, name, url, rec_status) VALUES(1, 'priborMaster', 'priborMaster store', 'https://pribormaster.ru', 'A');
-        </sql>
-    </changeSet>
-
     <changeSet author="al (generated)" id="1754651614171_fill_dictionaries_2">
         <sql splitStatements="false">
             INSERT INTO d_countries (id, iso_code_2, iso_code_3, isd_code, name, rec_status, date_added) VALUES('65f87394-9c99-4492-9364-76f5e45f6837'::uuid, 'RU', 'RUS', '+7', 'Российская Федерация', 'A', '2024-06-03 08:48:19.128');
 
-            INSERT INTO d_countries (id, iso_code_2, iso_code_3, isd_code, name, rec_status, date_added) VALUES('75f87394-9c99-4492-9364-76f5e45f6837'::uuid, 'BY', 'BLR', '+', 'Белоруссия (Беларусь)', 'A', '2024-06-03 08:48:19.128');
-            INSERT INTO d_countries (id, iso_code_2, iso_code_3, isd_code, name, rec_status, date_added) VALUES('85f87394-9c99-4492-9364-76f5e45f6837'::uuid, 'GE', 'GEO', '+', 'Грузия', 'A', '2024-06-03 08:48:19.128');
+            INSERT INTO d_countries (id, iso_code_2, iso_code_3, isd_code, name, rec_status, date_added) VALUES('75f87394-9c99-4492-9364-76f5e45f6837'::uuid, 'BY', 'BLR', '+375', 'Белоруссия (Беларусь)', 'A', '2024-06-03 08:48:19.128');
+            INSERT INTO d_countries (id, iso_code_2, iso_code_3, isd_code, name, rec_status, date_added) VALUES('85f87394-9c99-4492-9364-76f5e45f6837'::uuid, 'GE', 'GEO', '+995', 'Грузия', 'A', '2024-06-03 08:48:19.128');
             INSERT INTO d_countries (id, iso_code_2, iso_code_3, isd_code, name, rec_status, date_added) VALUES('95f87394-9c99-4492-9364-76f5e45f6837'::uuid, 'KZ', 'KAZ', '+7', 'Казахстан', 'A', '2024-06-03 08:48:19.128');
-            INSERT INTO d_countries (id, iso_code_2, iso_code_3, isd_code, name, rec_status, date_added) VALUES('a5f87394-9c99-4492-9364-76f5e45f6837'::uuid, 'KG', 'KGZ', '+', 'Киргизия (Кыргызстан)', 'A', '2024-06-03 08:48:19.128');
-            INSERT INTO d_countries (id, iso_code_2, iso_code_3, isd_code, name, rec_status, date_added) VALUES('b5f87394-9c99-4492-9364-76f5e45f6837'::uuid, 'UA', 'UKR', '+', 'Украина', 'A', '2024-06-03 08:48:19.128');
-            INSERT INTO d_countries (id, iso_code_2, iso_code_3, isd_code, name, rec_status, date_added) VALUES('c5f87394-9c99-4492-9364-76f5e45f6837'::uuid, 'UZ', 'UZB', '+', 'Узбекистан', 'A', '2024-06-03 08:48:19.128');
+            INSERT INTO d_countries (id, iso_code_2, iso_code_3, isd_code, name, rec_status, date_added) VALUES('a5f87394-9c99-4492-9364-76f5e45f6837'::uuid, 'KG', 'KGZ', '+996', 'Киргизия (Кыргызстан)', 'A', '2024-06-03 08:48:19.128');
+            INSERT INTO d_countries (id, iso_code_2, iso_code_3, isd_code, name, rec_status, date_added) VALUES('b5f87394-9c99-4492-9364-76f5e45f6837'::uuid, 'UA', 'UKR', '+380', 'Украина', 'A', '2024-06-03 08:48:19.128');
+            INSERT INTO d_countries (id, iso_code_2, iso_code_3, isd_code, name, rec_status, date_added) VALUES('c5f87394-9c99-4492-9364-76f5e45f6837'::uuid, 'UZ', 'UZB', '+998', 'Узбекистан', 'A', '2024-06-03 08:48:19.128');
         </sql>
     </changeSet>
 
@@ -78,101 +72,9 @@
         </sql>
     </changeSet>
 
-    <changeSet author="al (generated)" id="1754651614171_fill_dictionaries_4">
-        <sql splitStatements="false">
-            INSERT INTO d_address_types (id, name, rec_status, date_added) VALUES(1, 'главный', 'A', '2024-06-05 08:19:32.053');
-            INSERT INTO d_address_types (id, name, rec_status, date_added) VALUES(2, 'дополнительный', 'A', '2024-06-05 08:19:32.053');
-            INSERT INTO d_address_types (id, name, rec_status, date_added) VALUES(3, 'пункт выдачи', 'A', '2024-06-05 08:19:32.053');
-            INSERT INTO d_address_types (id, name, rec_status, date_added) VALUES(4, 'терминал', 'A', '2024-06-05 08:19:32.053');
-            INSERT INTO d_address_types (id, name, rec_status, date_added) VALUES(5, 'самовывоз', 'A', '2024-06-05 08:19:32.053');
-        </sql>
-    </changeSet>
-
-    <changeSet author="al (generated)" id="1754651614171_fill_dictionaries_5">
-        <sql splitStatements="false">
-            INSERT INTO d_customer_types (id, name, rec_status, date_added) VALUES(1, 'физическое лицо', 'A', '2024-06-03 09:56:03.283');
-            INSERT INTO d_customer_types (id, name, rec_status, date_added) VALUES(2, 'юридическое лицо', 'A', '2024-06-03 09:56:03.283');
-            INSERT INTO d_customer_types (id, name, rec_status, date_added) VALUES(3, 'индивидуальный предприниматель', 'A', '2024-06-03 09:56:03.283');
-            INSERT INTO d_customer_types (id, name, rec_status, date_added) VALUES(4, 'нерезидент, физическое лицо', 'A', '2024-06-03 09:56:03.283');
-            INSERT INTO d_customer_types (id, name, rec_status, date_added) VALUES(5, 'нерезидент, юридическое лицо', 'A', '2024-06-03 09:56:03.283');
-            INSERT INTO d_customer_types (id, name, rec_status, date_added) VALUES(6, 'неопределен', 'A', '2024-06-03 09:56:03.283');
-        </sql>
-    </changeSet>
-
-    <changeSet author="al (generated)" id="1754651614171_fill_dictionaries_6">
-        <sql splitStatements="false">
-            INSERT INTO d_order_types (id, name, rec_status, date_added) VALUES(1, 'заказ', 'A', '2024-06-03 14:52:13.308');
-            INSERT INTO d_order_types (id, name, rec_status, date_added) VALUES(2, 'счет на оплату', 'A', '2024-06-03 14:52:13.308');
-            INSERT INTO d_order_types (id, name, rec_status, date_added) VALUES(3, 'коммерческое предложение', 'A', '2024-06-03 14:52:13.308');
-            INSERT INTO d_order_types (id, name, rec_status, date_added) VALUES(4, 'консультация', 'A', '2024-06-03 14:52:13.308');
-            INSERT INTO d_order_types (id, name, rec_status, date_added) VALUES(11, 'замена', 'A', '2024-06-03 14:52:13.308');
-            INSERT INTO d_order_types (id, name, rec_status, date_added) VALUES(12, 'возврат', 'A', '2024-06-03 14:52:13.308');
-            INSERT INTO d_order_types (id, name, rec_status, date_added) VALUES(13, 'подарок', 'A', '2024-06-03 14:52:13.308');
-            INSERT INTO d_order_types (id, name, rec_status, date_added) VALUES(14, 'тест-драйв', 'A', '2024-06-03 14:52:13.308');
-            INSERT INTO d_order_types (id, name, rec_status, date_added) VALUES(15, 'ремонт', 'A', '2024-06-03 14:52:13.308');
-        </sql>
-    </changeSet>
-
-    <changeSet author="al (generated)" id="1754651614171_fill_dictionaries_7">
-        <sql splitStatements="false">
-            INSERT INTO d_order_source_types (id, name, rec_status, date_added) VALUES(1, 'звонок', 'A', '2024-06-06 09:55:42.284');
-            INSERT INTO d_order_source_types (id, name, rec_status, date_added) VALUES(2, 'чат', 'A', '2024-06-06 09:55:42.284');
-            INSERT INTO d_order_source_types (id, name, rec_status, date_added) VALUES(3, 'письмо', 'A', '2024-06-06 09:55:42.284');
-            INSERT INTO d_order_source_types (id, name, rec_status, date_added) VALUES(4, 'лид', 'A', '2024-06-06 09:55:42.284');
-            INSERT INTO d_order_source_types (id, name, rec_status, date_added) VALUES(5, 'быстрый заказ', 'A', '2024-06-06 09:55:42.284');
-            INSERT INTO d_order_source_types (id, name, rec_status, date_added) VALUES(6, 'обратный звонок', 'A', '2024-06-06 09:55:42.284');
-            INSERT INTO d_order_source_types (id, name, rec_status, date_added) VALUES(8, 'тендер', 'A', '2024-06-06 09:55:42.284');
-        </sql>
-    </changeSet>
-
-    <changeSet author="al (generated)" id="1754651614171_fill_dictionaries_8">
-        <sql splitStatements="false">
-            INSERT INTO d_order_advert_types (id, name, rec_status, date_added) VALUES(1, 'реклама', 'A', '2024-06-06 09:55:42.275');
-            INSERT INTO d_order_advert_types (id, name, rec_status, date_added) VALUES(2, 'поиск', 'A', '2024-06-06 09:55:42.275');
-            INSERT INTO d_order_advert_types (id, name, rec_status, date_added) VALUES(3, 'youtube', 'A', '2024-06-06 09:55:42.275');
-            INSERT INTO d_order_advert_types (id, name, rec_status, date_added) VALUES(4, 'сарафанное радио', 'A', '2024-06-06 09:55:42.275');
-            INSERT INTO d_order_advert_types (id, name, rec_status, date_added) VALUES(5, 'повторное обращение', 'A', '2024-06-06 09:55:42.275');
-            INSERT INTO d_order_advert_types (id, name, rec_status, date_added) VALUES(6, 'холодный звонок', 'A', '2024-06-06 09:55:42.275');
-            INSERT INTO d_order_advert_types (id, name, rec_status, date_added) VALUES(8, 'тендер', 'A', '2024-06-06 09:55:42.275');
-        </sql>
-    </changeSet>
-
-    <changeSet author="al (generated)" id="1754651614171_fill_dictionaries_9">
-        <sql splitStatements="false">
-            INSERT INTO d_order_payment_types (id, name, rec_status, date_added) VALUES(1, 'предоплата', 'A', '2024-06-06 09:55:42.291');
-            INSERT INTO d_order_payment_types (id, name, rec_status, date_added) VALUES(2, 'постоплата', 'A', '2024-06-06 09:55:42.291');
-            INSERT INTO d_order_payment_types (id, name, rec_status, date_added) VALUES(5, 'наличными курьеру', 'A', '2024-06-06 09:55:42.291');
-            INSERT INTO d_order_payment_types (id, name, rec_status, date_added) VALUES(6, 'банковской картой', 'A', '2024-06-06 09:55:42.291');
-        </sql>
-    </changeSet>
-
-    <changeSet author="al (generated)" id="1754651614171_fill_dictionaries_11">
-        <sql splitStatements="false">
-            INSERT INTO d_order_email_statuses (id, name, rec_status, date_added) VALUES(0, 'неопределен', 'A', '2024-06-06 10:52:33.674');
-            INSERT INTO d_order_email_statuses (id, name, rec_status, date_added) VALUES(1, 'запрос отзыва', 'A', '2024-06-06 10:52:33.674');
-            INSERT INTO d_order_email_statuses (id, name, rec_status, date_added) VALUES(2, 'запрос на актуальность', 'A', '2024-06-06 10:52:33.674');
-        </sql>
-    </changeSet>
-
-    <changeSet author="al (generated)" id="1754651614171_fill_dictionaries_12">
-        <sql splitStatements="false">
-            INSERT INTO d_contact_types (id, name, rec_status, date_added) VALUES(1, 'главный', 'A', '2024-06-03 09:56:03.283');
-            INSERT INTO d_contact_types (id, name, rec_status, date_added) VALUES(2, 'дополнительный', 'A', '2024-06-03 09:56:03.283');
-        </sql>
-    </changeSet>
-
     <changeSet author="al (generated)" id="1754651614171_fill_dictionaries_13">
         <sql splitStatements="false">
             INSERT INTO d_manufactures (id, name, image_url, country_brand, country_origin, sort_key, rec_status, date_added) VALUES(5, 'ЭКОСНАЙПЕР', 'catalog/2logo-brands/ehkosnajper.png', 'Россия', 'Тайвань', 0, 'A', '2024-06-03 09:56:03.283');
-        </sql>
-    </changeSet>
-
-    <changeSet author="al (generated)" id="1754651614171_fill_dictionaries_14">
-        <sql splitStatements="false">
-            INSERT INTO d_stock_statuses (id, name, rec_status, date_added) VALUES(5, 'Нет в наличии', 'A', '2024-06-03 09:56:03.283');
-            INSERT INTO d_stock_statuses (id, name, rec_status, date_added) VALUES(6, 'Ожидание 2-3 дня', 'A', '2024-06-03 09:56:03.283');
-            INSERT INTO d_stock_statuses (id, name, rec_status, date_added) VALUES(7, 'В наличии', 'A', '2024-06-03 09:56:03.283');
-            INSERT INTO d_stock_statuses (id, name, rec_status, date_added) VALUES(8, 'Предзаказ', 'A', '2024-06-03 09:56:03.283');
         </sql>
     </changeSet>
 

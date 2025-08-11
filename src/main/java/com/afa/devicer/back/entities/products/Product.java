@@ -2,8 +2,8 @@ package com.afa.devicer.back.entities.products;
 
 import com.afa.devicer.back.entities.dictionaries.Manufacture;
 import com.afa.devicer.back.entities.dictionaries.ProductCategory;
-import com.afa.devicer.back.entities.dictionaries.StockStatus;
 import com.afa.devicer.back.enums.LengthClasses;
+import com.afa.devicer.back.enums.StockStatusTypes;
 import com.afa.devicer.back.enums.WeightClasses;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -68,11 +68,10 @@ public class Product {
     @JsonIgnore
     private Manufacture manufacture;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "stock_status_id")
-    @ToString.Exclude
-    @JsonIgnore
-    private StockStatus stockStatus;
+    @NotNull
+    @Column(name = "stock_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private StockStatusTypes stockStatus;
 
     @Column(name = "date_available")
     private LocalDate dateAvailable;

@@ -12,14 +12,18 @@
             <column name="short_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="long_name" type="TEXT"/>
+            <column name="long_name" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
             <column name="image_url" type="VARCHAR(255)"/>
             <column name="quantity" type="INTEGER"/>
             <column name="minimum" type="INTEGER"/>
             <column name="price" type="numeric(15, 2)"/>
             <column name="product_category_id" type="BIGINT"/>
             <column name="manufacture_id" type="BIGINT"/>
-            <column name="stock_status_id" type="BIGINT"/>
+            <column name="stock_status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="date_available" type="date"/>
             <column name="weight" type="numeric(15, 2)"/>
             <column name="weight_class" type="VARCHAR(255)">
@@ -56,10 +60,6 @@
 
     <changeSet author="al (generated)" id="1754837442376_bp_products_4">
         <addForeignKeyConstraint baseColumnNames="product_category_id" baseTableName="bp_products" constraintName="fk_bp_products_product_category_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="d_product_categories" validate="true"/>
-    </changeSet>
-
-    <changeSet author="al (generated)" id="1754837442376_bp_products_5">
-        <addForeignKeyConstraint baseColumnNames="stock_status_id" baseTableName="bp_products" constraintName="fk_bp_products_stock_status_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="d_stock_statuses" validate="true"/>
     </changeSet>
 
 </databaseChangeLog>

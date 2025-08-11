@@ -12,6 +12,9 @@
             <column name="person_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
+            <column name="contact_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="rec_status" type="CHAR(1)">
                 <constraints nullable="false"/>
             </column>

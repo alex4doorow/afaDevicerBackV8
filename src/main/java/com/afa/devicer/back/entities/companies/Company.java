@@ -1,23 +1,25 @@
 package com.afa.devicer.back.entities.companies;
 
 import com.afa.devicer.back.entities.dictionaries.Country;
+import com.afa.devicer.back.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Instant;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "bp_companies", indexes = {
-        @Index(name = "idx_bp_companies_inn", columnList = "inn"),
+        @Index(name = "uq_bp_companies_inn", columnList = "inn", unique = true),
         @Index(name = "idx_bp_companies_short_name", columnList = "short_name"),
+        @Index(name = "idx_bp_companies_email", columnList = "email")
+
 })
 @SuppressWarnings({"PMD.TooManyFields", "PMD.AvoidDuplicateLiterals", "PMD.LawOfDemeter"})
 public class Company {
@@ -46,17 +48,20 @@ public class Company {
     @Column(name = "long_name")
     private String longName;
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "email")
+    @NotNull
+    @Column(name = "email", nullable = false)
     private String email;
 
     @NotNull
+    @Builder.Default
     @Column(name = "rec_status", nullable = false)
-    private Character recStatus;
+    private Character recStatus = DefaultConstants.ACTIVE;
 
     @NotNull
+    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 

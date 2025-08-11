@@ -8,7 +8,7 @@
             </column>
             <column name="company_id" type="BIGINT"/>
             <column name="person_id" type="BIGINT"/>
-            <column name="type_id" type="BIGINT">
+            <column name="customer_type" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="user_added" type="BIGINT">
@@ -22,10 +22,6 @@
             </column>
             <column name="date_modified" type="TIMESTAMP WITH TIME ZONE"/>
         </createTable>
-    </changeSet>
-
-    <changeSet author="al (generated)" id="1754656022954_bp_customers_2">
-        <addForeignKeyConstraint baseColumnNames="type_id" baseTableName="bp_customers" constraintName="fk_bp_customers_type_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="d_customer_types" validate="true"/>
     </changeSet>
 
     <changeSet author="al (generated)" id="1754656022954_bp_customers_3">

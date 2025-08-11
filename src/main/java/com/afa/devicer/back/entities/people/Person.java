@@ -1,13 +1,11 @@
 package com.afa.devicer.back.entities.people;
 
 import com.afa.devicer.back.entities.dictionaries.Country;
+import com.afa.devicer.back.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -15,11 +13,14 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "bp_persons",
         indexes = {
-                @Index(name = "idx_bp_persons_keycloak_uuid", columnList = "keycloak_uuid")
+                @Index(name = "idx_bp_persons_keycloak_uuid", columnList = "keycloak_uuid"),
+                @Index(name = "uq_bp_persons_phone_number", columnList = "phone_number", unique = true)
         })
 public class Person {
 
@@ -53,22 +54,20 @@ public class Person {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
+    @NotNull
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
     @Column(name = "email")
     private String email;
 
-//    @NotNull
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "person", cascade = CascadeType.ALL)
-//    @EqualsAndHashCode.Exclude
-//    private List<PersonContact> contacts = new ArrayList<>();
-
     @NotNull
+    @Builder.Default
     @Column(name = "rec_status", nullable = false)
-    private Character recStatus;
+    private Character recStatus = DefaultConstants.ACTIVE;
 
     @NotNull
+    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 

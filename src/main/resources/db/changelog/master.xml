@@ -9,18 +9,7 @@
     <!-- DICTIONARIES -->
     <include file="/db/changelog/create/table/initial_create_d_countries.xml" relativeToChangelogFile="false"/>
     <include file="/db/changelog/create/table/initial_create_d_manufactures.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_d_stock_statuses.xml" relativeToChangelogFile="false"/>
-
-    <include file="/db/changelog/create/table/initial_create_d_contact_types.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_d_address_types.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_d_customer_types.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_d_order_types.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_d_order_advert_types.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_d_order_source_types.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_d_order_payment_types.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_d_order_email_statuses.xml" relativeToChangelogFile="false"/>
     <include file="/db/changelog/create/table/initial_create_d_product_categories.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_d_sys_stores.xml" relativeToChangelogFile="false"/>
 
     <!-- BUSINESS TABLES -->
     <include file="/db/changelog/create/table/initial_create_bp_products.xml" relativeToChangelogFile="false"/>

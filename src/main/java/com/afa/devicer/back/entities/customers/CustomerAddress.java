@@ -2,6 +2,7 @@ package com.afa.devicer.back.entities.customers;
 
 import com.afa.devicer.back.entities.dictionaries.Address;
 import com.afa.devicer.back.entities.people.Person;
+import com.afa.devicer.back.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -44,8 +45,9 @@ public class CustomerAddress {
     private Address address;
 
     @NotNull
+    @Builder.Default
     @Column(name = "rec_status", nullable = false)
-    private Character recStatus;
+    private Character recStatus = DefaultConstants.ACTIVE;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)

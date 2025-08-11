@@ -1,19 +1,20 @@
 package com.afa.devicer.back.entities.dictionaries;
 
 import com.afa.devicer.back.entities.people.Person;
+import com.afa.devicer.back.enums.AddressTypes;
+import com.afa.devicer.back.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Instant;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "bp_addresses")
 @SuppressWarnings({"PMD.TooManyFields", "PMD.AvoidDuplicateLiterals", "PMD.LawOfDemeter"})
@@ -27,11 +28,9 @@ public class Address {
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "type_id", nullable = false)
-    @ToString.Exclude
-    @JsonIgnore
-    private AddressType type;
+    @Column(name = "address_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AddressTypes type;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -52,8 +51,14 @@ public class Address {
     @Column(name = "flat",  length = 128)
     private String flat;
 
-    @Column(name = "address")
+    @NotNull
+    @Column(name = "address_line", nullable = false)
     private String addressLine;
+
+    @NotNull
+    @Builder.Default
+    @Column(name = "rec_status", nullable = false)
+    private Character recStatus = DefaultConstants.ACTIVE;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -63,6 +68,7 @@ public class Address {
     private Person userAdded;
 
     @NotNull
+    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 
