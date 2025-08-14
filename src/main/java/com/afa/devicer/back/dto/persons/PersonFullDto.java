@@ -23,11 +23,11 @@ public class PersonFullDto {
     @Schema(description = "first name", example = "Сергей")
     private String firstName;
 
-    @Schema(description = "last name", example = "Туманов")
-    private String lastName;
-
     @Schema(description = "last name", example = "V")
     private String middleName;
+
+    @Schema(description = "last name", example = "Туманов")
+    private String lastName;
 
     @Schema(description = "phone_number")
     private String phoneNumber;

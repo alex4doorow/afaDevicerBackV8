@@ -10,7 +10,7 @@ public enum OrderPaymentTypes {
 	PREPAYMENT("предоплата"),
 	POSTPAY("постоплата"),
 	PAYMENT_COURIER("наличными курьеру"),
-	YANDEX_PAY("банковской картой");
+	CARD_PAY("банковской картой");
 
 	private final String annotation;
 }

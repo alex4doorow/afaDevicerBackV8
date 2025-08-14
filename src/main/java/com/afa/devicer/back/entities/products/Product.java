@@ -1,7 +1,6 @@
 package com.afa.devicer.back.entities.products;
 
 import com.afa.devicer.back.entities.dictionaries.Manufacture;
-import com.afa.devicer.back.entities.dictionaries.ProductCategory;
 import com.afa.devicer.back.enums.LengthClasses;
 import com.afa.devicer.back.enums.StockStatusTypes;
 import com.afa.devicer.back.enums.WeightClasses;

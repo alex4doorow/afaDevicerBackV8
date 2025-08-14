@@ -3,6 +3,7 @@ package com.afa.devicer.back.entities.people;
 import com.afa.devicer.back.entities.dictionaries.Country;
 import com.afa.devicer.back.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -75,7 +76,13 @@ public class Person {
     private Instant dateModified;
 
     public String getFullName() {
-        return (lastName + " " + firstName + " " + middleName).trim();
+        if (StringUtils.isBlank(middleName) && StringUtils.isNotBlank(lastName)) {
+            return (lastName + " " + firstName).trim();
+        } else if (StringUtils.isBlank(middleName) && StringUtils.isBlank(lastName)) {
+            return firstName.trim();
+        } else {
+            return (lastName + " " + firstName + " " + middleName).trim();
+        }
     }
 
     public String getShortName() {
@@ -84,6 +91,6 @@ public class Person {
     }
 
     public Boolean getDeactivated() {
-        return Character.valueOf('D').equals(recStatus);
+        return DefaultConstants.DELETED.equals(recStatus);
     }
 }

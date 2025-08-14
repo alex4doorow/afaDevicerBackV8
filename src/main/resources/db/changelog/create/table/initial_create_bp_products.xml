@@ -31,10 +31,10 @@
             </column>
             <column name="length" type="numeric(15, 2)"/>
             <column name="height" type="numeric(15, 2)"/>
+            <column name="width" type="numeric(15, 2)"/>
             <column name="length_class" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="width" type="numeric(15, 2)"/>
             <column name="composite" type="BOOLEAN"/>
             <column name="deactivated" type="BOOLEAN"/>
             <column name="sort_key" type="INTEGER"/>

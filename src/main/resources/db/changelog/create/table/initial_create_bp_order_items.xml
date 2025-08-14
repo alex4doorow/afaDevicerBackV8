@@ -6,6 +6,9 @@
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_order_items"/>
             </column>
+            <column name="item_num" type="INT">
+                <constraints nullable="false"/>
+            </column>
             <column name="order_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -41,8 +44,9 @@
     </changeSet>
 
     <changeSet author="al (generated)" id="1754895885460_bp_order_items_2">
-        <createIndex indexName="idx_bp_order_items_order_id" tableName="bp_order_items">
+        <createIndex indexName="uq_bp_order_items_order_id_item_num" tableName="bp_order_items" unique="true">
             <column name="order_id"/>
+            <column name="item_num"/>
         </createIndex>
     </changeSet>
 

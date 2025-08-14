@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum PaymentDeliveryTypes {
+public enum DeliveryPaymentTypes {
 
     CUSTOMER("покупатель"),
     SELLER("продавец");

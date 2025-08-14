@@ -2,19 +2,19 @@ package com.afa.devicer.back.entities.orders;
 
 import com.afa.devicer.back.entities.people.Person;
 import com.afa.devicer.back.enums.OrderStatusTypes;
+import com.afa.devicer.back.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Instant;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "bp_order_status_history",
         indexes = {
@@ -41,12 +41,16 @@ public class OrderStatusHistory {
     @Enumerated(EnumType.STRING)
     private OrderStatusTypes status;
 
+    @Column(name = "crm_status")
+    private String crmStatus;
+
     @Column(name = "crm_sub_status")
     private String crmSubStatus;
 
     @NotNull
+    @Builder.Default
     @Column(name = "rec_status", nullable = false)
-    private Character recStatus;
+    private Character recStatus = DefaultConstants.ACTIVE;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,6 +60,7 @@ public class OrderStatusHistory {
     private Person userAdded;
 
     @NotNull
+    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 }

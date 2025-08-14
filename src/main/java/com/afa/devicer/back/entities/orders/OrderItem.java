@@ -2,24 +2,24 @@ package com.afa.devicer.back.entities.orders;
 
 import com.afa.devicer.back.entities.people.Person;
 import com.afa.devicer.back.entities.products.Product;
+import com.afa.devicer.back.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "bp_order_items",
         indexes = {
-                @Index(name = "idx_bp_order_items_order_id", columnList = "order_id"),
+                @Index(name = "uq_bp_order_items_order_id_item_num", columnList = "order_id, item_num", unique = true),
                 @Index(name = "idx_bp_order_items_product_id", columnList = "product_id")
         })
 public class OrderItem {
@@ -30,6 +30,10 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "d_sequence")
     @Column(name = "id", updatable = false)
     private Long id;
+
+    @NotNull
+    @Column(name = "item_num", nullable = false)
+    private Integer itemNum;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -58,16 +62,19 @@ public class OrderItem {
     private BigDecimal discountRate;
 
     @NotNull
+    @Builder.Default
     @Column(name = "amount", nullable = false)
-    private BigDecimal amount;
+    private BigDecimal amount = BigDecimal.ZERO;
 
     @NotNull
+    @Builder.Default
     @Column(name = "amount_supplier", nullable = false)
-    private BigDecimal amountSupplier;
+    private BigDecimal amountSupplier = BigDecimal.ZERO;
 
     @NotNull
+    @Builder.Default
     @Column(name = "rec_status", nullable = false)
-    private Character recStatus;
+    private Character recStatus = DefaultConstants.ACTIVE;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -77,6 +84,7 @@ public class OrderItem {
     private Person userAdded;
 
     @NotNull
+    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 

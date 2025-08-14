@@ -10,12 +10,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Address")
 public class AddressSaveRequest {
+
+    @NotNull
+    @Schema(description = "country id")
+    private UUID countryId;
 
     @NotNull
     @Schema(description = "address type")

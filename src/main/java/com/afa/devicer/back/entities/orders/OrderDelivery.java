@@ -4,21 +4,23 @@ import com.afa.devicer.back.entities.dictionaries.Address;
 import com.afa.devicer.back.entities.people.Person;
 import com.afa.devicer.back.enums.DeliveryPriceTypes;
 import com.afa.devicer.back.enums.DeliveryTypes;
-import com.afa.devicer.back.enums.PaymentDeliveryTypes;
+import com.afa.devicer.back.enums.DeliveryPaymentTypes;
+import com.afa.devicer.back.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "bp_order_deliveries",
         indexes = {
@@ -35,32 +37,9 @@ public class OrderDelivery {
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
-    @ToString.Exclude
-    @JsonIgnore
+    @OneToOne
+    @JoinColumn(name = "order_id", nullable = false, unique = true)
     private Order order;
-
-    /**
-     * Значение, которое ввел оператор
-     */
-    @NotNull
-    @Column(name = "price", nullable = false)
-    private BigDecimal price;
-
-    /**
-     * Сколько платит покупатель
-     */
-    @NotNull
-    @Column(name = "customer_price", nullable = false)
-    private BigDecimal factCustomerPrice;
-
-    /**
-     * Сколько платит продавец
-     */
-    @NotNull
-    @Column(name = "seller_price", nullable = false)
-    private BigDecimal factSellerPrice;
 
     @NotNull
     @Column(name = "delivery_type", nullable = false)
@@ -68,31 +47,51 @@ public class OrderDelivery {
     private DeliveryTypes deliveryType;
 
     @NotNull
-    @Column(name = "delivery_price_type", nullable = false)
+    @Column(name = "delivery_payment_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private DeliveryPriceTypes deliveryPrice;
+    private DeliveryPaymentTypes deliveryPaymentType;
+
+    @Column(name = "delivery_price_type")
+    @Enumerated(EnumType.STRING)
+    private DeliveryPriceTypes deliveryPriceType;
+
+    /**
+     * Значение, которое ввел оператор
+     */
+    @NotNull
+    @Builder.Default
+    @Column(name = "price", nullable = false)
+    private BigDecimal price = BigDecimal.ZERO;
+
+    /**
+     * Сколько платит покупатель - доставка за счет покупателя
+     */
+    @NotNull
+    @Builder.Default
+    @Column(name = "customer_price", nullable = false)
+    private BigDecimal factCustomerPrice = BigDecimal.ZERO;
+
+    /**
+     * Сколько платит продавец - доставка за счет продавца
+     */
+    @NotNull
+    @Builder.Default
+    @Column(name = "seller_price", nullable = false)
+    private BigDecimal factSellerPrice = BigDecimal.ZERO;
 
     @NotNull
-    @Column(name = "payment_delivery_type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private PaymentDeliveryTypes paymentDeliveryType;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id")
+    @JoinColumn(name = "address_id",  nullable = false)
     @ToString.Exclude
     @JsonIgnore
     private Address address;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipient_id")
+    @JoinColumn(name = "recipient_id", nullable = false)
     @ToString.Exclude
     @JsonIgnore
     private Person recipient;
-
-//    @NotNull
-//    @Column(name = "carrier_status", nullable = false)
-//    @Enumerated(EnumType.STRING)
-//    private CarrierStatuses carrierStatus;
 
     @Column(name = "annotation")
     private String annotation;
@@ -100,23 +99,22 @@ public class OrderDelivery {
     @Column(name = "track_code")
     private String trackCode;
 
-//    date_delivery` datetime DEFAULT NULL,
-//            `time_in` time DEFAULT NULL,
-//
-//            `time_out` time DEFAULT NULL,
+    @Column(name = "delivery_date")
+    private LocalDate deliveryDate;
+
+    @Column(name = "time_in")
+    private LocalTime timeIn;
+
+    @Column(name = "time_out")
+    private LocalTime timeOut;
 
     @NotNull
+    @Builder.Default
     @Column(name = "rec_status", nullable = false)
-    private Character recStatus;
+    private Character recStatus = DefaultConstants.ACTIVE;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_added", nullable = false)
-    @ToString.Exclude
-    @JsonIgnore
-    private Person userAdded;
-
-    @NotNull
+    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 

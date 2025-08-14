@@ -1,4 +1,4 @@
-package com.afa.devicer.back.entities.dictionaries;
+package com.afa.devicer.back.entities.products;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

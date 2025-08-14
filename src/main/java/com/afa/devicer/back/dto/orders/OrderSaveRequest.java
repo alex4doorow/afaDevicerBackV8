@@ -1,14 +1,16 @@
 package com.afa.devicer.back.dto.orders;
 
+import com.afa.devicer.back.enums.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
@@ -18,7 +20,7 @@ import java.time.LocalDate;
 public class OrderSaveRequest {
 
     @NotNull
-    @Size(min = 1)
+    @Positive
     @Schema(description = "order num")
     private Long orderNum;
 
@@ -30,60 +32,43 @@ public class OrderSaveRequest {
     @Schema(description = "customer id")
     private Long customerId;
 
+    @NotNull
+    @Schema(description = "order type", example = "ORDER")
+    private OrderTypes type;
 
-//
-//    @NotNull
-//    @Schema(description = "запрос")
-//    private UUID projectId;
-//
-//    @NotNull
-//    @Schema(description = "направление")
-//    private UUID competenceCategoryId;
-//
-//    @NotNull
-//    @Schema(description = "специализация")
-//    private UUID competenceId;
-//
-//    @NotNull
-//    @Min(value = 1, message = "Значение должно быть больше 0")
-//    @Schema(description = "specialist quantity", example = "1")
-//    private Integer specialistQnt;
-//
-//    @NotBlank
-//    @Size(max = 1024)
-//    @Schema(description = "задачи", example = "for save Earth")
-//    private String objectives;
-//
-//    @Size(max = 1024)
-//    @Schema(description = "будет плюсом")
-//    private String niceToHave;
-//
-//    @NotNull
-//    @Schema(description = "валюта покупки")
-//    private UUID buyCurrencyId;
-//
-//    @Min(value = 1, message = "Ставка покупки должна быть положительной")
-//    @Schema(description = "ставка покупки")
-//    private Integer buyRateMax;
-//
-//    @NotNull
-//    @Schema(description = "валюта продажи")
-//    private UUID saleCurrencyId;
-//
-//    @Min(value = 1, message = "Ставка продажи должна быть положительной")
-//    @Schema(description = "ставка продажи")
-//    private Integer saleRateMax;
-//
-//    @Size(min = 1, max = 2)
-//    @NotNull
-//    @Schema(description = "грейды")
-//    private Set<UUID> grades;
-//
-//    @Schema(description = "ключевые навыки")
-//    private Set<UUID> skills;
-//
-//    @Size(min = 1)
-//    @NotNull
-//    @Schema(description = "опыт")
-//    private List<@Size(min = 2, max = 1024, message = "Длина строки должна быть от {min} до {max} символов.") String> experiences;
+    @NotNull
+    @Schema(description = "source type", example = "CALL")
+    private OrderSourceTypes sourceType;
+
+    @NotNull
+    @Schema(description = "advert type", example = "ADVERT")
+    private OrderAdvertTypes advertType;
+
+    @NotNull
+    @Schema(description = "payment type", example = "PREPAYMENT")
+    private OrderPaymentTypes paymentType;
+
+    @NotNull
+    @Schema(description = "store")
+    private StoreTypes store;
+
+    @NotNull
+    @PositiveOrZero
+    @Schema(description = "product category id")
+    private Long productCategoryId;
+
+    @Valid
+    @NotNull
+    @Schema(description = "delivery")
+    private OrderDeliverySaveRequest delivery;
+
+    @Valid
+    @NotNull
+    @Schema(description = "items")
+    @Size(min = 0, max = 20)
+    private Set<OrderItemSaveRequest> items;
+
+    @NotBlank
+    @Schema(description = "annotation")
+    private String annotation;
 }

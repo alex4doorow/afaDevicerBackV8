@@ -42,8 +42,7 @@ public class CustomerController {
             @AuthenticationPrincipal final Jwt principal,
             @NotNull @Valid @PathVariable final Long customerId
     ) {
-        return ResponseEntity.ok(service.getCustomer(userInfoService.fillUserInfo(principal),
-                customerId));
+        return ResponseEntity.ok(service.getCustomer(userInfoService.fillUserInfo(principal), customerId));
     }
 
     @PostMapping()

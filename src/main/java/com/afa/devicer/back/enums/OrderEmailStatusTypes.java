@@ -5,9 +5,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum OrderEmailStatuses {
+public enum OrderEmailStatusTypes {
 	
-	UNKNOWN("неопределен"),
 	FEEDBACK("запрос отзыва"),
 	TERM_EXPAIRED("запрос на актуальность");
 		

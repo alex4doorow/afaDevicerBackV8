@@ -9,10 +9,11 @@
             <column name="order_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="status" type="VARCHAR(255)">
+            <column name="status" type="TEXT">
                 <constraints nullable="false"/>
             </column>
-            <column name="crm_sub_status" type="VARCHAR(255)"/>
+            <column name="crm_status" type="TEXT"/>
+            <column name="crm_sub_status" type="TEXT"/>
             <column name="rec_status" type="CHAR(1)">
                 <constraints nullable="false"/>
             </column>

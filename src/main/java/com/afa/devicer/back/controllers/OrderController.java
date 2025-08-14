@@ -1,9 +1,7 @@
 package com.afa.devicer.back.controllers;
 
-import com.afa.devicer.back.dto.orders.OrderDto;
-import com.afa.devicer.back.dto.orders.OrderPagedFilter;
-import com.afa.devicer.back.dto.orders.OrderPagedResponse;
-import com.afa.devicer.back.dto.orders.OrderSaveRequest;
+import com.afa.devicer.back.dto.BaseResponse;
+import com.afa.devicer.back.dto.orders.*;
 import com.afa.devicer.back.mappers.OrderMapper;
 import com.afa.devicer.back.services.OrderService;
 import com.afa.devicer.back.services.UserInfoService;
@@ -46,6 +44,17 @@ public class OrderController {
         return ResponseEntity.ok(service.getFiltered(userInfoService.fillUserInfo(principal), filter));
     }
 
+    @GetMapping("/{orderId}")
+    @Secured({ROLE_ADMIN})
+    @Operation(summary = "Order по идентификатору")
+    @Transactional
+    public ResponseEntity<OrderSingleResponse> getOrder(
+            @AuthenticationPrincipal final Jwt principal,
+            @NotNull @Valid @PathVariable final Long orderId
+    ) {
+        return ResponseEntity.ok(service.getOrder(userInfoService.fillUserInfo(principal), orderId));
+    }
+
     @PostMapping()
     @Secured({ROLE_ADMIN})
     @Operation(summary = "Сохранить заявку нового заказа")
@@ -53,10 +62,20 @@ public class OrderController {
             @AuthenticationPrincipal final Jwt principal,
             @NotNull @Valid @RequestBody final OrderSaveRequest request
     ) {
-        return ResponseEntity.ok(
-                mapper.fromOrder(service.create(userInfoService.fillUserInfo(principal), request))
-        );
+        return ResponseEntity.ok(mapper.fromOrder(service.create(userInfoService.fillUserInfo(principal), request)));
     }
+
+    @DeleteMapping("/{orderId}")
+    @Secured({ROLE_ADMIN})
+    @Operation(summary = "Delete order")
+    public ResponseEntity<BaseResponse> delete(
+            @AuthenticationPrincipal final Jwt principal,
+            @NotNull @Valid @PathVariable final Long orderId
+    ) {
+        service.delete(userInfoService.fillUserInfo(principal), orderId);
+        return ResponseEntity.ok(new BaseResponse());
+    }
+
 
     /*
 

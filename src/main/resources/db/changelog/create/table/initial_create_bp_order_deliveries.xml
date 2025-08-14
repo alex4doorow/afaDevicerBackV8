@@ -6,54 +6,37 @@
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_order_deliveries"/>
             </column>
-
             <column name="order_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-
-            <column name="price" type="NUMERIC(15, 4)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="customer_price" type="NUMERIC(15, 4)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="seller_price" type="NUMERIC(15, 4)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="supplier_price" type="NUMERIC(15, 4)">
-                <constraints nullable="false"/>
-            </column>
-
             <column name="delivery_type" type="TEXT">
                 <constraints nullable="false"/>
             </column>
-
-            <column name="delivery_price_type" type="TEXT">
+            <column name="delivery_payment_type" type="TEXT">
                 <constraints nullable="false"/>
             </column>
-
-            <column name="payment_delivery_type" type="TEXT">
+            <column name="delivery_price_type" type="TEXT"/>
+            <column name="price" type="NUMERIC(15, 4)">
                 <constraints nullable="false"/>
             </column>
-
+            <column name="customer_price" type="NUMERIC(15, 4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="seller_price" type="NUMERIC(15, 4)">
+                <constraints nullable="false"/>
+            </column>
             <column name="address_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-
             <column name="recipient_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-
             <column name="annotation" type="TEXT"/>
             <column name="track_code" type="TEXT"/>
-
+            <column name="delivery_date" type="TIMESTAMP"/>
+            <column name="time_in" type="TIME"/>
+            <column name="time_out" type="TIME"/>
             <column name="rec_status" type="CHAR">
-                <constraints nullable="false"/>
-            </column>
-            <column name="user_added" type="INT">
                 <constraints nullable="false"/>
             </column>
             <column name="date_added" type="TIMESTAMP WITH TIME ZONE">
@@ -72,10 +55,6 @@
     </changeSet>
 
     <changeSet author="al (generated)" id="1718023010060_bp_order_deliveries_3">
-        <addForeignKeyConstraint baseColumnNames="user_added" baseTableName="bp_order_deliveries" constraintName="fk_bp_order_deliveries_user_added" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_persons" validate="true"/>
-    </changeSet>
-
-    <changeSet author="al (generated)" id="1718023010060_bp_order_deliveries_4">
         <addForeignKeyConstraint baseColumnNames="order_id" baseTableName="bp_order_deliveries" constraintName="fk_bp_order_deliveries_order_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_orders" validate="true"/>
         <addForeignKeyConstraint baseColumnNames="address_id" baseTableName="bp_order_deliveries" constraintName="fk_bp_order_deliveries_address_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_addresses" validate="true"/>
         <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="bp_order_deliveries" constraintName="fk_bp_order_deliveries_recipient_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_persons" validate="true"/>

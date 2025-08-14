@@ -33,33 +33,30 @@
             <column name="customer_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="amount_total" type="NUMERIC(15, 4)" defaultValue="0">
+            <column name="total_amount" type="NUMERIC(15, 4)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
-            <column name="amount_total_with_delivery" type="NUMERIC(15, 4)" defaultValue="0">
+            <column name="total_with_delivery_amount" type="NUMERIC(15, 4)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
-            <column name="amount_bill" type="NUMERIC(15, 4)" defaultValue="0">
+            <column name="bill_amount" type="NUMERIC(15, 4)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
-            <column name="amount_supplier" type="NUMERIC(15, 4)" defaultValue="0">
+            <column name="supplier_amount" type="NUMERIC(15, 4)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
-            <column name="amount_margin" type="NUMERIC(15, 4)" defaultValue="0">
+            <column name="margin_amount" type="NUMERIC(15, 4)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
-            <column name="amount_postpay" type="NUMERIC(15, 4)" defaultValue="0">
+            <column name="postpay_amount" type="NUMERIC(15, 4)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
             <column name="status" type="TEXT">
                 <constraints nullable="false"/>
             </column>
-            <column name="status_email" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="offer_count_day" type="INT" defaultValue="0">
-                <constraints nullable="false"/>
-            </column>
+            <column name="email_status" type="VARCHAR(255)"/>
+            <column name="offer_count_day" type="INT"/>
+            <column name="offer_start_date" type="TIMESTAMP"/>
             <column name="annotation" type="TEXT"/>
             <column name="rec_status" type="CHAR">
                 <constraints nullable="false"/>
