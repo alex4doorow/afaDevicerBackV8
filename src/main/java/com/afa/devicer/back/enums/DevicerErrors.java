@@ -34,12 +34,12 @@ public enum DevicerErrors {
     CUSTOMER_PERSON_TYPE_FORBIDDEN("Тип клиента требует ввода данных по персоне <{0}>"),
     CUSTOMER_COMPANY_TYPE_MUST_NULL("Тип клиента требует отсутствия ввода данных по компании <{0}>"),
     CUSTOMER_PERSON_TYPE_MUST_NULL("Тип клиента требует отсутствия ввода данных по персоне <{0}>"),
-
     CUSTOMER_COMPANY_BY_INN_EXIST("Компания с таким ИНН уже существует <{0}>"),
+
     // order
+    ORDER_PERIOD_NOT_EXIST("Установлен признак \"задан период\" - необходимо задать диапазон дат (с, по)"),
 
-
-
+    // s3
     S3_ERROR("Сервис S3, {0}, ошибка {1}")
     ;
 

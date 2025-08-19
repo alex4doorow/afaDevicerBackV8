@@ -7,7 +7,6 @@ import com.afa.devicer.back.services.OrderService;
 import com.afa.devicer.back.services.UserInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -33,21 +32,30 @@ public class OrderController {
     private final OrderService service;
     private final OrderMapper mapper;
 
-    @GetMapping()
+    @PostMapping("/full-filtered")
     @Secured({ROLE_ADMIN})
     @Operation(summary = "orders filtered & paged")
-    @Transactional
     public ResponseEntity<OrderPagedResponse> getFiltered(
             @AuthenticationPrincipal final Jwt principal,
-            @NotNull @Valid final OrderPagedFilter filter
+            @NotNull @Valid @RequestBody final OrderPagedFilter filter
     ) {
         return ResponseEntity.ok(service.getFiltered(userInfoService.fillUserInfo(principal), filter));
+    }
+
+    @GetMapping("/simple-filtered")
+    @Secured({ROLE_ADMIN})
+    @Operation(summary = "orders filtered by single text")
+    public ResponseEntity<OrderPagedResponse> getSimpleFiltered(
+            @AuthenticationPrincipal final Jwt principal,
+            @NotNull @RequestParam("dirtyConditions") final String dirtyConditions) {
+
+        return ResponseEntity.ok(service.getSimpleFiltered(userInfoService.fillUserInfo(principal), dirtyConditions)
+        );
     }
 
     @GetMapping("/{orderId}")
     @Secured({ROLE_ADMIN})
     @Operation(summary = "Order по идентификатору")
-    @Transactional
     public ResponseEntity<OrderSingleResponse> getOrder(
             @AuthenticationPrincipal final Jwt principal,
             @NotNull @Valid @PathVariable final Long orderId

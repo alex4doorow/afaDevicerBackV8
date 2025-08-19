@@ -1,6 +1,9 @@
 package com.afa.devicer.back.validators;
 
+import com.afa.devicer.back.dto.orders.OrderPagedFilter;
 import com.afa.devicer.back.dto.orders.OrderSaveRequest;
+import com.afa.devicer.back.enums.DevicerErrors;
+import com.afa.devicer.back.exceptions.DevicerException;
 import com.afa.devicer.back.services.CustomerService;
 import com.afa.devicer.back.services.ProductCategoryService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,13 @@ public class OrderServiceValidator {
     public void validateOrderCreating(final OrderSaveRequest request) {
         customerService.findByIdOrThrow(request.getCustomerId());
         productCategoryService.findByIdOrThrow(request.getProductCategoryId());
+    }
+
+    public void validateFilterByList(final OrderPagedFilter filter) {
+
+        if (filter.isPeriodExist() && filter.getPeriod() == null) {
+            throw new DevicerException(DevicerErrors.ORDER_PERIOD_NOT_EXIST);
+        }
     }
 
 }

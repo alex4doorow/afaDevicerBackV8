@@ -58,8 +58,13 @@ public class OrderDto {
     @Schema(description = "delivery")
     private OrderDeliveryDto delivery;
 
+    private OrderStatusTypes status;
+
     @Schema(description = "items")
     private Set<OrderItemDto> items;
+
+    @Schema(description = "status history")
+    private Set<OrderStatusHistoryDto> statusHistory;
 
     @NotBlank
     @Schema(description = "annotation")

@@ -3,22 +3,28 @@ package com.afa.devicer.back.services;
 import com.afa.devicer.back.dto.UserInfoDto;
 import com.afa.devicer.back.dto.orders.*;
 import com.afa.devicer.back.dto.persons.PersonSaveRequest;
+import com.afa.devicer.back.entities.companies.Company_;
+import com.afa.devicer.back.entities.customers.Customer_;
 import com.afa.devicer.back.entities.dictionaries.Address;
+import com.afa.devicer.back.entities.dictionaries.Address_;
 import com.afa.devicer.back.entities.dictionaries.Country;
 import com.afa.devicer.back.entities.orders.*;
 import com.afa.devicer.back.entities.people.Person;
+import com.afa.devicer.back.entities.people.Person_;
 import com.afa.devicer.back.entities.products.Product;
 import com.afa.devicer.back.enums.AddressTypes;
 import com.afa.devicer.back.enums.DevicerErrors;
 import com.afa.devicer.back.enums.OrderStatusTypes;
 import com.afa.devicer.back.exceptions.DevicerException;
 import com.afa.devicer.back.mappers.OrderMapper;
+import com.afa.devicer.back.utils.NumericHelper;
 import com.afa.devicer.back.validators.OrderServiceValidator;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -67,15 +73,12 @@ public class OrderService {
         return new OrderSingleResponse(result);
     }
 
-
-    @Transactional
     @SuppressWarnings("PMD.UnnecessaryLocalBeforeReturn")
     public OrderPagedResponse getFiltered(
             final UserInfoDto user,
             final OrderPagedFilter filter) {
 
-        final List<Order> orders = iOrder.findAll();
-        log.debug(orders.toString());
+        validator.validateFilterByList(filter);
 
         final Page<Order> page = iOrder.findAll(fillOrderSpecification(user, filter),
                 filter.createPageRequest(filter.isSortedByEmpty() ? "id desc" : filter.getSortedBy(),
@@ -87,7 +90,21 @@ public class OrderService {
                 page.getTotalElements(), page.getTotalPages(),
                 page.hasPrevious(), page.hasNext(),
                 orderDtos);
+    }
 
+    @SuppressWarnings("PMD.UnnecessaryLocalBeforeReturn")
+    public OrderPagedResponse getSimpleFiltered(
+            final UserInfoDto user,
+            final String dirtyConditions) {
+
+        if (StringUtils.isEmpty(dirtyConditions)) {
+            return new OrderPagedResponse(0, 1, false, false, Collections.emptyList());
+        }
+        log.debug("getSimpleFiltered(): {}", dirtyConditions);
+
+        final List<Order> orders = iOrder.findAll(fillOrderSpecificationBySimpleConditions(user, dirtyConditions.trim()));
+        final List<OrderDto> orderDtos = mapper.fromOrders(orders);
+        return new OrderPagedResponse(orders.size(), 1, false, false, orderDtos);
     }
 
     @Transactional
@@ -152,10 +169,10 @@ public class OrderService {
         final Set<OrderItem> items = new HashSet<>();
         if (request.getItems() != null && !request.getItems().isEmpty()) {
 
-            for (final OrderItemSaveRequest ir :  request.getItems()) {
+            for (final OrderItemSaveRequest ir : request.getItems()) {
                 final Product product = productService.findByIdOrThrow(ir.getProductId());
 
-                  items.add(OrderItem.builder()
+                items.add(OrderItem.builder()
                         .itemNum(ir.getItemNum())
                         .order(order)
                         .product(product)
@@ -169,7 +186,7 @@ public class OrderService {
         order.setItems(items);
 
         // set status bid in history - first status item
-        order.getOrderStatusHistory().add(OrderStatusHistory.builder()
+        order.getStatusHistory().add(OrderStatusHistory.builder()
                 .order(order)
                 .status(OrderStatusTypes.BID)
                 .userAdded(originator)
@@ -186,15 +203,142 @@ public class OrderService {
     }
 
     @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity", "PMD.UnusedFormalParameter"})
+    private Specification<Order> fillOrderSpecificationBySimpleConditions(
+            final UserInfoDto user,
+            final String dirtyConditions) {
+
+        return (root, query, builder) -> {
+
+            final List<Predicate> predicates = new ArrayList<>();
+            List<Order> orders;
+
+            // 1) ищем по номеру заказа
+            if (NumericHelper.isNumeric(dirtyConditions)) {
+                orders = iOrder.findByOrderNum(Long.valueOf(dirtyConditions));
+                if (!orders.isEmpty()) {
+                    predicates.add(builder.equal(root.get(Order_.ORDER_NUM), Long.valueOf(dirtyConditions)));
+                    return builder.and(predicates.toArray(new Predicate[0]));
+                }
+            }
+
+            // 2) ищем по трэккоду
+            orders = iOrder.findByDeliveryTrackCode(dirtyConditions);
+            if (!orders.isEmpty()) {
+                predicates.add(builder.equal(root.get(Order_.DELIVERY).get(OrderDelivery_.TRACK_CODE), dirtyConditions));
+                return builder.and(predicates.toArray(new Predicate[0]));
+            }
+            // 3) ищем по телефону физика
+            orders = iOrder.findByCustomerPersonIsNotNullAndCustomerPersonPhoneNumber(dirtyConditions);
+            if (!orders.isEmpty()) {
+                predicates.add(builder.isNotNull(root.get(Order_.CUSTOMER).get(Customer_.PERSON)));
+                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.PERSON).get(Person_.PHONE_NUMBER), dirtyConditions));
+                return builder.and(predicates.toArray(new Predicate[0]));
+            }
+
+            // 4) ищем по email физика
+            orders = iOrder.findByCustomerPersonIsNotNullAndCustomerPersonEmail(dirtyConditions);
+            if (!orders.isEmpty()) {
+                predicates.add(builder.isNotNull(root.get(Order_.CUSTOMER).get(Customer_.PERSON)));
+                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.PERSON).get(Person_.EMAIL), dirtyConditions));
+                return builder.and(predicates.toArray(new Predicate[0]));
+            }
+
+            // 5) ищем по email юрика
+            orders = iOrder.findByCustomerCompanyIsNotNullAndCustomerCompanyEmail(dirtyConditions);
+            if (!orders.isEmpty()) {
+                predicates.add(builder.isNotNull(root.get(Order_.CUSTOMER).get(Customer_.COMPANY)));
+                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.COMPANY).get(Company_.EMAIL), dirtyConditions));
+                return builder.and(predicates.toArray(new Predicate[0]));
+            }
+
+            // 6) ищем по телефону юрика
+            orders = iOrder.findByCustomerCompanyIsNotNullAndCustomerCompanyPhoneNumber(dirtyConditions);
+            if (!orders.isEmpty()) {
+                predicates.add(builder.isNotNull(root.get(Order_.CUSTOMER).get(Customer_.COMPANY)));
+                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.COMPANY).get(Company_.PHONE_NUMBER), dirtyConditions));
+                return builder.and(predicates.toArray(new Predicate[0]));
+            }
+
+            // 7) ищем по opencart no
+
+            // 8) ищем по наименованию компании
+
+
+            // ничего не нашли - возвращаем фильтр для пустого списка
+            predicates.add(builder.lessThan(root.get(Order_.ID), 0L));
+            return builder.and(predicates.toArray(new Predicate[0]));
+        };
+
+    }
+
+    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity", "PMD.UnusedFormalParameter", "PMD.EmptyControlStatement"})
     private Specification<Order> fillOrderSpecification(final UserInfoDto user, final OrderPagedFilter filter) {
 
         return (root, query, builder) -> {
 
             final List<Predicate> predicates = new ArrayList<>();
 
-            // order id
-            if (filter.getOrderId() != null) {
-                predicates.add(builder.equal(root.get(Order_.ID), filter.getOrderId()));
+            // order
+            if (filter.getId() != null) {
+                predicates.add(builder.equal(root.get(Order_.ID), filter.getId()));
+            }
+            if (filter.getOrderNum() != null) {
+                predicates.add(builder.equal(root.get(Order_.ORDER_NUM), filter.getOrderNum()));
+            }
+            if (StringUtils.isNoneBlank(filter.getTrackCode())) {
+                predicates.add(builder.equal(root.get(Order_.DELIVERY).get(OrderDelivery_.TRACK_CODE), filter.getTrackCode()));
+            }
+            if (StringUtils.isNoneBlank(filter.getDeliveryAddress())) {
+                predicates.add(builder.equal(root.get(Order_.DELIVERY).get(OrderDelivery_.ADDRESS).get(Address_.ADDRESS_LINE), filter.getDeliveryAddress()));
+            }
+            if (filter.getTypes() != null && !filter.getTypes().isEmpty()) {
+                predicates.add(root.get(Order_.TYPE).in(filter.getTypes()));
+            }
+            if (filter.getAdvertTypes() != null && !filter.getAdvertTypes().isEmpty()) {
+                predicates.add(root.get(Order_.ADVERT_TYPE).in(filter.getAdvertTypes()));
+            }
+            if (filter.getPaymentTypes() != null && !filter.getPaymentTypes().isEmpty()) {
+                predicates.add(root.get(Order_.PAYMENT_TYPE).in(filter.getPaymentTypes()));
+            }
+            if (filter.getDeliveryTypes() != null && !filter.getDeliveryTypes().isEmpty()) {
+                predicates.add(root.get(Order_.DELIVERY).get(OrderDelivery_.DELIVERY_TYPE).in(filter.getDeliveryTypes()));
+            }
+            if (filter.getStatuses() != null && !filter.getStatuses().isEmpty()) {
+                predicates.add(root.get(Order_.STATUS).in(filter.getStatuses()));
+            }
+
+            // customer
+            if (filter.getCustomerConditions().getCustomerTypes() != null && !filter.getCustomerConditions().getCustomerTypes().isEmpty()) {
+                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.TYPE), filter.getCustomerConditions().getCustomerTypes()));
+            }
+//            if (filter.getCustomerConditions().getCountries() != null && !filter.getCustomerConditions().getCountries().isEmpty()) {
+//                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.COMPANY), filter.getCustomerConditions().getCustomerTypes()));
+//            }
+            // customer - person
+            if (StringUtils.isNoneBlank(filter.getCustomerConditions().getPersonPhoneNumber())) {
+
+                predicates.add(builder.isNotNull(root.get(Order_.CUSTOMER).get(Customer_.PERSON)));
+                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.PERSON).get(Person_.PHONE_NUMBER),
+                        filter.getCustomerConditions().getPersonPhoneNumber()
+                ));
+            }
+            // customer - company
+            if (StringUtils.isNoneBlank(filter.getCustomerConditions().getCompanyInn())) {
+
+                predicates.add(builder.isNotNull(root.get(Order_.CUSTOMER).get(Customer_.COMPANY)));
+                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.COMPANY).get(Company_.INN),
+                        filter.getCustomerConditions().getCompanyInn()
+                ));
+            }
+
+            // period
+            if (filter.isPeriodExist()) {
+                // за установленный период
+                predicates.add(builder.between(root.get(Order_.ORDER_DATE), filter.getPeriod().getFirst(), filter.getPeriod().getSecond()));
+
+
+            } else {
+                // без учета периода
             }
 
             return builder.and(predicates.toArray(new Predicate[0]));

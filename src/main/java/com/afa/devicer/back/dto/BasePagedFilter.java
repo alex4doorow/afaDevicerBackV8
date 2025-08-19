@@ -26,9 +26,6 @@ public class BasePagedFilter {
     @Schema(description = "result's page number", example = "3")
     private Integer pageNumber = 1;
 
-    @Schema(description = "sort results by desc if true")
-    private boolean reverseOrder;
-
     @Schema(description = "list sorted fields", example = "tsCreated asc, name desc, status asc")
     private String sortedBy;
 
@@ -39,19 +36,6 @@ public class BasePagedFilter {
     @JsonIgnore
     public boolean isSortedByEmpty() {
         return StringUtils.isEmpty(sortedBy);
-    }
-
-    /**
-     * Create {@link PageRequest} request from filter properties
-     * @return {@link PageRequest} request
-     */
-    public PageRequest createPageRequest(final String... orders) {
-        final Sort sort = orders == null || orders.length == 0
-                ? Sort.unsorted()
-                : Sort.by(orders);
-        return PageRequest.of(Math.max(pageNumber - 1, 0),
-                resultsOnPage,
-                reverseOrder ? sort.descending() : sort.ascending());
     }
 
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.UseVarargs"})

@@ -2,6 +2,7 @@ package com.afa.devicer.back.entities.products;
 
 import com.afa.devicer.back.entities.dictionaries.Manufacture;
 import com.afa.devicer.back.enums.LengthClasses;
+import com.afa.devicer.back.enums.ProductTypes;
 import com.afa.devicer.back.enums.StockStatusTypes;
 import com.afa.devicer.back.enums.WeightClasses;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,7 +22,8 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "bp_products",
         indexes = {
-                @Index(name = "idx_bp_products_sku", columnList = "sku")
+                @Index(name = "idx_bp_products_sku", columnList = "sku"),
+                @Index(name = "idx_bp_products_product_type", columnList = "product_type")
         })
 @SuppressWarnings({"PMD.TooManyFields", "PMD.AvoidDuplicateLiterals", "PMD.LawOfDemeter"})
 public class Product {
@@ -33,6 +35,12 @@ public class Product {
     @Column(name = "id", updatable = false)
     private Long id;
 
+    @NotNull
+    @Column(name = "product_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ProductTypes type;
+
+    @NotNull
     @Column(name = "sku", nullable = false)
     private String sku;
 
@@ -46,23 +54,28 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @NotNull
     @Column(name = "quantity")
     private Integer quantity;
 
+    @NotNull
     @Column(name = "minimum")
     private Integer minimum;
 
+    @NotNull
     @Column(name = "price")
     private BigDecimal price;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_category_id")
     @ToString.Exclude
     @JsonIgnore
     private ProductCategory category;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manufacture_id")
+    @JoinColumn(name = "manufacture_id", nullable = false)
     @ToString.Exclude
     @JsonIgnore
     private Manufacture manufacture;
@@ -72,7 +85,8 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private StockStatusTypes stockStatus;
 
-    @Column(name = "date_available")
+    @NotNull
+    @Column(name = "date_available", nullable = false)
     private LocalDate dateAvailable;
 
     @Column(name = "weight")
@@ -95,14 +109,17 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private LengthClasses lengthClass;
 
-    @Column(name = "composite")
+    @NotNull
+    @Column(name = "composite", nullable = false)
     private Boolean composite;
 
-    @Column(name = "sort_key")
+    @NotNull
+    @Column(name = "sort_key", nullable = false)
     private Integer sortKey;
 
+    @NotNull
     @Builder.Default
-    @Column(name = "deactivated")
+    @Column(name = "deactivated", nullable = false)
     private Boolean deactivated = false;
 
     @NotNull

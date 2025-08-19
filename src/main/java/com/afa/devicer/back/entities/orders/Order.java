@@ -127,7 +127,7 @@ public class Order {
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
-    private Set<OrderStatusHistory> orderStatusHistory = new HashSet<>();
+    private Set<OrderStatusHistory> statusHistory = new HashSet<>();
 
     @NotNull
     @Column(name = "status", nullable = false)

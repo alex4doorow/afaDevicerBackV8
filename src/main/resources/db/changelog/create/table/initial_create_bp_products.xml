@@ -6,6 +6,9 @@
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_products"/>
             </column>
+            <column name="product_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="sku" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
@@ -55,10 +58,16 @@
     </changeSet>
 
     <changeSet author="al (generated)" id="1754837442376_bp_products_3">
-        <addForeignKeyConstraint baseColumnNames="manufacture_id" baseTableName="bp_products" constraintName="fk_bp_products_manufacture_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="d_manufactures" validate="true"/>
+        <createIndex indexName="idx_bp_products_product_type" tableName="bp_products">
+            <column name="product_type"/>
+        </createIndex>
     </changeSet>
 
     <changeSet author="al (generated)" id="1754837442376_bp_products_4">
+        <addForeignKeyConstraint baseColumnNames="manufacture_id" baseTableName="bp_products" constraintName="fk_bp_products_manufacture_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="d_manufactures" validate="true"/>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_products_5">
         <addForeignKeyConstraint baseColumnNames="product_category_id" baseTableName="bp_products" constraintName="fk_bp_products_product_category_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="d_product_categories" validate="true"/>
     </changeSet>
 
