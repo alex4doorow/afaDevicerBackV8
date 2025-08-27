@@ -1,6 +1,6 @@
 package com.afa.devicer.back.dto.customers;
 
-import com.afa.devicer.back.entities.dictionaries.Country;
+import com.afa.devicer.back.dto.dictionaries.CountryDto;
 import com.afa.devicer.back.enums.CustomerTypes;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -24,7 +24,7 @@ public class CustomerConditionsDto {
     private Set<CustomerTypes> customerTypes;
 
     @Schema(description = "list of countries")
-    private Set<Country> countries;
+    private Set<CountryDto> countries;
 
     // CUSTOMER - PERSON
     private String personPhoneNumber;
