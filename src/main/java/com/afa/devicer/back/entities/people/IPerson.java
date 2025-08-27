@@ -1,6 +1,6 @@
 package com.afa.devicer.back.entities.people;
 
-import com.afa.devicer.back.dto.UserInfoDbModel;
+import com.afa.core.dto.UserInfoDbModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

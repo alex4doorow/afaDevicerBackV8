@@ -1,7 +1,7 @@
 package com.afa.devicer.back.controllers;
 
-import com.afa.devicer.back.dto.BaseResponse;
-import com.afa.devicer.back.dto.orders.*;
+import com.afa.core.dto.BaseResponse;
+import com.afa.core.dto.orders.*;
 import com.afa.devicer.back.mappers.OrderMapper;
 import com.afa.devicer.back.services.OrderService;
 import com.afa.devicer.back.services.UserInfoService;

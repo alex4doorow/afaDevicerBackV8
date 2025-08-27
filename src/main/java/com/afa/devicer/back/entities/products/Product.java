@@ -1,10 +1,10 @@
 package com.afa.devicer.back.entities.products;
 
 import com.afa.devicer.back.entities.dictionaries.Manufacture;
-import com.afa.devicer.back.enums.LengthClasses;
-import com.afa.devicer.back.enums.ProductTypes;
-import com.afa.devicer.back.enums.StockStatusTypes;
-import com.afa.devicer.back.enums.WeightClasses;
+import com.afa.core.enums.LengthClasses;
+import com.afa.core.enums.ProductTypes;
+import com.afa.core.enums.StockStatusTypes;
+import com.afa.core.enums.WeightClasses;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

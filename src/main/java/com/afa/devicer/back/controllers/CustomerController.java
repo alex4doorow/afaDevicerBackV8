@@ -1,8 +1,8 @@
 package com.afa.devicer.back.controllers;
 
-import com.afa.devicer.back.dto.customers.CustomerDto;
-import com.afa.devicer.back.dto.customers.CustomerSaveRequest;
-import com.afa.devicer.back.dto.customers.CustomerSingleResponse;
+import com.afa.core.dto.customers.CustomerDto;
+import com.afa.core.dto.customers.CustomerSaveRequest;
+import com.afa.core.dto.customers.CustomerSingleResponse;
 import com.afa.devicer.back.mappers.CustomerMapper;
 import com.afa.devicer.back.services.CustomerService;
 import com.afa.devicer.back.services.UserInfoService;

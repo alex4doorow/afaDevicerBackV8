@@ -1,7 +1,7 @@
 package com.afa.devicer.back.entities.people;
 
 import com.afa.devicer.back.entities.dictionaries.Country;
-import com.afa.devicer.back.utils.DefaultConstants;
+import com.afa.core.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.*;

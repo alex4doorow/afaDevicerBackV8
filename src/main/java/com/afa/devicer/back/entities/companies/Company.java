@@ -1,7 +1,7 @@
 package com.afa.devicer.back.entities.companies;
 
 import com.afa.devicer.back.entities.dictionaries.Country;
-import com.afa.devicer.back.utils.DefaultConstants;
+import com.afa.core.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

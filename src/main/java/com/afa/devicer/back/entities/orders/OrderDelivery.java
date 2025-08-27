@@ -2,10 +2,10 @@ package com.afa.devicer.back.entities.orders;
 
 import com.afa.devicer.back.entities.dictionaries.Address;
 import com.afa.devicer.back.entities.people.Person;
-import com.afa.devicer.back.enums.DeliveryPriceTypes;
-import com.afa.devicer.back.enums.DeliveryTypes;
-import com.afa.devicer.back.enums.DeliveryPaymentTypes;
-import com.afa.devicer.back.utils.DefaultConstants;
+import com.afa.core.enums.DeliveryPriceTypes;
+import com.afa.core.enums.DeliveryTypes;
+import com.afa.core.enums.DeliveryPaymentTypes;
+import com.afa.core.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

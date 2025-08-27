@@ -1,11 +1,11 @@
 package com.afa.devicer.back.validators;
 
-import com.afa.devicer.back.dto.customers.CustomerSaveRequest;
+import com.afa.core.dto.customers.CustomerSaveRequest;
 import com.afa.devicer.back.entities.companies.Company;
 import com.afa.devicer.back.entities.companies.ICompany;
-import com.afa.devicer.back.enums.CustomerTypes;
-import com.afa.devicer.back.enums.DevicerErrors;
-import com.afa.devicer.back.exceptions.DevicerException;
+import com.afa.core.enums.CustomerTypes;
+import com.afa.core.enums.DevicerErrors;
+import com.afa.core.exceptions.DevicerException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

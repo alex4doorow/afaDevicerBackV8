@@ -1,15 +1,15 @@
 package com.afa.devicer.back.services;
 
-import com.afa.devicer.back.dto.UserInfoDto;
-import com.afa.devicer.back.dto.customers.*;
+import com.afa.core.dto.UserInfoDto;
+import com.afa.core.dto.customers.*;
 import com.afa.devicer.back.entities.companies.Company;
 import com.afa.devicer.back.entities.companies.ICompany;
 import com.afa.devicer.back.entities.customers.*;
 import com.afa.devicer.back.entities.dictionaries.Address;
 import com.afa.devicer.back.entities.dictionaries.Country;
 import com.afa.devicer.back.entities.people.Person;
-import com.afa.devicer.back.enums.DevicerErrors;
-import com.afa.devicer.back.exceptions.DevicerException;
+import com.afa.core.enums.DevicerErrors;
+import com.afa.core.exceptions.DevicerException;
 import com.afa.devicer.back.mappers.CustomerMapper;
 import com.afa.devicer.back.validators.CustomerServiceValidator;
 import jakarta.transaction.Transactional;

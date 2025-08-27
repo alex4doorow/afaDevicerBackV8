@@ -1,7 +1,7 @@
 package com.afa.devicer.back.mappers;
 
-import com.afa.devicer.back.dto.orders.OrderDto;
-import com.afa.devicer.back.dto.persons.PersonShortDto;
+import com.afa.core.dto.orders.OrderDto;
+import com.afa.core.dto.persons.PersonShortDto;
 import com.afa.devicer.back.entities.orders.Order;
 import com.afa.devicer.back.utils.persons.PersonHelper;
 import org.mapstruct.Mapper;

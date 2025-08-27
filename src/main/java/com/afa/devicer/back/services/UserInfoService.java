@@ -1,14 +1,14 @@
 package com.afa.devicer.back.services;
 
-import com.afa.devicer.back.components.CacheConstants;
-import com.afa.devicer.back.dto.UserInfoDbModel;
-import com.afa.devicer.back.dto.UserInfoDto;
+import com.afa.core.components.CacheConstants;
+import com.afa.core.dto.UserInfoDbModel;
+import com.afa.core.dto.UserInfoDto;
 import com.afa.devicer.back.entities.people.IPerson;
 import com.afa.devicer.back.entities.people.Person;
 import com.afa.devicer.back.entities.people.Person_;
-import com.afa.devicer.back.enums.DevicerErrors;
-import com.afa.devicer.back.exceptions.DevicerException;
-import com.afa.devicer.back.utils.DefaultConstants;
+import com.afa.core.enums.DevicerErrors;
+import com.afa.core.exceptions.DevicerException;
+import com.afa.core.utils.DefaultConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;

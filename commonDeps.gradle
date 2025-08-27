@@ -58,6 +58,9 @@ dependencies {
     // Jasper reports
 //    implementation 'net.sf.jasperreports:jasperreports:6.21.3'
 
+    // afa lib modules
+    implementation 'com.afa.core:afa-core:8.0.1-SNAPSHOT'
+
     // Tests
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.springframework.security:spring-security-test:6.3.1"

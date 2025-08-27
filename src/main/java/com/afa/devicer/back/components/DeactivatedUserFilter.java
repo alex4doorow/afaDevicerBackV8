@@ -1,11 +1,12 @@
 package com.afa.devicer.back.components;
 
+import com.afa.core.components.FilterOrderConstants;
 import com.afa.devicer.back.controllers.internal.ControllerConstants;
-import com.afa.devicer.back.dto.BaseResponse;
+import com.afa.core.dto.BaseResponse;
 import com.afa.devicer.back.entities.people.IPerson;
 import com.afa.devicer.back.entities.people.Person;
-import com.afa.devicer.back.enums.DevicerErrors;
-import com.afa.devicer.back.exceptions.DevicerException;
+import com.afa.core.enums.DevicerErrors;
+import com.afa.core.exceptions.DevicerException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;

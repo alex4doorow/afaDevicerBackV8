@@ -1,8 +1,8 @@
 package com.afa.devicer.back.controllers.internal;
 
-import com.afa.devicer.back.dto.BaseResponse;
-import com.afa.devicer.back.dto.ValidationErrorResponse;
-import com.afa.devicer.back.exceptions.DevicerException;
+import com.afa.core.dto.BaseResponse;
+import com.afa.core.dto.ValidationErrorResponse;
+import com.afa.core.exceptions.DevicerException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NoArgsConstructor;

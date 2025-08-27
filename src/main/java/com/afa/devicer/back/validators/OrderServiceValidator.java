@@ -1,9 +1,9 @@
 package com.afa.devicer.back.validators;
 
-import com.afa.devicer.back.dto.orders.OrderPagedFilter;
-import com.afa.devicer.back.dto.orders.OrderSaveRequest;
-import com.afa.devicer.back.enums.DevicerErrors;
-import com.afa.devicer.back.exceptions.DevicerException;
+import com.afa.core.dto.orders.OrderPagedFilter;
+import com.afa.core.dto.orders.OrderSaveRequest;
+import com.afa.core.enums.DevicerErrors;
+import com.afa.core.exceptions.DevicerException;
 import com.afa.devicer.back.services.CustomerService;
 import com.afa.devicer.back.services.ProductCategoryService;
 import lombok.RequiredArgsConstructor;

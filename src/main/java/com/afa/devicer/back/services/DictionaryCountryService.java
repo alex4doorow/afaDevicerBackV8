@@ -3,8 +3,8 @@ package com.afa.devicer.back.services;
 import com.afa.devicer.back.entities.dictionaries.Country;
 import com.afa.devicer.back.entities.dictionaries.Country_;
 import com.afa.devicer.back.entities.dictionaries.ICountry;
-import com.afa.devicer.back.enums.DevicerErrors;
-import com.afa.devicer.back.exceptions.DevicerException;
+import com.afa.core.enums.DevicerErrors;
+import com.afa.core.exceptions.DevicerException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,8 +1,8 @@
 package com.afa.devicer.back.entities.orders;
 
 import com.afa.devicer.back.entities.people.Person;
-import com.afa.devicer.back.enums.CrmStatuses;
-import com.afa.devicer.back.enums.CrmTypes;
+import com.afa.core.enums.CrmStatuses;
+import com.afa.core.enums.CrmTypes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

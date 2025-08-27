@@ -1,8 +1,8 @@
 package com.afa.devicer.back.entities.customers;
 
 import com.afa.devicer.back.entities.people.Person;
-import com.afa.devicer.back.enums.ContactTypes;
-import com.afa.devicer.back.utils.DefaultConstants;
+import com.afa.core.enums.ContactTypes;
+import com.afa.core.utils.DefaultConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
