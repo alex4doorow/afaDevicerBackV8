@@ -49,8 +49,7 @@ public class OrderController {
             @AuthenticationPrincipal final Jwt principal,
             @NotNull @RequestParam("dirtyConditions") final String dirtyConditions) {
 
-        return ResponseEntity.ok(service.getSimpleFiltered(userInfoService.fillUserInfo(principal), dirtyConditions)
-        );
+        return ResponseEntity.ok(service.getSimpleFiltered(userInfoService.fillUserInfo(principal), dirtyConditions));
     }
 
     @GetMapping("/{orderId}")
