@@ -1,10 +1,10 @@
 package com.afa.devicer.back.entities.orders;
 
-import com.afa.devicer.back.entities.customers.Customer;
-import com.afa.devicer.back.entities.products.ProductCategory;
-import com.afa.devicer.back.entities.people.Person;
 import com.afa.core.enums.*;
 import com.afa.core.utils.DefaultConstants;
+import com.afa.devicer.back.entities.customers.Customer;
+import com.afa.devicer.back.entities.people.Person;
+import com.afa.devicer.back.entities.products.ProductCategory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -166,4 +166,37 @@ public class Order {
 
     @Column(name = "date_modified", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateModified;
+
+    @PreUpdate
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    private void preUpdate() {
+        this.dateModified = Instant.now();
+    }
+
+    public CrmTypes getExternalCrm() {
+        final CrmTypes result;
+        if (this.getExternalCrmByCode(CrmTypes.OZON) != null) {
+            result = CrmTypes.OZON;
+        } else if (this.getExternalCrmByCode(CrmTypes.YANDEX_MARKET) != null) {
+            result = CrmTypes.YANDEX_MARKET;
+        }  else if (this.getExternalCrmByCode(CrmTypes.OPENCART) != null) {
+            result = CrmTypes.OPENCART;
+        } else {
+            result = CrmTypes.NONE;
+        }
+        return result;
+
+    }
+
+    public OrderCrm getExternalCrmByCode(final CrmTypes crmTypes) {
+        if (crms == null || crms.isEmpty() || crmTypes == CrmTypes.NONE) {
+            return null;
+        }
+        for (final OrderCrm externalCrm : crms) {
+            if (crmTypes == externalCrm.getCrm()) {
+                return externalCrm;
+            }
+        }
+        return null;
+    }
 }

@@ -72,6 +72,32 @@ public class OrderController {
         return ResponseEntity.ok(mapper.fromOrder(service.create(userInfoService.fillUserInfo(principal), request)));
     }
 
+    @PutMapping("/{orderId}")
+    @Secured({ROLE_ADMIN})
+    @Operation(summary = "Редактирование order")
+    public ResponseEntity<OrderDto> edit(
+            @AuthenticationPrincipal final Jwt principal,
+            @NotNull @Valid @PathVariable final Long orderId,
+            @NotNull @Valid @RequestBody final OrderSaveRequest request
+    ) {
+        return ResponseEntity.ok(
+                mapper.fromOrder(service.edit(userInfoService.fillUserInfo(principal), orderId, request))
+        );
+    }
+
+    @PatchMapping("/{orderId}/changeFullStatus")
+    @Secured({ROLE_ADMIN})
+    @Operation(summary = "Change status order")
+    public ResponseEntity<OrderDto> changeFullStatus(
+            @AuthenticationPrincipal final Jwt principal,
+            @NotNull @Valid @PathVariable final Long orderId,
+            @NotNull @Valid @RequestBody final OrderChangeStatusSaveRequest request
+    ) {
+        return ResponseEntity.ok(
+                mapper.fromOrder(service.changeFullStatus(userInfoService.fillUserInfo(principal), orderId, request))
+        );
+    }
+
     @DeleteMapping("/{orderId}")
     @Secured({ROLE_ADMIN})
     @Operation(summary = "Delete order")
@@ -134,31 +160,9 @@ public class OrderController {
         );
     }
 
-    @PutMapping("/{vacancyId}")
-    @Secured({ROLE_INTERNAL})
-    @Operation(summary = "Редактирование вакансии")
-    public ResponseEntity<VacancyDto> edit(
-            @AuthenticationPrincipal final Jwt principal,
-            @NotNull @Valid @PathVariable final UUID vacancyId,
-            @NotNull @Valid @RequestBody final VacancySaveRequest request
-    ) {
-        return ResponseEntity.ok(
-                mapper.fromVacancy(service.edit(userInfoService.fillUserInfo(principal), vacancyId, request))
-        );
-    }
 
-    @PatchMapping("/{vacancyId}/editRate")
-    @Secured({ROLE_INTERNAL})
-    @Operation(summary = "Редактирование ставки")
-    public ResponseEntity<VacancyDto> editRate(
-            @AuthenticationPrincipal final Jwt principal,
-            @NotNull @Valid @PathVariable final UUID vacancyId,
-            @NotNull @Valid @RequestBody final VacancyEditRateRequest request
-    ) {
-        return ResponseEntity.ok(
-                mapper.fromVacancy(service.editRate(userInfoService.fillUserInfo(principal), vacancyId, request))
-        );
-    }
+
+
 
     */
 }

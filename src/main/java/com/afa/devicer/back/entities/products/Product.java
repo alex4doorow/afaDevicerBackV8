@@ -1,10 +1,10 @@
 package com.afa.devicer.back.entities.products;
 
-import com.afa.devicer.back.entities.dictionaries.Manufacture;
 import com.afa.core.enums.LengthClasses;
 import com.afa.core.enums.ProductTypes;
 import com.afa.core.enums.StockStatusTypes;
 import com.afa.core.enums.WeightClasses;
+import com.afa.devicer.back.entities.dictionaries.Manufacture;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +13,8 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -109,6 +111,12 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private LengthClasses lengthClass;
 
+    /**
+     * Признак комплекта
+     * примеры
+     * GSM Розетка Телеметрика (Master + Slave)
+     * Визуальный отпугиватель птиц Кондор 4м (птица + флагшток)
+     */
     @NotNull
     @Column(name = "composite", nullable = false)
     private Boolean composite;
@@ -133,4 +141,9 @@ public class Product {
 
     @Column(name = "date_modified", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateModified;
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "master", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    private Set<ProductComposite> kitComponents = new HashSet<>();
 }

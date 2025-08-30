@@ -3,6 +3,9 @@ package com.afa.devicer.back.services;
 import com.afa.core.dto.UserInfoDto;
 import com.afa.core.dto.orders.*;
 import com.afa.core.dto.persons.PersonSaveRequest;
+import com.afa.core.enums.*;
+import com.afa.core.exceptions.DevicerException;
+import com.afa.core.utils.NumericHelper;
 import com.afa.devicer.back.entities.companies.Company_;
 import com.afa.devicer.back.entities.customers.Customer_;
 import com.afa.devicer.back.entities.dictionaries.Address;
@@ -12,12 +15,7 @@ import com.afa.devicer.back.entities.orders.*;
 import com.afa.devicer.back.entities.people.Person;
 import com.afa.devicer.back.entities.people.Person_;
 import com.afa.devicer.back.entities.products.Product;
-import com.afa.core.enums.AddressTypes;
-import com.afa.core.enums.DevicerErrors;
-import com.afa.core.enums.OrderStatusTypes;
-import com.afa.core.exceptions.DevicerException;
 import com.afa.devicer.back.mappers.OrderMapper;
-import com.afa.core.utils.NumericHelper;
 import com.afa.devicer.back.validators.OrderServiceValidator;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
@@ -29,6 +27,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.*;
 
 @Slf4j
@@ -85,11 +85,19 @@ public class OrderService {
                         Order_.class.getDeclaredFields()));
 
         final List<OrderDto> orderDtos = mapper.fromOrders(page.getContent());
+        for (final OrderDto dto : orderDtos) {
+            dto.setPresentationStatus(OrderPresentationStatusDto.createOrderPresentationStatusDto(dto));
+        }
+
+        final Map<OrderAmountTypes, BigDecimal> totalAmounts = new HashMap<>();
+        totalAmounts.put(OrderAmountTypes.TOTAL, BigDecimal.ZERO);
+        totalAmounts.put(OrderAmountTypes.TOTAL_WITH_DELIVERY, BigDecimal.ZERO);
 
         return new OrderPagedResponse(
                 page.getTotalElements(), page.getTotalPages(),
                 page.hasPrevious(), page.hasNext(),
-                orderDtos);
+                orderDtos,
+                totalAmounts);
     }
 
     @SuppressWarnings("PMD.UnnecessaryLocalBeforeReturn")
@@ -98,13 +106,18 @@ public class OrderService {
             final String dirtyConditions) {
 
         if (StringUtils.isEmpty(dirtyConditions)) {
-            return new OrderPagedResponse(0, 1, false, false, Collections.emptyList());
+            return new OrderPagedResponse(0, 1, false, false, Collections.emptyList(), Collections.emptyMap());
         }
         log.debug("getSimpleFiltered(): {}", dirtyConditions);
 
         final List<Order> orders = iOrder.findAll(fillOrderSpecificationBySimpleConditions(user, dirtyConditions.trim()));
         final List<OrderDto> orderDtos = mapper.fromOrders(orders);
-        return new OrderPagedResponse(orders.size(), 1, false, false, orderDtos);
+
+        for (final OrderDto dto : orderDtos) {
+            dto.setPresentationStatus(OrderPresentationStatusDto.createOrderPresentationStatusDto(dto));
+        }
+        return new OrderPagedResponse(orders.size(), 1, false, false, orderDtos,
+                Collections.emptyMap());
     }
 
     @Transactional
@@ -190,8 +203,66 @@ public class OrderService {
                 .order(order)
                 .status(OrderStatusTypes.BID)
                 .userAdded(originator)
-                .dateAdded(order.getDateAdded())
+                .dateAdded(Instant.now())
                 .build());
+
+        return iOrder.saveAndFlush(order);
+    }
+
+    @Transactional
+    public Order edit(final UserInfoDto userInfo,
+                      final Long orderId,
+                      final OrderSaveRequest request) {
+        final Order order = findByIdOrThrow(orderId);
+
+        //
+
+        return iOrder.saveAndFlush(order);
+    }
+
+    @SuppressWarnings("PMD")
+    @Transactional
+    public Order changeFullStatus(final UserInfoDto userInfo,
+                                  final Long orderId,
+                                  final OrderChangeStatusSaveRequest request) {
+        final Order order = findByIdOrThrow(orderId);
+        final OrderStatusTypes currentStatus = order.getStatus();
+
+        final Person originator = userInfoService.findByIdOrThrow(userInfo.getPersonId());
+
+        order.setType(request.getType());
+        order.setSourceType(request.getSourceType());
+        order.setPaymentType(request.getPaymentType());
+        order.setProductCategory(productCategoryService.findByIdOrThrow(request.getProductCategoryId()));
+        order.setStatus(request.getStatus());
+        order.setAnnotation(request.getAnnotation());
+
+        order.getDelivery().setTrackCode(request.getTrackCode());
+
+        if (currentStatus != request.getStatus()) {
+            order.getStatusHistory().add(OrderStatusHistory.builder()
+                    .order(order)
+                    .status(request.getStatus())
+                    .userAdded(originator)
+                    .dateAdded(Instant.now())
+                    .build());
+        }
+
+        if (request.getStatus() == OrderStatusTypes.APPROVED) {
+            operateSubstructProductQuantityOrder(order, OrderStatusTypes.APPROVED);
+        }
+
+        if (request.getStatus() == OrderStatusTypes.BID && currentStatus == OrderStatusTypes.CANCELED) {
+            if (order.getType() == OrderTypes.BILL) {
+
+//                final String sqlUpdateOrderOffer = "UPDATE sr_order"
+//                        + "  SET offer_date_start = ?"
+//                        + "  WHERE id = ?";
+//                this.jdbcTemplate.update(sqlUpdateOrderOffer, new Object[]{
+//                        DateTimeUtils.sysDate(),
+//                        order.getId()});
+            }
+        }
 
         return iOrder.saveAndFlush(order);
     }
@@ -343,6 +414,18 @@ public class OrderService {
 
             return builder.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    /**
+     * Операция по расходу товаров с полок нашего склада при подтверждении заказа
+     * @param order
+     */
+    public void operateSubstructProductQuantityOrder(final Order order, final OrderStatusTypes phase) {
+
+        for (final OrderItem orderItem : order.getItems()) {
+            productService.updateDeltaQuantityProduct(orderItem.getProduct(), orderItem.getQuantity(), order.getExternalCrm(), phase);
+        }
+
     }
 
 }

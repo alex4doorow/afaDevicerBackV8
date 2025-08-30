@@ -32,9 +32,14 @@ apply from: "commonDeps.gradle"
 apply from: "liquibase.gradle"
 
 group = 'com.afa.devicer'
-version = '8.0.1-SNAPSHOT'
+//version = '8.0.1-SNAPSHOT'
 
 isRelease = isRelease()
+
+wrapper {
+    gradleVersion = "8.7"
+    distributionUrl = distributionUrl.replace("bin", "all")
+}
 
 repositories {
     mavenLocal()
@@ -46,26 +51,29 @@ repositories {
     }
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.postgresql:postgresql:42.7.7'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+springBoot {
+    buildInfo()
 }
 
 configurations {
     all {
-        // Удаляем лишние биндинги SLF4J
-//        exclude group: "org.apache.logging.log4j", module: "log4j-to-slf4j"
-        exclude group: "org.apache.logging.log4j", module: "log4j-slf4j2-impl"
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
     }
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+compileJava {
+    options.encoding = "UTF-8"
+    options.incremental = true
+    options.fork = true
+    options.compilerArgs += "-Xlint:deprecation"
+    options.debugOptions.debugLevel = "source,lines,vars"
+}
+
+pmd {
+    consoleOutput = true
+    toolVersion = "7.2.0"
+    rulesMinimumPriority = 5
+    ruleSetFiles = files("pmd-ruleset.xml")
 }

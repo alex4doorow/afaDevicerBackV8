@@ -1,0 +1,44 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="al (generated)" id="1754837442376_bp_product_composites_1">
+        <createTable tableName="bp_product_composites">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_product_composites"/>
+            </column>
+            <column name="master_product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slave_product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slave_quantity" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slave_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_product_composites_2">
+        <createIndex indexName="idx_bp_product_composites_master_product_id" tableName="bp_product_composites">
+            <column name="master_product_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_product_composites_3">
+        <createIndex indexName="idx_bp_product_composites_slave_product_id" tableName="bp_product_composites">
+            <column name="slave_product_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_product_composites_4">
+        <addForeignKeyConstraint baseColumnNames="master_product_id" baseTableName="bp_product_composites" constraintName="fk_bp_product_composites_master_product_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_products" validate="true"/>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_product_composites_5">
+        <addForeignKeyConstraint baseColumnNames="slave_product_id" baseTableName="bp_product_composites" constraintName="fk_bp_product_composites_slave_product_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_products" validate="true"/>
+    </changeSet>
+
+</databaseChangeLog>
