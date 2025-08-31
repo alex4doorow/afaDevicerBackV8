@@ -21,20 +21,20 @@
             <column name="image_url" type="VARCHAR(255)"/>
             <column name="quantity" type="INTEGER"/>
             <column name="minimum" type="INTEGER"/>
-            <column name="price" type="numeric(15, 2)"/>
+            <column name="price" type="NUMERIC(15, 2)"/>
             <column name="product_category_id" type="BIGINT"/>
             <column name="manufacture_id" type="BIGINT"/>
             <column name="stock_status" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="date_available" type="date"/>
-            <column name="weight" type="numeric(15, 2)"/>
+            <column name="weight" type="NUMERIC(15, 2)"/>
             <column name="weight_class" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="length" type="numeric(15, 2)"/>
-            <column name="height" type="numeric(15, 2)"/>
-            <column name="width" type="numeric(15, 2)"/>
+            <column name="length" type="NUMERIC(15, 2)"/>
+            <column name="height" type="NUMERIC(15, 2)"/>
+            <column name="width" type="NUMERIC(15, 2)"/>
             <column name="length_class" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>

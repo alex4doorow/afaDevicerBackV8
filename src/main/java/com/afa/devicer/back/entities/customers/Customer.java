@@ -18,10 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "bp_customers",
-        indexes = {
-                @Index(name = "uq_bp_customers_type_id", columnList = "type_id")
-        })
+@Table(name = "bp_customers")
 public class Customer {
 
     @Id

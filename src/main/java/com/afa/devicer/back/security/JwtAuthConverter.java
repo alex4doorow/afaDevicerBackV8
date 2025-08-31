@@ -1,7 +1,6 @@
 package com.afa.devicer.back.security;
 
 import lombok.NoArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,7 +38,7 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
         final Map<String, Object> realmAccess = jwt.getClaim(REALM_ACCESS_CLAIM);
         final List<String> realmRoles = (List<String>) realmAccess.get(ROLES_CLAIM);
 
-        if (CollectionUtils.isNotEmpty(realmRoles)) {
+        if (!realmRoles.isEmpty()) {
             return realmRoles.stream()
                     .map(role -> new SimpleGrantedAuthority(ROLE_PREFIX + role.toUpperCase()))
                     .collect(Collectors.toSet());

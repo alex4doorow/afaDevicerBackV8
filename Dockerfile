@@ -31,7 +31,6 @@ COPY gradle/wrapper gradle/wrapper
 #COPY gradle.properties gradle.properties
 COPY build.gradle build.gradle
 COPY settings.gradle settings.gradle
-COPY commonDeps.gradle commonDeps.gradle
 
 # Cache Gradle dependencies
 #RUN gradle dependencies

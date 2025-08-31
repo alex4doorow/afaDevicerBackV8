@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import liquibase.integration.spring.SpringLiquibase;
 import lombok.NoArgsConstructor;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 
 @Configuration
@@ -22,6 +24,16 @@ import java.io.IOException;
 @EnableScheduling
 @NoArgsConstructor
 public class BackOfficeConfig {
+
+    @Bean
+    public SpringLiquibase liquibase(final DataSource dataSource) {
+        final SpringLiquibase liquibase = new SpringLiquibase();
+        liquibase.setDataSource(dataSource);
+        liquibase.setChangeLog("classpath:db/changelog/master.xml");
+        liquibase.setContexts("default");
+        liquibase.setShouldRun(true);
+        return liquibase;
+    }
 
     @Bean
     public ObjectMapper objectMapper() {

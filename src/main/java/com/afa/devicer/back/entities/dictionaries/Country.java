@@ -33,7 +33,7 @@ public class Country {
     private String isoCode3;
 
     @NotNull
-    @Column(name = "isd_code", length = 3, nullable = false)
+    @Column(name = "isd_code", length = 32, nullable = false)
     private String isdCode;
 
     @NotNull

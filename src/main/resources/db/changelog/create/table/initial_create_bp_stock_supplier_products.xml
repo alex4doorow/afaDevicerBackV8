@@ -15,7 +15,7 @@
             <column name="supplier" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="supplier_price" type="VARCHAR(255)">
+            <column name="supplier_price" type="NUMERIC(15, 2)">
                 <constraints nullable="false"/>
             </column>
             <column name="supplier_quantity" type="INTEGER">

@@ -1,74 +1,202 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:latest.release")
-        classpath("de.undercouch:gradle-download-task:4.0.0")
-        classpath("gradle.plugin.com.github.ksoichiro:gradle-console-reporter:0.6.3")
-    }
-}
-
 plugins {
-    id 'org.springframework.boot' version '3.5.4'
-    id 'io.spring.dependency-management' version '1.1.7'
-    id "com.palantir.git-version" version "0.12.3"
-    id "com.google.osdetector" version "1.7.0"
-    id "org.sonarqube" version "5.0.0.4638"
-    id "pmd"
-    id "jacoco"
-    id "java"
+    id 'java'
+    id 'pmd'
+    id 'org.springframework.boot' version '3.5.5'
+    id 'io.spring.dependency-management' version '1.1.4'
 }
-
-apply plugin: "maven-publish"
-apply plugin: "io.spring.dependency-management"
-apply plugin: "application"
-
-apply from: "utils.gradle"
-apply from: "commonDeps.gradle"
-apply from: "liquibase.gradle"
 
 group = 'com.afa.devicer'
-//version = '8.0.1-SNAPSHOT'
+version = '1.0.0-SNAPSHOT'
+description = 'Devicer Back V8'
 
-isRelease = isRelease()
-
-wrapper {
-    gradleVersion = "8.7"
-    distributionUrl = distributionUrl.replace("bin", "all")
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    if (isRelease) {
-        println "It is a release build"
-    } else {
-        println "It is a snapshot build"
-    }
-}
-
-springBoot {
-    buildInfo()
+    mavenLocal()
 }
 
 configurations {
-    all {
-        exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
-    }
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntime.extendsFrom testRuntime
+    liquibase
+    liquibaseRuntime
+//    compileOnly {
+//        extendsFrom annotationProcessor
+//    }
 }
 
-compileJava {
-    options.encoding = "UTF-8"
-    options.incremental = true
-    options.fork = true
-    options.compilerArgs += "-Xlint:deprecation"
-    options.debugOptions.debugLevel = "source,lines,vars"
+dependencies {
+
+    // === Spring Boot ===
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation "org.springframework.boot:spring-boot-starter-mail"
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
+    implementation('org.springframework.boot:spring-boot-starter-log4j2') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+    }
+//    implementation "org.springframework.boot:spring-boot-starter-log4j2"
+
+    // Security
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+
+    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '3.5.5') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-netty'
+    }
+
+    // === Netty (фикс проблемы epoll) ===
+    implementation 'io.netty:netty-all:4.1.110.Final'
+    implementation('org.springframework.boot:spring-boot-starter-webflux') {
+        exclude group: 'io.netty', module: 'netty-transport-native-epoll'
+        exclude group: 'io.netty', module: 'netty-transport-native-kqueue'
+    }
+
+//    if (osdetector.arch.equals("aarch_64")) {
+//        implementation("io.netty:netty-all")
+//    }
+
+    implementation "com.auth0:java-jwt:4.4.0"
+    implementation "com.google.guava:guava:33.3.1-jre"
+    implementation "com.h2database:h2"
+    implementation "com.nimbusds:nimbus-jose-jwt:9.37.3"
+    implementation 'org.apache.commons:commons-lang3:3.18.0'
+    implementation "commons-codec:commons-codec:1.17.1"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0"
+
+    // === PostgreSQL ===
+    runtimeOnly 'org.postgresql:postgresql:42.7.3'
+
+    // === Liquibase ===
+    liquibase 'org.liquibase:liquibase-core:4.28.0'
+    implementation 'org.liquibase:liquibase-core:4.28.0'
+
+//    implementation ("org.liquibase:liquibase-core:4.25.0") {
+//        exclude group: "ch.qos.logback", module: "logback-classic"
+//    }
+
+    liquibaseRuntime 'org.liquibase:liquibase-core:4.28.0'
+    liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate6:4.28.0' // для Hibernate 6
+    liquibaseRuntime 'org.postgresql:postgresql:42.7.3'             // драйвер БД
+
+    // === Hibernate ===
+    implementation 'org.hibernate:hibernate-core:6.6.22.Final'
+    annotationProcessor 'org.hibernate:hibernate-jpamodelgen:6.6.22.Final'
+
+    // === Lombok ===
+    compileOnly 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+    testCompileOnly 'org.projectlombok:lombok:1.18.32'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+    // === MapStruct ===
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    // === Логирование Slf4j через Lombok (@Slf4j) ===
+//    implementation 'org.slf4j:slf4j-api:2.0.13'
+
+    // === Swagger / OpenAPI 3 ===
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+
+    // === Jakarta Validation === (вместо старого javax.validation)
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+
+    // JSON
+    implementation "org.json:json:20250107"
+
+    // S3
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.762'
+
+    // afa lib modules
+    implementation 'com.afa.core:afa-core:8.0.1-SNAPSHOT'
+
+    // === Тесты ===
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-parameters']
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
+//task liquibaseDiffChangelog() {
+//    dependsOn 'compileJava'
+//
+//    doLast {
+//        tasks.create('liquibaseDiffChangelogExec', JavaExec) {
+//            group = "liquibase"
+//
+//            classpath sourceSets.main.runtimeClasspath
+//            classpath configurations.liquibase
+//
+//            mainClass = "liquibase.integration.commandline.Main"
+//
+//            // Задаем аргументы для main class
+//            args "--changeLogFile=src/main/resources/db/changelog/" + buildTimestamp() + "_changelog.xml"
+//            args "--referenceUrl=jdbc:postgresql://localhost:5432/devicer-v8-test?user=postgres&password=postgres"
+//            args "--username=postgres"
+//            args "--password=postgres"
+//            args "--url=jdbc:postgresql://localhost:5432/devicer-v8-test"
+//            args "--driver=org.postgresql.Driver"
+//            args "diffChangeLog"
+//        }.exec()
+//    }
+//}
+
+tasks.register("liquibaseDiffChangelog", JavaExec) {
+    group = "liquibase"
+    description = "Генерация Liquibase changelog на основе различий между entity и схемой БД"
+
+    dependsOn compileJava
+    mainClass = "liquibase.integration.commandline.Main"
+    classpath = configurations.liquibaseRuntime + sourceSets.main.runtimeClasspath
+
+    args "--changeLogFile=src/main/resources/db/changelog/" + buildTimestamp() + "_changelog.xml"
+    args "--referenceUrl=hibernate:spring:com.afa.devicer.back.entities?dialect=org.hibernate.dialect.PostgreSQLDialect"
+    args "--username=postgres"
+    args "--password=postgres"
+    args "--url=jdbc:postgresql://localhost:5432/devicer-v8-test"
+    args "--driver=org.postgresql.Driver"
+//    args "--logLevel=debug"
+    args "diffChangeLog"
+}
+
+//liquibase {
+//    activities {
+//        main {
+//            changeLogFile 'src/main/resources/db/changelog/master.xml'
+//            url 'jdbc:postgresql://localhost:5432/devicer-v8-test'
+//            username 'postgres'
+//            password 'postgres'
+//            driver 'org.postgresql.Driver'
+//        }
+//    }
+//    runList = 'main'
+//}
+
+static def buildTimestamp() { // Функция для создания временной метки
+    def date = new Date() // Получаем текущую дату и время
+    def formattedDate = date.format('yyyyMMddHHmmss') // Форматируем дату
+    return formattedDate // Возвращаем форматированную дату
+}
+
+configurations.all {
+    exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
+    exclude group: 'commons-logging', module: 'commons-logging'
 }
 
 pmd {
