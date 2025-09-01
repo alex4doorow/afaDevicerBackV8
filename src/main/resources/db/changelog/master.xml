@@ -31,6 +31,8 @@
     <include file="/db/changelog/create/table/initial_create_bp_order_items.xml" relativeToChangelogFile="false"/>
     <include file="/db/changelog/create/table/initial_create_bp_order_status_history.xml" relativeToChangelogFile="false"/>
 
+    <include file="/db/changelog/create/table/initial_create_bp_period_total_amounts.xml" relativeToChangelogFile="false"/>
+
     <!-- DICTIONARIES DATA -->
     <include file="/db/changelog/create/data/initial_fill_dictionaries.xml" relativeToChangelogFile="false"/>
 

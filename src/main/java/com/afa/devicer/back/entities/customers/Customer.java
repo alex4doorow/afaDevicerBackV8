@@ -72,4 +72,16 @@ public class Customer {
 
     @Column(name = "date_modified", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateModified;
+
+    public boolean isPerson() {
+        return person != null;
+    }
+
+    public boolean isCompany() {
+        return company != null;
+    }
+
+    public String getViewShortName() {
+        return isCompany() ? company.getShortName() : person.getShortName();
+    }
 }

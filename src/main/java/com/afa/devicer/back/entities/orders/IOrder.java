@@ -1,8 +1,12 @@
 package com.afa.devicer.back.entities.orders;
 
+import com.afa.core.enums.OrderStatusTypes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @SuppressWarnings({"PMD.MethodNamingConventions"})
@@ -28,4 +32,11 @@ public interface IOrder extends JpaRepository<Order, Long>, JpaSpecificationExec
     List<Order> findByCustomerCompanyIsNotNullAndCustomerCompanyEmail(String email);
 
     List<Order> findByCustomerCompanyIsNotNullAndCustomerCompanyPhoneNumber(String phoneNumber);
+
+    @Query("SELECT MIN(o.orderDate) " +
+            "FROM Order o " +
+            "WHERE o.postpayAmount > 0 " +
+            "AND o.status NOT IN :excludedStatuses")
+    LocalDate findMinOrderDateWithPostpayExcludingStatuses(@Param("excludedStatuses") List<OrderStatusTypes> excludedStatuses);
+
 }

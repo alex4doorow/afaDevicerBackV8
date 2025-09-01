@@ -5,6 +5,7 @@ import com.afa.core.dto.orders.*;
 import com.afa.core.dto.persons.PersonSaveRequest;
 import com.afa.core.enums.*;
 import com.afa.core.exceptions.DevicerException;
+import com.afa.core.utils.DateHelper;
 import com.afa.core.utils.NumericHelper;
 import com.afa.devicer.back.entities.companies.Company_;
 import com.afa.devicer.back.entities.customers.Customer_;
@@ -25,17 +26,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.CouplingBetweenObjects", "PMD.ExcessiveImports", "PMD.TooManyMethods",
-        "PMD.GodClass", "PMD.CyclomaticComplexity"})
+        "PMD.GodClass", "PMD.CyclomaticComplexity", "PMD.CognitiveComplexity"})
 public class OrderService {
 
     private final IOrder iOrder;
@@ -49,7 +53,7 @@ public class OrderService {
     private final AddressService addressService;
 
     private final DictionaryCountryService dictionaryCountryService;
-
+    private final PeriodTotalAmountService periodTotalAmountService;
     private final OrderServiceValidator validator;
 
     private final OrderMapper mapper;
@@ -88,16 +92,138 @@ public class OrderService {
         for (final OrderDto dto : orderDtos) {
             dto.setPresentationStatus(OrderPresentationStatusDto.createOrderPresentationStatusDto(dto));
         }
-
-        final Map<OrderAmountTypes, BigDecimal> totalAmounts = new HashMap<>();
-        totalAmounts.put(OrderAmountTypes.TOTAL, BigDecimal.ZERO);
-        totalAmounts.put(OrderAmountTypes.TOTAL_WITH_DELIVERY, BigDecimal.ZERO);
-
         return new OrderPagedResponse(
                 page.getTotalElements(), page.getTotalPages(),
                 page.hasPrevious(), page.hasNext(),
                 orderDtos,
-                totalAmounts);
+                calcTotalOrdersAmounts(user, page.getContent(), filter.getPeriod()));
+    }
+
+    private Map<AmountTypes, BigDecimal> calcTotalOrdersAmounts(
+            @NotNull final UserInfoDto user,
+            final List<Order> orders,
+            final Pair<LocalDate, LocalDate> period) {
+
+        final Map<AmountTypes, BigDecimal> results = new HashMap<>();
+
+        BigDecimal billAmount = BigDecimal.ZERO;
+        BigDecimal supplierAmount = BigDecimal.ZERO;
+        BigDecimal marginAmount = BigDecimal.ZERO;
+        BigDecimal approvedConversion = BigDecimal.ZERO;
+        BigDecimal bidConversion = BigDecimal.ZERO;
+        int realOrdersCount = 0;
+
+        for (final Order order : orders) {
+            if (order.isBillAmount()) {
+                realOrdersCount++;
+                billAmount = billAmount.add(order.getBillAmount());
+                supplierAmount = supplierAmount.add(order.getSupplierAmount());
+                marginAmount = marginAmount.add(order.getMarginAmount());
+            }
+        }
+
+        final BigDecimal advertAmount = periodTotalAmountService.ejectTotalAmountsByConditions(AmountTypes.ADVERT_BUDGET, period);
+        final BigDecimal clickCount = periodTotalAmountService.ejectTotalAmountsByConditions(AmountTypes.COUNT_VISITS, period);
+
+        if (clickCount != null && !clickCount.equals(BigDecimal.ZERO)) {
+            approvedConversion = BigDecimal.valueOf(realOrdersCount).divide(clickCount, 4, RoundingMode.HALF_UP);
+            bidConversion = BigDecimal.valueOf(orders.size()).divide(clickCount, 4, RoundingMode.HALF_UP);
+        }
+        final BigDecimal marginWithoutAdvertAmount = marginAmount.subtract(advertAmount);
+        results.put(AmountTypes.BILL, billAmount);
+        results.put(AmountTypes.SUPPLIER, supplierAmount);
+        results.put(AmountTypes.MARGIN, marginWithoutAdvertAmount);
+        final Map<AmountTypes, BigDecimal> postpayAmounts = calcTotalOrdersPostpayAmountByConditions(user);
+
+        results.put(AmountTypes.POSTPAY, postpayAmounts.get(AmountTypes.POSTPAY));
+        results.put(AmountTypes.POSTPAY_SDEK, postpayAmounts.get(AmountTypes.POSTPAY_SDEK));
+        results.put(AmountTypes.POSTPAY_POST, postpayAmounts.get(AmountTypes.POSTPAY_POST));
+        results.put(AmountTypes.POSTPAY_COMPANY, postpayAmounts.get(AmountTypes.POSTPAY_COMPANY));
+        results.put(AmountTypes.POSTPAY_YANDEX_MARKET, postpayAmounts.get(AmountTypes.POSTPAY_YANDEX_MARKET));
+        results.put(AmountTypes.POSTPAY_OZON_MARKET, postpayAmounts.get(AmountTypes.POSTPAY_OZON_MARKET));
+        results.put(AmountTypes.POSTPAY_OZON_ROCKET, postpayAmounts.get(AmountTypes.POSTPAY_OZON_ROCKET));
+        results.put(AmountTypes.POSTPAY_YANDEX_GO, postpayAmounts.get(AmountTypes.POSTPAY_YANDEX_GO));
+
+        results.put(AmountTypes.ADVERT_BUDGET, advertAmount);
+        results.put(AmountTypes.COUNT_REAL_ORDERS, BigDecimal.valueOf(realOrdersCount));
+        results.put(AmountTypes.CONVERSION_APPROVED, approvedConversion);
+        results.put(AmountTypes.CONVERSION_BID, bidConversion);
+        return results;
+    }
+
+    private Map<AmountTypes, BigDecimal> calcTotalOrdersPostpayAmountByConditions(
+            @NotNull final UserInfoDto user) {
+
+        LocalDate minOrderDate = iOrder.findMinOrderDateWithPostpayExcludingStatuses(List.of(
+                OrderStatusTypes.UNKNOWN,
+                OrderStatusTypes.BID,
+                OrderStatusTypes.PROCESSING,
+                OrderStatusTypes.UNPAID,
+                OrderStatusTypes.APPROVED,
+                OrderStatusTypes.PAY_ON,
+                OrderStatusTypes.FINISHED,
+                OrderStatusTypes.CANCELED,
+                OrderStatusTypes.REDELIVERY_FINISHED,
+                OrderStatusTypes.LOST,
+                OrderStatusTypes.DOC_NOT_EXIST));
+
+        if (minOrderDate == null) {
+            minOrderDate = DateHelper.firstDayOfYear(LocalDate.now());
+        }
+
+        final Map<AmountTypes, BigDecimal> postpayAmounts = new HashMap<>();
+        BigDecimal postpayAmount = BigDecimal.ZERO;
+        BigDecimal cdekPostpayAmount = BigDecimal.ZERO;
+        BigDecimal postPostpayAmount = BigDecimal.ZERO;
+        BigDecimal companyPostpayAmount = BigDecimal.ZERO;
+        BigDecimal yandexMarketPostpayAmount = BigDecimal.ZERO;
+        BigDecimal ozonMarketPostpayAmount = BigDecimal.ZERO;
+        BigDecimal yandexGoPostpayAmount = BigDecimal.ZERO;
+
+        final Pair<LocalDate, LocalDate> postpayPeriod = Pair.of(minOrderDate, DateHelper.lastDayOfMonth(LocalDate.now()));
+        final OrderPagedFilter postpayFilter = OrderPagedFilter.builder()
+                .period(postpayPeriod)
+                .periodExist(true)
+                .build();
+
+        final Page<Order> postpayPage = iOrder.findAll(fillOrderSpecification(user, postpayFilter),
+                postpayFilter.createPageRequest(postpayFilter.isSortedByEmpty() ? "id desc" : postpayFilter.getSortedBy(),
+                        Order_.class.getDeclaredFields()));
+
+        for (final Order order : postpayPage.getContent()) {
+            if (order.isPostpayAmount()) {
+
+                postpayAmount = postpayAmount.add(order.getPostpayAmount());
+
+                if (order.getAdvertType() == OrderAdvertTypes.YANDEX_MARKET) {
+                    yandexMarketPostpayAmount = yandexMarketPostpayAmount.add(order.getPostpayAmount());
+                } else if (order.getAdvertType() == OrderAdvertTypes.OZON) {
+                    ozonMarketPostpayAmount = ozonMarketPostpayAmount.add(order.getPostpayAmount());
+                } else if (order.getCustomer().isPerson() && (order.getDelivery().getDeliveryType().isCdek() || order.getDelivery().getDeliveryType() == DeliveryTypes.PICKUP)) {
+                    cdekPostpayAmount = cdekPostpayAmount.add(order.getPostpayAmount());
+                } else if (order.getCustomer().isPerson() && order.getDelivery().getDeliveryType().isPost()) {
+                    postPostpayAmount = postPostpayAmount.add(order.getPostpayAmount());
+                } else if (order.getCustomer().isPerson() && order.getDelivery().getDeliveryType() == DeliveryTypes.YANDEX_GO) {
+                    yandexGoPostpayAmount = postPostpayAmount.add(order.getPostpayAmount());
+                } else if (order.getCustomer().isCompany()) {
+                    companyPostpayAmount = companyPostpayAmount.add(order.getPostpayAmount());
+                } else {
+                    cdekPostpayAmount = cdekPostpayAmount.add(order.getPostpayAmount());
+                }
+                log.debug("postpay: {}, {}, {}, [sdek:{}, post:{}, company:{}, ym:{}, ozon:{}, yGo:{}]", order.getOrderNum(), order.getCustomer().getViewShortName(), order.getPostpayAmount(),
+                        cdekPostpayAmount, postPostpayAmount, companyPostpayAmount,
+                        yandexMarketPostpayAmount, ozonMarketPostpayAmount, yandexGoPostpayAmount);
+            }
+        }
+
+        postpayAmounts.put(AmountTypes.POSTPAY, postpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_SDEK, cdekPostpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_POST, postPostpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_COMPANY, companyPostpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_YANDEX_MARKET, yandexMarketPostpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_OZON_MARKET, ozonMarketPostpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_YANDEX_GO, yandexGoPostpayAmount);
+        return postpayAmounts;
     }
 
     @SuppressWarnings("PMD.UnnecessaryLocalBeforeReturn")
@@ -273,7 +399,7 @@ public class OrderService {
         iOrder.deleteById(orderId);
     }
 
-    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity", "PMD.UnusedFormalParameter"})
+    @SuppressWarnings({"PMD.NPathComplexity", "PMD.UnusedFormalParameter"})
     private Specification<Order> fillOrderSpecificationBySimpleConditions(
             final UserInfoDto user,
             final String dirtyConditions) {
@@ -342,7 +468,7 @@ public class OrderService {
 
     }
 
-    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity", "PMD.UnusedFormalParameter", "PMD.EmptyControlStatement"})
+    @SuppressWarnings({"PMD.NPathComplexity", "PMD.UnusedFormalParameter", "PMD.EmptyControlStatement"})
     private Specification<Order> fillOrderSpecification(final UserInfoDto user, final OrderPagedFilter filter) {
 
         return (root, query, builder) -> {
@@ -379,14 +505,14 @@ public class OrderService {
             }
 
             // customer
-            if (filter.getCustomerConditions().getCustomerTypes() != null && !filter.getCustomerConditions().getCustomerTypes().isEmpty()) {
+            if (filter.getCustomerConditions() != null && filter.getCustomerConditions().getCustomerTypes() != null && !filter.getCustomerConditions().getCustomerTypes().isEmpty()) {
                 predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.TYPE), filter.getCustomerConditions().getCustomerTypes()));
             }
 //            if (filter.getCustomerConditions().getCountries() != null && !filter.getCustomerConditions().getCountries().isEmpty()) {
 //                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.COMPANY), filter.getCustomerConditions().getCustomerTypes()));
 //            }
             // customer - person
-            if (StringUtils.isNoneBlank(filter.getCustomerConditions().getPersonPhoneNumber())) {
+            if (filter.getCustomerConditions() != null && StringUtils.isNoneBlank(filter.getCustomerConditions().getPersonPhoneNumber())) {
 
                 predicates.add(builder.isNotNull(root.get(Order_.CUSTOMER).get(Customer_.PERSON)));
                 predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.PERSON).get(Person_.PHONE_NUMBER),
@@ -394,7 +520,7 @@ public class OrderService {
                 ));
             }
             // customer - company
-            if (StringUtils.isNoneBlank(filter.getCustomerConditions().getCompanyInn())) {
+            if (filter.getCustomerConditions() != null && StringUtils.isNoneBlank(filter.getCustomerConditions().getCompanyInn())) {
 
                 predicates.add(builder.isNotNull(root.get(Order_.CUSTOMER).get(Customer_.COMPANY)));
                 predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.COMPANY).get(Company_.INN),
@@ -418,6 +544,7 @@ public class OrderService {
 
     /**
      * Операция по расходу товаров с полок нашего склада при подтверждении заказа
+     *
      * @param order
      */
     public void operateSubstructProductQuantityOrder(final Order order, final OrderStatusTypes phase) {

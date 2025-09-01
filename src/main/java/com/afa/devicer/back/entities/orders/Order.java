@@ -24,7 +24,7 @@ import java.util.Set;
 @Entity
 @Table(name = "bp_orders",
         indexes = {
-                @Index(name = "uq_bp_orders_order_num", columnList = "order_num",  unique = true),
+                @Index(name = "uq_bp_orders_order_num", columnList = "order_num", unique = true),
                 @Index(name = "indx_bp_orders_order_type", columnList = "order_type"),
                 @Index(name = "indx_bp_orders_customer_id", columnList = "customer_id")
         })
@@ -179,13 +179,12 @@ public class Order {
             result = CrmTypes.OZON;
         } else if (this.getExternalCrmByCode(CrmTypes.YANDEX_MARKET) != null) {
             result = CrmTypes.YANDEX_MARKET;
-        }  else if (this.getExternalCrmByCode(CrmTypes.OPENCART) != null) {
+        } else if (this.getExternalCrmByCode(CrmTypes.OPENCART) != null) {
             result = CrmTypes.OPENCART;
         } else {
             result = CrmTypes.NONE;
         }
         return result;
-
     }
 
     public OrderCrm getExternalCrmByCode(final CrmTypes crmTypes) {
@@ -198,5 +197,127 @@ public class Order {
             }
         }
         return null;
+    }
+
+    @SuppressWarnings("PMD.SimplifyBooleanReturns")
+    public boolean isPrepayment() {
+        if (paymentType == OrderPaymentTypes.PREPAYMENT || paymentType == OrderPaymentTypes.CARD_PAY) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @SuppressWarnings({"PMD.NcssCount", "PMD.CognitiveComplexity", "PMD.CyclomaticComplexity"})
+    public boolean isBillAmount() {
+        if (this.getType() == OrderTypes.ORDER) {
+            if (this.getStatus() == OrderStatusTypes.APPROVED) {
+                return true;
+            } else if (this.getStatus() == OrderStatusTypes.PAY_WAITING) {
+                return true;
+            } else if (this.getStatus() == OrderStatusTypes.PAY_ON) {
+                return true;
+            } else if (this.getStatus() == OrderStatusTypes.DELIVERING) {
+                return true;
+            } else if (this.getStatus() == OrderStatusTypes.READY_GIVE_AWAY) {
+                return true;
+            } else if (this.getStatus() == OrderStatusTypes.READY_GIVE_AWAY_TROUBLE) {
+                return true;
+            } else if (this.getStatus() == OrderStatusTypes.DELIVERED) {
+                return true;
+            } else if (this.getStatus() == OrderStatusTypes.FINISHED) {
+                return true;
+            } else if (this.getStatus() == OrderStatusTypes.DOC_NOT_EXIST) {
+                return true;
+            }
+        } else if (this.getType() == OrderTypes.BILL) {
+            if (this.isPrepayment()) {
+                if (this.getStatus() == OrderStatusTypes.APPROVED) {
+                    return false;
+                } else if (this.getStatus() == OrderStatusTypes.PAY_WAITING) {
+                    return false;
+                } else if (this.getStatus() == OrderStatusTypes.PAY_ON) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.DELIVERING) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.READY_GIVE_AWAY) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.READY_GIVE_AWAY_TROUBLE) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.DELIVERED) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.FINISHED) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.DOC_NOT_EXIST) {
+                    return true;
+                }
+            } else if (this.getPaymentType() == OrderPaymentTypes.POSTPAY) {
+
+                if (this.getStatus() == OrderStatusTypes.APPROVED) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.PAY_WAITING) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.PAY_ON) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.DELIVERING) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.READY_GIVE_AWAY) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.READY_GIVE_AWAY_TROUBLE) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.DELIVERED) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.FINISHED) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.DOC_NOT_EXIST) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.CyclomaticComplexity"})
+    public boolean isPostpayAmount() {
+
+        if (this.getType() == OrderTypes.ORDER) {
+            if (this.getPaymentType() == OrderPaymentTypes.POSTPAY) {
+                // заказ ФЛ с наложенным платежом
+                if (this.getStatus() == OrderStatusTypes.APPROVED) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.DELIVERING) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.READY_GIVE_AWAY) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.READY_GIVE_AWAY_TROUBLE) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.DELIVERED) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.REDELIVERY) {
+                    return true;
+                }
+            } else if (this.getPaymentType() == OrderPaymentTypes.PAYMENT_COURIER) {
+                return false;
+            }
+        } else if (this.getType() == OrderTypes.BILL) {
+            if (this.isPrepayment()) {
+                return false;
+            } else if (this.getPaymentType() == OrderPaymentTypes.POSTPAY) {
+                if (this.getStatus() == OrderStatusTypes.APPROVED) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.DELIVERING) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.READY_GIVE_AWAY) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.READY_GIVE_AWAY_TROUBLE) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.DELIVERED) {
+                    return true;
+                } else if (this.getStatus() == OrderStatusTypes.PAY_WAITING) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

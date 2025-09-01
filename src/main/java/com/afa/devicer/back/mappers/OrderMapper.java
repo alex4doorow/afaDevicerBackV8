@@ -2,7 +2,7 @@ package com.afa.devicer.back.mappers;
 
 import com.afa.core.dto.orders.OrderDto;
 import com.afa.core.dto.persons.PersonShortDto;
-import com.afa.core.enums.OrderAmountTypes;
+import com.afa.core.enums.AmountTypes;
 import com.afa.devicer.back.entities.orders.Order;
 import com.afa.devicer.back.utils.persons.PersonHelper;
 import org.mapstruct.Mapper;
@@ -34,15 +34,15 @@ public interface OrderMapper {
         return PersonHelper.fromPerson(order.getUserAdded());
     }
 
-    default Map<OrderAmountTypes, BigDecimal> getAmounts(final Order order) {
-        final Map<OrderAmountTypes, BigDecimal> amounts = new HashMap<>();
-        amounts.put(OrderAmountTypes.TOTAL_WITH_DELIVERY, new BigDecimal("0.00"));
-        amounts.put(OrderAmountTypes.TOTAL, order.getTotalAmount());
-        amounts.put(OrderAmountTypes.BILL, order.getBillAmount());
-        amounts.put(OrderAmountTypes.SUPPLIER, order.getSupplierAmount());
-        amounts.put(OrderAmountTypes.MARGIN, order.getMarginAmount());
-        amounts.put(OrderAmountTypes.DELIVERY, order.getDelivery().getPrice());
-        amounts.put(OrderAmountTypes.POSTPAY, order.getPostpayAmount());
+    default Map<AmountTypes, BigDecimal> getAmounts(final Order order) {
+        final Map<AmountTypes, BigDecimal> amounts = new HashMap<>();
+        amounts.put(AmountTypes.TOTAL_WITH_DELIVERY, new BigDecimal("0.00"));
+        amounts.put(AmountTypes.TOTAL, order.getTotalAmount());
+        amounts.put(AmountTypes.BILL, order.getBillAmount());
+        amounts.put(AmountTypes.SUPPLIER, order.getSupplierAmount());
+        amounts.put(AmountTypes.MARGIN, order.getMarginAmount());
+        amounts.put(AmountTypes.DELIVERY, order.getDelivery().getPrice());
+        amounts.put(AmountTypes.POSTPAY, order.getPostpayAmount());
 
         return amounts;
     }
