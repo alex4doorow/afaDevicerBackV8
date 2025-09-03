@@ -89,9 +89,6 @@ public class OrderService {
                         Order_.class.getDeclaredFields()));
 
         final List<OrderDto> orderDtos = mapper.fromOrders(page.getContent());
-        for (final OrderDto dto : orderDtos) {
-            dto.setPresentationStatus(OrderPresentationStatusDto.createOrderPresentationStatusDto(dto));
-        }
         return new OrderPagedResponse(
                 page.getTotalElements(), page.getTotalPages(),
                 page.hasPrevious(), page.hasNext(),
@@ -136,12 +133,11 @@ public class OrderService {
         final Map<AmountTypes, BigDecimal> postpayAmounts = calcTotalOrdersPostpayAmountByConditions(user);
 
         results.put(AmountTypes.POSTPAY, postpayAmounts.get(AmountTypes.POSTPAY));
-        results.put(AmountTypes.POSTPAY_SDEK, postpayAmounts.get(AmountTypes.POSTPAY_SDEK));
+        results.put(AmountTypes.POSTPAY_CDEK, postpayAmounts.get(AmountTypes.POSTPAY_CDEK));
         results.put(AmountTypes.POSTPAY_POST, postpayAmounts.get(AmountTypes.POSTPAY_POST));
         results.put(AmountTypes.POSTPAY_COMPANY, postpayAmounts.get(AmountTypes.POSTPAY_COMPANY));
         results.put(AmountTypes.POSTPAY_YANDEX_MARKET, postpayAmounts.get(AmountTypes.POSTPAY_YANDEX_MARKET));
         results.put(AmountTypes.POSTPAY_OZON_MARKET, postpayAmounts.get(AmountTypes.POSTPAY_OZON_MARKET));
-        results.put(AmountTypes.POSTPAY_OZON_ROCKET, postpayAmounts.get(AmountTypes.POSTPAY_OZON_ROCKET));
         results.put(AmountTypes.POSTPAY_YANDEX_GO, postpayAmounts.get(AmountTypes.POSTPAY_YANDEX_GO));
 
         results.put(AmountTypes.ADVERT_BUDGET, advertAmount);
@@ -217,7 +213,7 @@ public class OrderService {
         }
 
         postpayAmounts.put(AmountTypes.POSTPAY, postpayAmount);
-        postpayAmounts.put(AmountTypes.POSTPAY_SDEK, cdekPostpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_CDEK, cdekPostpayAmount);
         postpayAmounts.put(AmountTypes.POSTPAY_POST, postPostpayAmount);
         postpayAmounts.put(AmountTypes.POSTPAY_COMPANY, companyPostpayAmount);
         postpayAmounts.put(AmountTypes.POSTPAY_YANDEX_MARKET, yandexMarketPostpayAmount);
@@ -239,9 +235,6 @@ public class OrderService {
         final List<Order> orders = iOrder.findAll(fillOrderSpecificationBySimpleConditions(user, dirtyConditions.trim()));
         final List<OrderDto> orderDtos = mapper.fromOrders(orders);
 
-        for (final OrderDto dto : orderDtos) {
-            dto.setPresentationStatus(OrderPresentationStatusDto.createOrderPresentationStatusDto(dto));
-        }
         return new OrderPagedResponse(orders.size(), 1, false, false, orderDtos,
                 Collections.emptyMap());
     }
