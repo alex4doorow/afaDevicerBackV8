@@ -7,6 +7,7 @@ build/
 
 ### Local property files ###
 application-dev.properties
+application-dev.yaml
 gradle.properties
 logback-spring-*.xml
 

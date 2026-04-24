@@ -32,58 +32,30 @@ dependencies {
 
     // === Spring Boot ===
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation "org.springframework.boot:spring-boot-starter-mail"
-    implementation 'org.springframework.boot:spring-boot-starter-logging'
-    implementation('org.springframework.boot:spring-boot-starter-log4j2') {
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
-    }
-//    implementation "org.springframework.boot:spring-boot-starter-log4j2"
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
     // Security
-    implementation "org.springframework.boot:spring-boot-starter-security"
-    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
-    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '3.5.5') {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-netty'
-    }
+    // WebFlux
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-    // === Netty (фикс проблемы epoll) ===
-    implementation 'io.netty:netty-all:4.1.110.Final'
-    implementation('org.springframework.boot:spring-boot-starter-webflux') {
-        exclude group: 'io.netty', module: 'netty-transport-native-epoll'
-        exclude group: 'io.netty', module: 'netty-transport-native-kqueue'
-    }
-
-//    if (osdetector.arch.equals("aarch_64")) {
-//        implementation("io.netty:netty-all")
-//    }
-
-    implementation "com.auth0:java-jwt:4.4.0"
-    implementation "com.google.guava:guava:33.3.1-jre"
-    implementation "com.h2database:h2"
-    implementation "com.nimbusds:nimbus-jose-jwt:9.37.3"
-    implementation 'org.apache.commons:commons-lang3:3.18.0'
-    implementation "commons-codec:commons-codec:1.17.1"
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0"
-
-    // === PostgreSQL ===
-    runtimeOnly 'org.postgresql:postgresql:42.7.3'
+    // PostgreSQL драйвер должен быть видимым
+    implementation 'org.postgresql:postgresql:42.7.3'
 
     // === Liquibase ===
     liquibase 'org.liquibase:liquibase-core:4.28.0'
     implementation 'org.liquibase:liquibase-core:4.28.0'
 
-//    implementation ("org.liquibase:liquibase-core:4.25.0") {
-//        exclude group: "ch.qos.logback", module: "logback-classic"
-//    }
-
     liquibaseRuntime 'org.liquibase:liquibase-core:4.28.0'
-    liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate6:4.28.0' // для Hibernate 6
-    liquibaseRuntime 'org.postgresql:postgresql:42.7.3'             // драйвер БД
+    liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate6:4.28.0'
+    liquibaseRuntime 'org.postgresql:postgresql:42.7.3'
 
     // === Hibernate ===
     implementation 'org.hibernate:hibernate-core:6.6.22.Final'
@@ -99,9 +71,6 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-
-    // === Логирование Slf4j через Lombok (@Slf4j) ===
-//    implementation 'org.slf4j:slf4j-api:2.0.13'
 
     // === Swagger / OpenAPI 3 ===
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
@@ -133,30 +102,6 @@ tasks.withType(Test) {
     useJUnitPlatform()
 }
 
-//task liquibaseDiffChangelog() {
-//    dependsOn 'compileJava'
-//
-//    doLast {
-//        tasks.create('liquibaseDiffChangelogExec', JavaExec) {
-//            group = "liquibase"
-//
-//            classpath sourceSets.main.runtimeClasspath
-//            classpath configurations.liquibase
-//
-//            mainClass = "liquibase.integration.commandline.Main"
-//
-//            // Задаем аргументы для main class
-//            args "--changeLogFile=src/main/resources/db/changelog/" + buildTimestamp() + "_changelog.xml"
-//            args "--referenceUrl=jdbc:postgresql://localhost:5432/devicer-v8-test?user=postgres&password=postgres"
-//            args "--username=postgres"
-//            args "--password=postgres"
-//            args "--url=jdbc:postgresql://localhost:5432/devicer-v8-test"
-//            args "--driver=org.postgresql.Driver"
-//            args "diffChangeLog"
-//        }.exec()
-//    }
-//}
-
 tasks.register("liquibaseDiffChangelog", JavaExec) {
     group = "liquibase"
     description = "Генерация Liquibase changelog на основе различий между entity и схемой БД"
@@ -174,19 +119,6 @@ tasks.register("liquibaseDiffChangelog", JavaExec) {
 //    args "--logLevel=debug"
     args "diffChangeLog"
 }
-
-//liquibase {
-//    activities {
-//        main {
-//            changeLogFile 'src/main/resources/db/changelog/master.xml'
-//            url 'jdbc:postgresql://localhost:5432/devicer-v8-test'
-//            username 'postgres'
-//            password 'postgres'
-//            driver 'org.postgresql.Driver'
-//        }
-//    }
-//    runList = 'main'
-//}
 
 static def buildTimestamp() { // Функция для создания временной метки
     def date = new Date() // Получаем текущую дату и время
