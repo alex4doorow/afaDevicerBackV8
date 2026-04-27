@@ -12,11 +12,11 @@ import com.afa.core.enums.DevicerErrors;
 import com.afa.core.exceptions.DevicerException;
 import com.afa.devicer.back.mappers.CustomerMapper;
 import com.afa.devicer.back.validators.CustomerServiceValidator;
-import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -50,6 +50,7 @@ public class CustomerService {
         );
     }
 
+    @Transactional(readOnly = true)
     public CustomerSingleResponse getCustomer(
             @NotNull final UserInfoDto user,
             @NotNull final Long customerId) {

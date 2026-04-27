@@ -13,9 +13,13 @@ public interface IEmployee extends
         JpaSpecificationExecutor<Employee> {
 
     @Query("""
-    select e from Employee e where (e.person.recStatus = 'A')
-    """)
+            select e from Employee e where (e.person.recStatus = 'A')
+            """)
     List<Employee> getAllEmployees();
 
-    Optional<Employee> findByPersonId(Long id);
+    @Query("""
+            select e from Employee e left join Person p on p.id = e.person.id
+              where p.keycloakUuid = :keycloakUuid
+            """)
+    Optional<Employee> findByPersonKeycloakUuid(UUID keycloakUuid);
 }

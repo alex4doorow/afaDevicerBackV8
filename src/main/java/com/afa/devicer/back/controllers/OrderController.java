@@ -85,7 +85,7 @@ public class OrderController {
         );
     }
 
-    @PatchMapping("/{orderId}/changeFullStatus")
+    @PatchMapping("/{orderId}/change-status")
     @Secured({ROLE_ADMIN})
     @Operation(summary = "Change status order")
     public ResponseEntity<OrderDto> changeFullStatus(
@@ -109,60 +109,4 @@ public class OrderController {
         return ResponseEntity.ok(new BaseResponse());
     }
 
-
-    /*
-
-    @GetMapping()
-    @Secured({ROLE_ADMIN, ROLE_INTERNAL, ROLE_EXTERNAL})
-    @Operation(summary = "Вакансии filtered & paged")
-    @Transactional
-    public ResponseEntity<VacancyPagedResponse> getFiltered(
-            @AuthenticationPrincipal final Jwt principal,
-            @NotNull @Valid final VacancyPagedFilter filter
-    ) {
-        return ResponseEntity.ok(service.getFiltered(userInfoService.fillUserInfo(principal), filter));
-    }
-
-    @GetMapping("/{vacancyId}")
-    @Secured({ROLE_ADMIN, ROLE_INTERNAL, ROLE_EXTERNAL})
-    @Operation(summary = "Вакансия по идентификатору")
-    @Transactional
-    public ResponseEntity<VacancySingleResponse> getVacancy(
-            @AuthenticationPrincipal final Jwt principal,
-            @NotNull @Valid @PathVariable final UUID vacancyId
-    ) {
-        return ResponseEntity.ok(service.getVacancy(userInfoService.fillUserInfo(principal),
-                vacancyId));
-    }
-
-    @GetMapping("/{vacancyId}/statusHistory")
-    @Secured({ROLE_ADMIN, ROLE_INTERNAL, ROLE_EXTERNAL})
-    @Operation(summary = "История статусов запроса")
-    public ResponseEntity<VacancyStatusHistoryPagedResponse> statusHistory(
-            @AuthenticationPrincipal final Jwt principal,
-            @NotNull @Valid @PathVariable final UUID vacancyId,
-            @NotNull @Valid final VacancyStatusHistoryPagedFilter filter) {
-
-        return ResponseEntity.ok(service.getStatusHistory(userInfoService.fillUserInfo(principal),
-                vacancyId, filter));
-    }
-
-
-    @PostMapping()
-    @Secured({ROLE_INTERNAL})
-    @Operation(summary = "Сохранить новую вакансию")
-    public ResponseEntity<VacancyDto> create(
-            @AuthenticationPrincipal final Jwt principal,
-            @NotNull @Valid @RequestBody final VacancySaveRequest request
-    ) {
-        return ResponseEntity.ok(
-                mapper.fromVacancy(service.create(userInfoService.fillUserInfo(principal), request))
-        );
-    }
-
-
-
-
-
-    */
 }

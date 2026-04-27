@@ -1,6 +1,6 @@
 package com.afa.devicer.back.validators;
 
-import com.afa.core.dto.orders.OrderPagedFilter;
+import com.afa.core.dto.orders.OrderConditionsDto;
 import com.afa.core.dto.orders.OrderSaveRequest;
 import com.afa.core.enums.DevicerErrors;
 import com.afa.core.exceptions.DevicerException;
@@ -23,7 +23,7 @@ public class OrderServiceValidator {
         productCategoryService.findByIdOrThrow(request.getProductCategoryId());
     }
 
-    public void validateFilterByList(final OrderPagedFilter filter) {
+    public void validateFilterByList(final OrderConditionsDto filter) {
 
         if (filter.isPeriodExist() && filter.getPeriod() == null) {
             throw new DevicerException(DevicerErrors.ORDER_PERIOD_NOT_EXIST);

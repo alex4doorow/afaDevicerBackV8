@@ -65,8 +65,6 @@ public class UserInfoService {
         return user;
     }
 
-
-
     public Person findByIdOrThrow(final Long id) {
         return findByIdOptional(id).orElseThrow(() ->
                 new DevicerException(DevicerErrors.DB_ENTITY_NOT_FOUND, Person_.class_, id)

@@ -8,7 +8,6 @@ import com.afa.devicer.back.services.CustomerService;
 import com.afa.devicer.back.services.UserInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,6 @@ public class CustomerController {
     @GetMapping("/{customerId}")
     @Secured({ROLE_ADMIN})
     @Operation(summary = "Customer по идентификатору")
-    @Transactional
     public ResponseEntity<CustomerSingleResponse> getCustomer(
             @AuthenticationPrincipal final Jwt principal,
             @NotNull @Valid @PathVariable final Long customerId

@@ -19,7 +19,6 @@ import com.afa.devicer.back.entities.products.Product;
 import com.afa.devicer.back.mappers.OrderMapper;
 import com.afa.devicer.back.validators.OrderServiceValidator;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -80,12 +80,13 @@ public class OrderService {
     @SuppressWarnings("PMD.UnnecessaryLocalBeforeReturn")
     public OrderPagedResponse getFiltered(
             final UserInfoDto user,
-            final OrderPagedFilter filter) {
+            final OrderPagedFilter request) {
 
+        final OrderConditionsDto filter = request.getConditions();
         validator.validateFilterByList(filter);
 
         final Page<Order> page = iOrder.findAll(fillOrderSpecification(user, filter),
-                filter.createPageRequest(filter.isSortedByEmpty() ? "id desc" : filter.getSortedBy(),
+                request.createPageRequest(request.isSortedByEmpty() ? "id desc" : request.getSortedBy(),
                         Order_.class.getDeclaredFields()));
 
         final List<OrderDto> orderDtos = mapper.fromOrders(page.getContent());
@@ -178,11 +179,13 @@ public class OrderService {
 
         final Pair<LocalDate, LocalDate> postpayPeriod = Pair.of(minOrderDate, DateHelper.lastDayOfMonth(LocalDate.now()));
         final OrderPagedFilter postpayFilter = OrderPagedFilter.builder()
-                .period(postpayPeriod)
-                .periodExist(true)
+                .conditions(OrderConditionsDto.builder()
+                        .period(postpayPeriod)
+                        .periodExist(true)
+                        .build())
                 .build();
 
-        final Page<Order> postpayPage = iOrder.findAll(fillOrderSpecification(user, postpayFilter),
+        final Page<Order> postpayPage = iOrder.findAll(fillOrderSpecification(user, postpayFilter.getConditions()),
                 postpayFilter.createPageRequest(postpayFilter.isSortedByEmpty() ? "id desc" : postpayFilter.getSortedBy(),
                         Order_.class.getDeclaredFields()));
 
@@ -462,69 +465,69 @@ public class OrderService {
     }
 
     @SuppressWarnings({"PMD.NPathComplexity", "PMD.UnusedFormalParameter", "PMD.EmptyControlStatement"})
-    private Specification<Order> fillOrderSpecification(final UserInfoDto user, final OrderPagedFilter filter) {
+    private Specification<Order> fillOrderSpecification(final UserInfoDto user, final OrderConditionsDto filterConditions) {
 
         return (root, query, builder) -> {
 
             final List<Predicate> predicates = new ArrayList<>();
 
             // order
-            if (filter.getId() != null) {
-                predicates.add(builder.equal(root.get(Order_.ID), filter.getId()));
+            if (filterConditions.getId() != null) {
+                predicates.add(builder.equal(root.get(Order_.ID), filterConditions.getId()));
             }
-            if (filter.getOrderNum() != null) {
-                predicates.add(builder.equal(root.get(Order_.ORDER_NUM), filter.getOrderNum()));
+            if (filterConditions.getOrderNum() != null) {
+                predicates.add(builder.equal(root.get(Order_.ORDER_NUM), filterConditions.getOrderNum()));
             }
-            if (StringUtils.isNoneBlank(filter.getTrackCode())) {
-                predicates.add(builder.equal(root.get(Order_.DELIVERY).get(OrderDelivery_.TRACK_CODE), filter.getTrackCode()));
+            if (StringUtils.isNoneBlank(filterConditions.getTrackCode())) {
+                predicates.add(builder.equal(root.get(Order_.DELIVERY).get(OrderDelivery_.TRACK_CODE), filterConditions.getTrackCode()));
             }
-            if (StringUtils.isNoneBlank(filter.getDeliveryAddress())) {
-                predicates.add(builder.equal(root.get(Order_.DELIVERY).get(OrderDelivery_.ADDRESS).get(Address_.ADDRESS_LINE), filter.getDeliveryAddress()));
+            if (StringUtils.isNoneBlank(filterConditions.getDeliveryAddress())) {
+                predicates.add(builder.equal(root.get(Order_.DELIVERY).get(OrderDelivery_.ADDRESS).get(Address_.ADDRESS_LINE), filterConditions.getDeliveryAddress()));
             }
-            if (filter.getTypes() != null && !filter.getTypes().isEmpty()) {
-                predicates.add(root.get(Order_.TYPE).in(filter.getTypes()));
+            if (filterConditions.getTypes() != null && !filterConditions.getTypes().isEmpty()) {
+                predicates.add(root.get(Order_.TYPE).in(filterConditions.getTypes()));
             }
-            if (filter.getAdvertTypes() != null && !filter.getAdvertTypes().isEmpty()) {
-                predicates.add(root.get(Order_.ADVERT_TYPE).in(filter.getAdvertTypes()));
+            if (filterConditions.getAdvertTypes() != null && !filterConditions.getAdvertTypes().isEmpty()) {
+                predicates.add(root.get(Order_.ADVERT_TYPE).in(filterConditions.getAdvertTypes()));
             }
-            if (filter.getPaymentTypes() != null && !filter.getPaymentTypes().isEmpty()) {
-                predicates.add(root.get(Order_.PAYMENT_TYPE).in(filter.getPaymentTypes()));
+            if (filterConditions.getPaymentTypes() != null && !filterConditions.getPaymentTypes().isEmpty()) {
+                predicates.add(root.get(Order_.PAYMENT_TYPE).in(filterConditions.getPaymentTypes()));
             }
-            if (filter.getDeliveryTypes() != null && !filter.getDeliveryTypes().isEmpty()) {
-                predicates.add(root.get(Order_.DELIVERY).get(OrderDelivery_.DELIVERY_TYPE).in(filter.getDeliveryTypes()));
+            if (filterConditions.getDeliveryTypes() != null && !filterConditions.getDeliveryTypes().isEmpty()) {
+                predicates.add(root.get(Order_.DELIVERY).get(OrderDelivery_.DELIVERY_TYPE).in(filterConditions.getDeliveryTypes()));
             }
-            if (filter.getStatuses() != null && !filter.getStatuses().isEmpty()) {
-                predicates.add(root.get(Order_.STATUS).in(filter.getStatuses()));
+            if (filterConditions.getStatuses() != null && !filterConditions.getStatuses().isEmpty()) {
+                predicates.add(root.get(Order_.STATUS).in(filterConditions.getStatuses()));
             }
 
             // customer
-            if (filter.getCustomerConditions() != null && filter.getCustomerConditions().getCustomerTypes() != null && !filter.getCustomerConditions().getCustomerTypes().isEmpty()) {
-                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.TYPE), filter.getCustomerConditions().getCustomerTypes()));
+            if (filterConditions.getCustomerConditions() != null && filterConditions.getCustomerConditions().getCustomerTypes() != null && !filterConditions.getCustomerConditions().getCustomerTypes().isEmpty()) {
+                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.TYPE), filterConditions.getCustomerConditions().getCustomerTypes()));
             }
-//            if (filter.getCustomerConditions().getCountries() != null && !filter.getCustomerConditions().getCountries().isEmpty()) {
-//                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.COMPANY), filter.getCustomerConditions().getCustomerTypes()));
+//            if (filterConditions.getCustomerConditions().getCountries() != null && !filterConditions.getCustomerConditions().getCountries().isEmpty()) {
+//                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.COMPANY), filterConditions.getCustomerConditions().getCustomerTypes()));
 //            }
             // customer - person
-            if (filter.getCustomerConditions() != null && StringUtils.isNoneBlank(filter.getCustomerConditions().getPersonPhoneNumber())) {
+            if (filterConditions.getCustomerConditions() != null && StringUtils.isNoneBlank(filterConditions.getCustomerConditions().getPersonPhoneNumber())) {
 
                 predicates.add(builder.isNotNull(root.get(Order_.CUSTOMER).get(Customer_.PERSON)));
                 predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.PERSON).get(Person_.PHONE_NUMBER),
-                        filter.getCustomerConditions().getPersonPhoneNumber()
+                        filterConditions.getCustomerConditions().getPersonPhoneNumber()
                 ));
             }
             // customer - company
-            if (filter.getCustomerConditions() != null && StringUtils.isNoneBlank(filter.getCustomerConditions().getCompanyInn())) {
+            if (filterConditions.getCustomerConditions() != null && StringUtils.isNoneBlank(filterConditions.getCustomerConditions().getCompanyInn())) {
 
                 predicates.add(builder.isNotNull(root.get(Order_.CUSTOMER).get(Customer_.COMPANY)));
                 predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.COMPANY).get(Company_.INN),
-                        filter.getCustomerConditions().getCompanyInn()
+                        filterConditions.getCustomerConditions().getCompanyInn()
                 ));
             }
 
             // period
-            if (filter.isPeriodExist()) {
+            if (filterConditions.isPeriodExist()) {
                 // за установленный период
-                predicates.add(builder.between(root.get(Order_.ORDER_DATE), filter.getPeriod().getFirst(), filter.getPeriod().getSecond()));
+                predicates.add(builder.between(root.get(Order_.ORDER_DATE), filterConditions.getPeriod().getFirst(), filterConditions.getPeriod().getSecond()));
 
 
             } else {
