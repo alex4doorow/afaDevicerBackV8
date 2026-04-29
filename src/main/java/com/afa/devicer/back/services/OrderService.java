@@ -528,8 +528,6 @@ public class OrderService {
             if (filterConditions.isPeriodExist()) {
                 // за установленный период
                 predicates.add(builder.between(root.get(Order_.ORDER_DATE), filterConditions.getPeriod().getFirst(), filterConditions.getPeriod().getSecond()));
-
-
             } else {
                 // без учета периода
             }

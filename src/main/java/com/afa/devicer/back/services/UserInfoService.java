@@ -1,17 +1,15 @@
 package com.afa.devicer.back.services;
 
-import com.afa.core.components.CacheConstants;
 import com.afa.core.dto.UserInfoDbModel;
 import com.afa.core.dto.UserInfoDto;
-import com.afa.devicer.back.entities.people.IPerson;
-import com.afa.devicer.back.entities.people.Person;
-import com.afa.devicer.back.entities.people.Person_;
 import com.afa.core.enums.DevicerErrors;
 import com.afa.core.exceptions.DevicerException;
 import com.afa.core.utils.DefaultConstants;
+import com.afa.devicer.back.entities.people.IPerson;
+import com.afa.devicer.back.entities.people.Person;
+import com.afa.devicer.back.entities.people.Person_;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -32,7 +30,6 @@ public class UserInfoService {
 
     private final IPerson iPerson;
 
-    @Cacheable(value = CacheConstants.CACHE_USERS, key = "#principal.subject")
     public UserInfoDto fillUserInfo(@AuthenticationPrincipal final Jwt principal) {
         validatePrincipal(principal);
 

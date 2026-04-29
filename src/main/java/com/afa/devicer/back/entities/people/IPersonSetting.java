@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface IEmployeeSetting extends
-        JpaRepository<EmployeeSetting, UUID>,
-        JpaSpecificationExecutor<EmployeeSetting> {
+public interface IPersonSetting extends
+        JpaRepository<PersonSetting, UUID>,
+        JpaSpecificationExecutor<PersonSetting> {
 
-    Optional<EmployeeSetting> findByPersonId(final Long personId);
+    Optional<PersonSetting> findByPersonId(final Long personId);
 
 }

@@ -1,9 +1,9 @@
 package com.afa.devicer.back.controllers;
 
 import com.afa.core.dto.BaseResponse;
-import com.afa.core.dto.employee.EmployeeSettingsResponse;
-import com.afa.core.dto.employee.EmployeeSettingsSaveRequest;
-import com.afa.devicer.back.services.EmployeeService;
+import com.afa.core.dto.persons.PersonSettingsResponse;
+import com.afa.core.dto.persons.PersonSettingsSaveRequest;
+import com.afa.devicer.back.services.PersonService;
 import com.afa.devicer.back.services.UserInfoService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -15,34 +15,33 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import static com.afa.devicer.back.controllers.internal.ControllerConstants.EMPLOYEES;
+import static com.afa.devicer.back.controllers.internal.ControllerConstants.PERSONS;
 import static com.afa.devicer.back.controllers.internal.ControllerConstants.ROLE_ADMIN;
 
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@RequestMapping(EMPLOYEES)
-public class EmployeeController {
+@RequestMapping(PERSONS)
+@Secured({ROLE_ADMIN})
+public class PersonController {
 
     private final UserInfoService userInfoService;
-    private final EmployeeService service;
+    private final PersonService service;
 
     @GetMapping("/settings")
-    @Secured({ROLE_ADMIN})
     @Transactional(readOnly = true)
-    public ResponseEntity<EmployeeSettingsResponse> getSettings(
+    public ResponseEntity<PersonSettingsResponse> getSettings(
             @AuthenticationPrincipal final Jwt principal
     ) {
         return ResponseEntity.ok(
-                new EmployeeSettingsResponse(service.getSettings(userInfoService.fillUserInfo(principal).getKeycloakUuid()))
+                new PersonSettingsResponse(service.getSettings(userInfoService.fillUserInfo(principal).getKeycloakUuid()))
         );
     }
 
     @PostMapping("settings")
-    @Secured({ROLE_ADMIN})
     public ResponseEntity<BaseResponse> saveSettings(
             @AuthenticationPrincipal final Jwt principal,
-            @NotNull @Valid @RequestBody final EmployeeSettingsSaveRequest request
+            @NotNull @Valid @RequestBody final PersonSettingsSaveRequest request
     ) {
         service.saveSettings(userInfoService.fillUserInfo(principal).getKeycloakUuid(), request);
         return ResponseEntity.ok(new BaseResponse());

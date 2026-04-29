@@ -18,7 +18,7 @@
 
     <include file="/db/changelog/create/table/initial_create_bp_persons.xml" relativeToChangelogFile="false"/>
     <include file="/db/changelog/create/table/initial_create_bp_employees.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_bp_employee_setting.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_person_settings.xml" relativeToChangelogFile="false"/>
     <include file="/db/changelog/create/table/initial_create_bp_addresses.xml" relativeToChangelogFile="false"/>
 
     <include file="/db/changelog/create/table/initial_create_bp_companies.xml" relativeToChangelogFile="false"/>

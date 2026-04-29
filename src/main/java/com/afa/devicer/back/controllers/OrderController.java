@@ -26,6 +26,7 @@ import static com.afa.devicer.back.controllers.internal.ControllerConstants.ROLE
 @RequiredArgsConstructor
 @RequestMapping(ORDERS)
 @Tag(name = "Orders", description = "Orders controller")
+@Secured({ROLE_ADMIN})
 public class OrderController {
 
     private final UserInfoService userInfoService;
@@ -33,7 +34,6 @@ public class OrderController {
     private final OrderMapper mapper;
 
     @PostMapping("/full-filtered")
-    @Secured({ROLE_ADMIN})
     @Operation(summary = "orders filtered & paged")
     public ResponseEntity<OrderPagedResponse> getFiltered(
             @AuthenticationPrincipal final Jwt principal,
@@ -43,7 +43,6 @@ public class OrderController {
     }
 
     @GetMapping("/simple-filtered")
-    @Secured({ROLE_ADMIN})
     @Operation(summary = "orders filtered by single text")
     public ResponseEntity<OrderPagedResponse> getSimpleFiltered(
             @AuthenticationPrincipal final Jwt principal,
@@ -53,7 +52,6 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
-    @Secured({ROLE_ADMIN})
     @Operation(summary = "Order по идентификатору")
     public ResponseEntity<OrderSingleResponse> getOrder(
             @AuthenticationPrincipal final Jwt principal,
@@ -63,7 +61,6 @@ public class OrderController {
     }
 
     @PostMapping()
-    @Secured({ROLE_ADMIN})
     @Operation(summary = "Сохранить заявку нового заказа")
     public ResponseEntity<OrderDto> create(
             @AuthenticationPrincipal final Jwt principal,
@@ -73,7 +70,6 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}")
-    @Secured({ROLE_ADMIN})
     @Operation(summary = "Редактирование order")
     public ResponseEntity<OrderDto> edit(
             @AuthenticationPrincipal final Jwt principal,
@@ -86,7 +82,6 @@ public class OrderController {
     }
 
     @PatchMapping("/{orderId}/change-status")
-    @Secured({ROLE_ADMIN})
     @Operation(summary = "Change status order")
     public ResponseEntity<OrderDto> changeFullStatus(
             @AuthenticationPrincipal final Jwt principal,
@@ -99,7 +94,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{orderId}")
-    @Secured({ROLE_ADMIN})
+
     @Operation(summary = "Delete order")
     public ResponseEntity<BaseResponse> delete(
             @AuthenticationPrincipal final Jwt principal,

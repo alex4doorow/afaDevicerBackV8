@@ -56,4 +56,7 @@ management:
     health:
       show-components: always
       show-details: always
-
+cache:
+  v2:
+    ttl:
+      hours: 6

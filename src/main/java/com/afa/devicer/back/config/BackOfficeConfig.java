@@ -1,4 +1,4 @@
-package com.afa.devicer.back;
+package com.afa.devicer.back.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;

@@ -14,11 +14,11 @@ import java.util.Map;
 @Entity
 @Getter
 @Setter
-@Table(name = "bp_employee_settings",
+@Table(name = "bp_person_settings",
         indexes = {
-                @Index(name = "uq_bp_employee_settings_person_id", columnList = "person_id", unique = true)
+                @Index(name = "uq_bp_person_settings_person_id", columnList = "person_id", unique = true)
         })
-public class EmployeeSetting {
+public class PersonSetting {
 
     @Id
     @NotNull

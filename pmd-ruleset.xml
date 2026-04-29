@@ -20,4 +20,10 @@
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
     </rule>
 
+    <rule ref="category/java/design.xml"/>
+    <rule ref="category/java/codestyle.xml/UnnecessaryImport"/>
+    <rule ref="category/java/codestyle.xml/LocalVariableCouldBeFinal"/>
+    <rule ref="category/java/codestyle.xml/MethodArgumentCouldBeFinal"/>
+
+
 </ruleset>
