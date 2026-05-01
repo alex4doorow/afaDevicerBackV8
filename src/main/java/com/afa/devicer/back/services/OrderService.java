@@ -1,6 +1,7 @@
 package com.afa.devicer.back.services;
 
 import com.afa.core.dto.UserInfoDto;
+import com.afa.core.dto.dictionaries.AddressSaveRequest;
 import com.afa.core.dto.orders.*;
 import com.afa.core.dto.persons.PersonSaveRequest;
 import com.afa.core.enums.*;
@@ -97,134 +98,6 @@ public class OrderService {
                 calcTotalOrdersAmounts(user, page.getContent(), filter.getPeriod()));
     }
 
-    private Map<AmountTypes, BigDecimal> calcTotalOrdersAmounts(
-            @NotNull final UserInfoDto user,
-            final List<Order> orders,
-            final Pair<LocalDate, LocalDate> period) {
-
-        final Map<AmountTypes, BigDecimal> results = new HashMap<>();
-
-        BigDecimal billAmount = BigDecimal.ZERO;
-        BigDecimal supplierAmount = BigDecimal.ZERO;
-        BigDecimal marginAmount = BigDecimal.ZERO;
-        BigDecimal approvedConversion = BigDecimal.ZERO;
-        BigDecimal bidConversion = BigDecimal.ZERO;
-        int realOrdersCount = 0;
-
-        for (final Order order : orders) {
-            if (order.isBillAmount()) {
-                realOrdersCount++;
-                billAmount = billAmount.add(order.getBillAmount());
-                supplierAmount = supplierAmount.add(order.getSupplierAmount());
-                marginAmount = marginAmount.add(order.getMarginAmount());
-            }
-        }
-
-        final BigDecimal advertAmount = periodTotalAmountService.ejectTotalAmountsByConditions(AmountTypes.ADVERT_BUDGET, period);
-        final BigDecimal clickCount = periodTotalAmountService.ejectTotalAmountsByConditions(AmountTypes.COUNT_VISITS, period);
-
-        if (clickCount != null && !clickCount.equals(BigDecimal.ZERO)) {
-            approvedConversion = BigDecimal.valueOf(realOrdersCount).divide(clickCount, 4, RoundingMode.HALF_UP);
-            bidConversion = BigDecimal.valueOf(orders.size()).divide(clickCount, 4, RoundingMode.HALF_UP);
-        }
-        final BigDecimal marginWithoutAdvertAmount = marginAmount.subtract(advertAmount);
-        results.put(AmountTypes.BILL, billAmount);
-        results.put(AmountTypes.SUPPLIER, supplierAmount);
-        results.put(AmountTypes.MARGIN, marginWithoutAdvertAmount);
-        final Map<AmountTypes, BigDecimal> postpayAmounts = calcTotalOrdersPostpayAmountByConditions(user);
-
-        results.put(AmountTypes.POSTPAY, postpayAmounts.get(AmountTypes.POSTPAY));
-        results.put(AmountTypes.POSTPAY_CDEK, postpayAmounts.get(AmountTypes.POSTPAY_CDEK));
-        results.put(AmountTypes.POSTPAY_POST, postpayAmounts.get(AmountTypes.POSTPAY_POST));
-        results.put(AmountTypes.POSTPAY_COMPANY, postpayAmounts.get(AmountTypes.POSTPAY_COMPANY));
-        results.put(AmountTypes.POSTPAY_YANDEX_MARKET, postpayAmounts.get(AmountTypes.POSTPAY_YANDEX_MARKET));
-        results.put(AmountTypes.POSTPAY_OZON_MARKET, postpayAmounts.get(AmountTypes.POSTPAY_OZON_MARKET));
-        results.put(AmountTypes.POSTPAY_YANDEX_GO, postpayAmounts.get(AmountTypes.POSTPAY_YANDEX_GO));
-
-        results.put(AmountTypes.ADVERT_BUDGET, advertAmount);
-        results.put(AmountTypes.COUNT_REAL_ORDERS, BigDecimal.valueOf(realOrdersCount));
-        results.put(AmountTypes.CONVERSION_APPROVED, approvedConversion);
-        results.put(AmountTypes.CONVERSION_BID, bidConversion);
-        return results;
-    }
-
-    private Map<AmountTypes, BigDecimal> calcTotalOrdersPostpayAmountByConditions(
-            @NotNull final UserInfoDto user) {
-
-        LocalDate minOrderDate = iOrder.findMinOrderDateWithPostpayExcludingStatuses(List.of(
-                OrderStatusTypes.UNKNOWN,
-                OrderStatusTypes.BID,
-                OrderStatusTypes.PROCESSING,
-                OrderStatusTypes.UNPAID,
-                OrderStatusTypes.APPROVED,
-                OrderStatusTypes.PAY_ON,
-                OrderStatusTypes.FINISHED,
-                OrderStatusTypes.CANCELED,
-                OrderStatusTypes.REDELIVERY_FINISHED,
-                OrderStatusTypes.LOST,
-                OrderStatusTypes.DOC_NOT_EXIST));
-
-        if (minOrderDate == null) {
-            minOrderDate = DateHelper.firstDayOfYear(LocalDate.now());
-        }
-
-        final Map<AmountTypes, BigDecimal> postpayAmounts = new HashMap<>();
-        BigDecimal postpayAmount = BigDecimal.ZERO;
-        BigDecimal cdekPostpayAmount = BigDecimal.ZERO;
-        BigDecimal postPostpayAmount = BigDecimal.ZERO;
-        BigDecimal companyPostpayAmount = BigDecimal.ZERO;
-        BigDecimal yandexMarketPostpayAmount = BigDecimal.ZERO;
-        BigDecimal ozonMarketPostpayAmount = BigDecimal.ZERO;
-        BigDecimal yandexGoPostpayAmount = BigDecimal.ZERO;
-
-        final Pair<LocalDate, LocalDate> postpayPeriod = Pair.of(minOrderDate, DateHelper.lastDayOfMonth(LocalDate.now()));
-        final OrderPagedFilter postpayFilter = OrderPagedFilter.builder()
-                .conditions(OrderConditionsDto.builder()
-                        .period(postpayPeriod)
-                        .periodExist(true)
-                        .build())
-                .build();
-
-        final Page<Order> postpayPage = iOrder.findAll(fillOrderSpecification(user, postpayFilter.getConditions()),
-                postpayFilter.createPageRequest(postpayFilter.isSortedByEmpty() ? "id desc" : postpayFilter.getSortedBy(),
-                        Order_.class.getDeclaredFields()));
-
-        for (final Order order : postpayPage.getContent()) {
-            if (order.isPostpayAmount()) {
-
-                postpayAmount = postpayAmount.add(order.getPostpayAmount());
-
-                if (order.getAdvertType() == OrderAdvertTypes.YANDEX_MARKET) {
-                    yandexMarketPostpayAmount = yandexMarketPostpayAmount.add(order.getPostpayAmount());
-                } else if (order.getAdvertType() == OrderAdvertTypes.OZON) {
-                    ozonMarketPostpayAmount = ozonMarketPostpayAmount.add(order.getPostpayAmount());
-                } else if (order.getCustomer().isPerson() && (order.getDelivery().getDeliveryType().isCdek() || order.getDelivery().getDeliveryType() == DeliveryTypes.PICKUP)) {
-                    cdekPostpayAmount = cdekPostpayAmount.add(order.getPostpayAmount());
-                } else if (order.getCustomer().isPerson() && order.getDelivery().getDeliveryType().isPost()) {
-                    postPostpayAmount = postPostpayAmount.add(order.getPostpayAmount());
-                } else if (order.getCustomer().isPerson() && order.getDelivery().getDeliveryType() == DeliveryTypes.YANDEX_GO) {
-                    yandexGoPostpayAmount = postPostpayAmount.add(order.getPostpayAmount());
-                } else if (order.getCustomer().isCompany()) {
-                    companyPostpayAmount = companyPostpayAmount.add(order.getPostpayAmount());
-                } else {
-                    cdekPostpayAmount = cdekPostpayAmount.add(order.getPostpayAmount());
-                }
-                log.debug("postpay: {}, {}, {}, [sdek:{}, post:{}, company:{}, ym:{}, ozon:{}, yGo:{}]", order.getOrderNum(), order.getCustomer().getViewShortName(), order.getPostpayAmount(),
-                        cdekPostpayAmount, postPostpayAmount, companyPostpayAmount,
-                        yandexMarketPostpayAmount, ozonMarketPostpayAmount, yandexGoPostpayAmount);
-            }
-        }
-
-        postpayAmounts.put(AmountTypes.POSTPAY, postpayAmount);
-        postpayAmounts.put(AmountTypes.POSTPAY_CDEK, cdekPostpayAmount);
-        postpayAmounts.put(AmountTypes.POSTPAY_POST, postPostpayAmount);
-        postpayAmounts.put(AmountTypes.POSTPAY_COMPANY, companyPostpayAmount);
-        postpayAmounts.put(AmountTypes.POSTPAY_YANDEX_MARKET, yandexMarketPostpayAmount);
-        postpayAmounts.put(AmountTypes.POSTPAY_OZON_MARKET, ozonMarketPostpayAmount);
-        postpayAmounts.put(AmountTypes.POSTPAY_YANDEX_GO, yandexGoPostpayAmount);
-        return postpayAmounts;
-    }
-
     @SuppressWarnings("PMD.UnnecessaryLocalBeforeReturn")
     public OrderPagedResponse getSimpleFiltered(
             final UserInfoDto user,
@@ -242,8 +115,11 @@ public class OrderService {
                 Collections.emptyMap());
     }
 
+
     @Transactional
-    public Order create(final UserInfoDto userInfo, final OrderSaveRequest request) {
+    public Order create(
+            final UserInfoDto userInfo,
+            final OrderSaveRequest request) {
 
         validator.validateOrderCreating(request);
 
@@ -251,82 +127,31 @@ public class OrderService {
         final Person originator = userInfoService.findByIdOrThrow(userInfo.getPersonId());
         Person recipient = personService.findByPhoneNumber(request.getDelivery().getRecipient().getPhoneNumber());
         if (recipient == null) {
+
             final PersonSaveRequest recipientRequest = request.getDelivery().getRecipient();
-            recipient = personService.create(Person.builder()
-                    .country(deliveryCountry)
-                    .firstName(recipientRequest.getFirstName())
-                    .middleName(recipientRequest.getMiddleName())
-                    .lastName(recipientRequest.getLastName())
-                    .phoneNumber(recipientRequest.getPhoneNumber())
-                    .email(recipientRequest.getEmail())
-                    .build());
+            final Person recipientPerson = new Person();
+            savePersonDataFromRequest(recipientPerson, recipientRequest, deliveryCountry);
+            recipient = personService.create(recipientPerson);
         }
 
-        Address deliveryAddress = Address.builder()
-                .country(deliveryCountry)
-                .type(AddressTypes.MAIN)
-                .postCode(request.getDelivery().getAddress().getPostCode())
-                .street(request.getDelivery().getAddress().getStreet())
-                .house(request.getDelivery().getAddress().getHouse())
-                .flat(request.getDelivery().getAddress().getFlat())
-                .addressLine(request.getDelivery().getAddress().getAddressLine())
-                .userAdded(originator)
-                .build();
+        Address deliveryAddress = new Address();
+        saveAddressDataFromRequest(deliveryAddress, deliveryCountry, request.getDelivery().getAddress());
+        deliveryAddress.setUserAdded(originator);
         deliveryAddress = addressService.create(deliveryAddress);
 
         final Order order = new Order();
-        order.setOrderNum(request.getOrderNum());
-        order.setOrderDate(request.getOrderDate());
-        order.setCustomer(customerService.findByIdOrThrow(request.getCustomerId()));
-        order.setType(request.getType());
-        order.setSourceType(request.getSourceType());
-        order.setAdvertType(request.getAdvertType());
-        order.setPaymentType(request.getPaymentType());
-        order.setStore(request.getStore());
-        order.setProductCategory(productCategoryService.findByIdOrThrow(request.getProductCategoryId()));
-        order.setDelivery(OrderDelivery.builder()
-                .order(order)
-                .price(request.getDelivery().getPrice())
-                .deliveryType(request.getDelivery().getDeliveryType())
-                .deliveryPaymentType(request.getDelivery().getDeliveryPaymentType())
-                .deliveryPriceType(request.getDelivery().getDeliveryPriceType())
-                .address(deliveryAddress)
-                .recipient(recipient)
-                .annotation(request.getDelivery().getAnnotation())
-                .deliveryDate(request.getDelivery().getDeliveryDate())
-                .timeIn(request.getDelivery().getTimeIn())
-                .timeOut(request.getDelivery().getTimeOut())
-                .build());
+        saveOrderDataFromRequest(order, request);
         order.setStatus(OrderStatusTypes.BID);
-        order.setAnnotation(request.getAnnotation());
         order.setUserAdded(originator);
 
-        final Set<OrderItem> items = new HashSet<>();
-        if (request.getItems() != null && !request.getItems().isEmpty()) {
+        final OrderDelivery delivery = new OrderDelivery();
+        saveOrderDeliveryDataFromRequest(delivery, deliveryAddress, recipient, order, request.getDelivery());
+        order.setDelivery(delivery);
 
-            for (final OrderItemSaveRequest ir : request.getItems()) {
-                final Product product = productService.findByIdOrThrow(ir.getProductId());
+        order.setItems(new HashSet<>());
+        saveOrderItemsDataFromRequest(order, request, originator);
 
-                items.add(OrderItem.builder()
-                        .itemNum(ir.getItemNum())
-                        .order(order)
-                        .product(product)
-                        .price(ir.getPrice())
-                        .quantity(ir.getQuantity())
-                        .discountRate(ir.getDiscountRate())
-                        .userAdded(originator)
-                        .build());
-            }
-        }
-        order.setItems(items);
-
-        // set status bid in history - first status item
-        order.getStatusHistory().add(OrderStatusHistory.builder()
-                .order(order)
-                .status(OrderStatusTypes.BID)
-                .userAdded(originator)
-                .dateAdded(Instant.now())
-                .build());
+        addStatusHistory(order, OrderStatusTypes.BID, originator);
 
         return iOrder.saveAndFlush(order);
     }
@@ -335,12 +160,27 @@ public class OrderService {
     public Order edit(final UserInfoDto userInfo,
                       final Long orderId,
                       final OrderSaveRequest request) {
-        final Order order = findByIdOrThrow(orderId);
 
-        //
+        final Order order = findByIdOrThrow(orderId);
+        validator.validateOrderEditing(orderId, request);
+
+        final Country deliveryCountry = dictionaryCountryService.findByIdOrThrow(request.getDelivery().getAddress().getCountryId());
+        final Person originator = userInfoService.findByIdOrThrow(userInfo.getPersonId());
+
+        final Address deliveryAddress = order.getDelivery().getAddress();
+        saveAddressDataFromRequest(deliveryAddress, deliveryCountry, request.getDelivery().getAddress());
+
+        saveOrderDataFromRequest(order, request);
+        order.setDateModified(Instant.now());
+
+        order.clearItems();
+        iOrder.flush();
+
+        saveOrderItemsDataFromRequest(order, request, originator);
 
         return iOrder.saveAndFlush(order);
     }
+
 
     @SuppressWarnings("PMD")
     @Transactional
@@ -349,7 +189,6 @@ public class OrderService {
                                   final OrderChangeStatusSaveRequest request) {
         final Order order = findByIdOrThrow(orderId);
         final OrderStatusTypes currentStatus = order.getStatus();
-
         final Person originator = userInfoService.findByIdOrThrow(userInfo.getPersonId());
 
         order.setType(request.getType());
@@ -362,12 +201,7 @@ public class OrderService {
         order.getDelivery().setTrackCode(request.getTrackCode());
 
         if (currentStatus != request.getStatus()) {
-            order.getStatusHistory().add(OrderStatusHistory.builder()
-                    .order(order)
-                    .status(request.getStatus())
-                    .userAdded(originator)
-                    .dateAdded(Instant.now())
-                    .build());
+            addStatusHistory(order, request.getStatus(), originator);
         }
 
         if (request.getStatus() == OrderStatusTypes.APPROVED) {
@@ -504,9 +338,6 @@ public class OrderService {
             if (filterConditions.getCustomerConditions() != null && filterConditions.getCustomerConditions().getCustomerTypes() != null && !filterConditions.getCustomerConditions().getCustomerTypes().isEmpty()) {
                 predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.TYPE), filterConditions.getCustomerConditions().getCustomerTypes()));
             }
-//            if (filterConditions.getCustomerConditions().getCountries() != null && !filterConditions.getCustomerConditions().getCountries().isEmpty()) {
-//                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.COMPANY), filterConditions.getCustomerConditions().getCustomerTypes()));
-//            }
             // customer - person
             if (filterConditions.getCustomerConditions() != null && StringUtils.isNoneBlank(filterConditions.getCustomerConditions().getPersonPhoneNumber())) {
 
@@ -523,13 +354,10 @@ public class OrderService {
                         filterConditions.getCustomerConditions().getCompanyInn()
                 ));
             }
-
             // period
             if (filterConditions.isPeriodExist()) {
                 // за установленный период
                 predicates.add(builder.between(root.get(Order_.ORDER_DATE), filterConditions.getPeriod().getFirst(), filterConditions.getPeriod().getSecond()));
-            } else {
-                // без учета периода
             }
 
             return builder.and(predicates.toArray(new Predicate[0]));
@@ -548,5 +376,227 @@ public class OrderService {
         }
 
     }
+
+    private Map<AmountTypes, BigDecimal> calcTotalOrdersAmounts(
+            @NotNull final UserInfoDto user,
+            final List<Order> orders,
+            final Pair<LocalDate, LocalDate> period) {
+
+        final Map<AmountTypes, BigDecimal> results = new HashMap<>();
+
+        BigDecimal billAmount = BigDecimal.ZERO;
+        BigDecimal supplierAmount = BigDecimal.ZERO;
+        BigDecimal marginAmount = BigDecimal.ZERO;
+        BigDecimal approvedConversion = BigDecimal.ZERO;
+        BigDecimal bidConversion = BigDecimal.ZERO;
+        int realOrdersCount = 0;
+
+        for (final Order order : orders) {
+            if (order.isBillAmount()) {
+                realOrdersCount++;
+                billAmount = billAmount.add(order.getBillAmount());
+                supplierAmount = supplierAmount.add(order.getSupplierAmount());
+                marginAmount = marginAmount.add(order.getMarginAmount());
+            }
+        }
+
+        final BigDecimal advertAmount = periodTotalAmountService.ejectTotalAmountsByConditions(AmountTypes.ADVERT_BUDGET, period);
+        final BigDecimal clickCount = periodTotalAmountService.ejectTotalAmountsByConditions(AmountTypes.COUNT_VISITS, period);
+
+        if (clickCount != null && !clickCount.equals(BigDecimal.ZERO)) {
+            approvedConversion = BigDecimal.valueOf(realOrdersCount).divide(clickCount, 4, RoundingMode.HALF_UP);
+            bidConversion = BigDecimal.valueOf(orders.size()).divide(clickCount, 4, RoundingMode.HALF_UP);
+        }
+        final BigDecimal marginWithoutAdvertAmount = marginAmount.subtract(advertAmount);
+        results.put(AmountTypes.BILL, billAmount);
+        results.put(AmountTypes.SUPPLIER, supplierAmount);
+        results.put(AmountTypes.MARGIN, marginWithoutAdvertAmount);
+        final Map<AmountTypes, BigDecimal> postpayAmounts = calcTotalOrdersPostpayAmountByConditions(user);
+
+        results.put(AmountTypes.POSTPAY, postpayAmounts.get(AmountTypes.POSTPAY));
+        results.put(AmountTypes.POSTPAY_CDEK, postpayAmounts.get(AmountTypes.POSTPAY_CDEK));
+        results.put(AmountTypes.POSTPAY_POST, postpayAmounts.get(AmountTypes.POSTPAY_POST));
+        results.put(AmountTypes.POSTPAY_COMPANY, postpayAmounts.get(AmountTypes.POSTPAY_COMPANY));
+        results.put(AmountTypes.POSTPAY_YANDEX_MARKET, postpayAmounts.get(AmountTypes.POSTPAY_YANDEX_MARKET));
+        results.put(AmountTypes.POSTPAY_OZON_MARKET, postpayAmounts.get(AmountTypes.POSTPAY_OZON_MARKET));
+        results.put(AmountTypes.POSTPAY_YANDEX_GO, postpayAmounts.get(AmountTypes.POSTPAY_YANDEX_GO));
+
+        results.put(AmountTypes.ADVERT_BUDGET, advertAmount);
+        results.put(AmountTypes.COUNT_REAL_ORDERS, BigDecimal.valueOf(realOrdersCount));
+        results.put(AmountTypes.CONVERSION_APPROVED, approvedConversion);
+        results.put(AmountTypes.CONVERSION_BID, bidConversion);
+        return results;
+    }
+
+    private Map<AmountTypes, BigDecimal> calcTotalOrdersPostpayAmountByConditions(
+            @NotNull final UserInfoDto user) {
+
+        LocalDate minOrderDate = iOrder.findMinOrderDateWithPostpayExcludingStatuses(List.of(
+                OrderStatusTypes.UNKNOWN,
+                OrderStatusTypes.BID,
+                OrderStatusTypes.PROCESSING,
+                OrderStatusTypes.UNPAID,
+                OrderStatusTypes.APPROVED,
+                OrderStatusTypes.PAY_ON,
+                OrderStatusTypes.FINISHED,
+                OrderStatusTypes.CANCELED,
+                OrderStatusTypes.REDELIVERY_FINISHED,
+                OrderStatusTypes.LOST,
+                OrderStatusTypes.DOC_NOT_EXIST));
+
+        if (minOrderDate == null) {
+            minOrderDate = DateHelper.firstDayOfYear(LocalDate.now());
+        }
+
+        final Map<AmountTypes, BigDecimal> postpayAmounts = new HashMap<>();
+        BigDecimal postpayAmount = BigDecimal.ZERO;
+        BigDecimal cdekPostpayAmount = BigDecimal.ZERO;
+        BigDecimal postPostpayAmount = BigDecimal.ZERO;
+        BigDecimal companyPostpayAmount = BigDecimal.ZERO;
+        BigDecimal yandexMarketPostpayAmount = BigDecimal.ZERO;
+        BigDecimal ozonMarketPostpayAmount = BigDecimal.ZERO;
+        BigDecimal yandexGoPostpayAmount = BigDecimal.ZERO;
+
+        final Pair<LocalDate, LocalDate> postpayPeriod = Pair.of(minOrderDate, DateHelper.lastDayOfMonth(LocalDate.now()));
+        final OrderPagedFilter postpayFilter = OrderPagedFilter.builder()
+                .conditions(OrderConditionsDto.builder()
+                        .period(postpayPeriod)
+                        .periodExist(true)
+                        .build())
+                .build();
+
+        final Page<Order> postpayPage = iOrder.findAll(fillOrderSpecification(user, postpayFilter.getConditions()),
+                postpayFilter.createPageRequest(postpayFilter.isSortedByEmpty() ? "id desc" : postpayFilter.getSortedBy(),
+                        Order_.class.getDeclaredFields()));
+
+        for (final Order order : postpayPage.getContent()) {
+            if (order.isPostpayAmount()) {
+
+                postpayAmount = postpayAmount.add(order.getPostpayAmount());
+
+                if (order.getAdvertType() == OrderAdvertTypes.YANDEX_MARKET) {
+                    yandexMarketPostpayAmount = yandexMarketPostpayAmount.add(order.getPostpayAmount());
+                } else if (order.getAdvertType() == OrderAdvertTypes.OZON) {
+                    ozonMarketPostpayAmount = ozonMarketPostpayAmount.add(order.getPostpayAmount());
+                } else if (order.getCustomer().isPerson() && (order.getDelivery().getDeliveryType().isCdek() || order.getDelivery().getDeliveryType() == DeliveryTypes.PICKUP)) {
+                    cdekPostpayAmount = cdekPostpayAmount.add(order.getPostpayAmount());
+                } else if (order.getCustomer().isPerson() && order.getDelivery().getDeliveryType().isPost()) {
+                    postPostpayAmount = postPostpayAmount.add(order.getPostpayAmount());
+                } else if (order.getCustomer().isPerson() && order.getDelivery().getDeliveryType() == DeliveryTypes.YANDEX_GO) {
+                    yandexGoPostpayAmount = postPostpayAmount.add(order.getPostpayAmount());
+                } else if (order.getCustomer().isCompany()) {
+                    companyPostpayAmount = companyPostpayAmount.add(order.getPostpayAmount());
+                } else {
+                    cdekPostpayAmount = cdekPostpayAmount.add(order.getPostpayAmount());
+                }
+                log.debug("postpay: {}, {}, {}, [sdek:{}, post:{}, company:{}, ym:{}, ozon:{}, yGo:{}]", order.getOrderNum(), order.getCustomer().getViewShortName(), order.getPostpayAmount(),
+                        cdekPostpayAmount, postPostpayAmount, companyPostpayAmount,
+                        yandexMarketPostpayAmount, ozonMarketPostpayAmount, yandexGoPostpayAmount);
+            }
+        }
+
+        postpayAmounts.put(AmountTypes.POSTPAY, postpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_CDEK, cdekPostpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_POST, postPostpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_COMPANY, companyPostpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_YANDEX_MARKET, yandexMarketPostpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_OZON_MARKET, ozonMarketPostpayAmount);
+        postpayAmounts.put(AmountTypes.POSTPAY_YANDEX_GO, yandexGoPostpayAmount);
+        return postpayAmounts;
+    }
+
+    private void savePersonDataFromRequest(
+            final Person person,
+            final PersonSaveRequest request,
+            final Country country) {
+        person.setCountry(country);
+        person.setFirstName(request.getFirstName());
+        person.setMiddleName(request.getMiddleName());
+        person.setLastName(request.getLastName());
+        person.setPhoneNumber(request.getPhoneNumber());
+        person.setEmail(request.getEmail());
+    }
+
+    private void saveAddressDataFromRequest(
+            final Address deliveryAddress,
+            final Country country,
+            final AddressSaveRequest request) {
+        deliveryAddress.setCountry(country);
+        deliveryAddress.setType(AddressTypes.MAIN);
+        deliveryAddress.setPostCode(request.getPostCode());
+        deliveryAddress.setStreet(request.getStreet());
+        deliveryAddress.setHouse(request.getHouse());
+        deliveryAddress.setFlat(request.getFlat());
+        deliveryAddress.setAddressLine(request.getAddressLine());
+    }
+
+    private void saveOrderDeliveryDataFromRequest(
+            final OrderDelivery delivery,
+            final Address deliveryAddress,
+            final Person person,
+            final Order order,
+            final OrderDeliverySaveRequest request) {
+        delivery.setOrder(order);
+        delivery.setPrice(request.getPrice());
+        delivery.setDeliveryType(request.getDeliveryType());
+        delivery.setDeliveryPaymentType(request.getDeliveryPaymentType());
+        delivery.setDeliveryPriceType(request.getDeliveryPriceType());
+        delivery.setAddress(deliveryAddress);
+        delivery.setRecipient(person);
+        delivery.setAnnotation(request.getAnnotation());
+        delivery.setDeliveryDate(request.getDeliveryDate());
+        delivery.setTimeIn(request.getTimeIn());
+        delivery.setTimeOut(request.getTimeOut());
+        order.setDelivery(delivery);
+    }
+
+    private void saveOrderDataFromRequest(
+            final Order order,
+            final OrderSaveRequest request) {
+        order.setOrderNum(request.getOrderNum());
+        order.setOrderDate(request.getOrderDate());
+        order.setCustomer(customerService.findByIdOrThrow(request.getCustomerId()));
+        order.setType(request.getType());
+        order.setSourceType(request.getSourceType());
+        order.setAdvertType(request.getAdvertType());
+        order.setPaymentType(request.getPaymentType());
+        order.setStore(request.getStore());
+        order.setProductCategory(productCategoryService.findByIdOrThrow(request.getProductCategoryId()));
+        order.setAnnotation(request.getAnnotation());
+    }
+
+    private void addStatusHistory(
+            final Order order,
+            final OrderStatusTypes status,
+            final Person originator) {
+        final OrderStatusHistory statusHistory = new OrderStatusHistory();
+        statusHistory.setOrder(order);
+        statusHistory.setStatus(status);
+        statusHistory.setUserAdded(originator);
+        statusHistory.setDateAdded(Instant.now());
+        order.getStatusHistory().add(statusHistory);
+    }
+
+    private void saveOrderItemsDataFromRequest(
+            final Order order,
+            final OrderSaveRequest request,
+            final Person originator) {
+        if (request.getItems() != null) {
+            for (final OrderItemSaveRequest ir : request.getItems()) {
+                final Product product = productService.findByIdOrThrow(ir.getProductId());
+
+                final OrderItem item = new OrderItem();
+                item.setItemNum(ir.getItemNum());
+                item.setProduct(product);
+                item.setPrice(ir.getPrice());
+                item.setQuantity(ir.getQuantity());
+                item.setDiscountRate(ir.getDiscountRate());
+                item.setUserAdded(originator);
+
+                order.addItem(item);
+            }
+        }
+    }
+
 
 }

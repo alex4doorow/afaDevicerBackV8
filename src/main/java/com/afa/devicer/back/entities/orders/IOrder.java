@@ -13,6 +13,9 @@ import java.util.List;
 public interface IOrder extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 
     List<Order> findByOrderNum(Long orderNum);
+
+    boolean existsByOrderNumAndIdNot(Long orderNum, Long id);
+
     List<Order> findByDeliveryTrackCode(String trackCode);
 
     /**
@@ -33,10 +36,10 @@ public interface IOrder extends JpaRepository<Order, Long>, JpaSpecificationExec
 
     List<Order> findByCustomerCompanyIsNotNullAndCustomerCompanyPhoneNumber(String phoneNumber);
 
-    @Query("SELECT MIN(o.orderDate) " +
-            "FROM Order o " +
-            "WHERE o.postpayAmount > 0 " +
-            "AND o.status NOT IN :excludedStatuses")
+    @Query("select MIN(o.orderDate) " +
+            "from Order o " +
+            "where o.postpayAmount > 0 " +
+            "and o.status not in :excludedStatuses")
     LocalDate findMinOrderDateWithPostpayExcludingStatuses(@Param("excludedStatuses") List<OrderStatusTypes> excludedStatuses);
 
 }

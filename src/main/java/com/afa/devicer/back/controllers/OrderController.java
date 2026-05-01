@@ -62,39 +62,40 @@ public class OrderController {
 
     @PostMapping()
     @Operation(summary = "Сохранить заявку нового заказа")
-    public ResponseEntity<OrderDto> create(
+    public ResponseEntity<OrderSingleResponse> create(
             @AuthenticationPrincipal final Jwt principal,
             @NotNull @Valid @RequestBody final OrderSaveRequest request
     ) {
-        return ResponseEntity.ok(mapper.fromOrder(service.create(userInfoService.fillUserInfo(principal), request)));
+        return ResponseEntity.ok(
+                new OrderSingleResponse(mapper.fromOrder(service.create(userInfoService.fillUserInfo(principal), request)))
+        );
     }
 
     @PutMapping("/{orderId}")
     @Operation(summary = "Редактирование order")
-    public ResponseEntity<OrderDto> edit(
+    public ResponseEntity<OrderSingleResponse> edit(
             @AuthenticationPrincipal final Jwt principal,
             @NotNull @Valid @PathVariable final Long orderId,
             @NotNull @Valid @RequestBody final OrderSaveRequest request
     ) {
         return ResponseEntity.ok(
-                mapper.fromOrder(service.edit(userInfoService.fillUserInfo(principal), orderId, request))
+                new OrderSingleResponse(mapper.fromOrder(service.edit(userInfoService.fillUserInfo(principal), orderId, request)))
         );
     }
 
     @PatchMapping("/{orderId}/change-status")
     @Operation(summary = "Change status order")
-    public ResponseEntity<OrderDto> changeFullStatus(
+    public ResponseEntity<OrderSingleResponse> changeFullStatus(
             @AuthenticationPrincipal final Jwt principal,
             @NotNull @Valid @PathVariable final Long orderId,
             @NotNull @Valid @RequestBody final OrderChangeStatusSaveRequest request
     ) {
         return ResponseEntity.ok(
-                mapper.fromOrder(service.changeFullStatus(userInfoService.fillUserInfo(principal), orderId, request))
+                new OrderSingleResponse(mapper.fromOrder(service.changeFullStatus(userInfoService.fillUserInfo(principal), orderId, request)))
         );
     }
 
     @DeleteMapping("/{orderId}")
-
     @Operation(summary = "Delete order")
     public ResponseEntity<BaseResponse> delete(
             @AuthenticationPrincipal final Jwt principal,

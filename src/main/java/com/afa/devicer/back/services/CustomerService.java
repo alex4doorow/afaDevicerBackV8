@@ -2,14 +2,14 @@ package com.afa.devicer.back.services;
 
 import com.afa.core.dto.UserInfoDto;
 import com.afa.core.dto.customers.*;
+import com.afa.core.enums.DevicerErrors;
+import com.afa.core.exceptions.DevicerException;
 import com.afa.devicer.back.entities.companies.Company;
 import com.afa.devicer.back.entities.companies.ICompany;
 import com.afa.devicer.back.entities.customers.*;
 import com.afa.devicer.back.entities.dictionaries.Address;
 import com.afa.devicer.back.entities.dictionaries.Country;
 import com.afa.devicer.back.entities.people.Person;
-import com.afa.core.enums.DevicerErrors;
-import com.afa.core.exceptions.DevicerException;
 import com.afa.devicer.back.mappers.CustomerMapper;
 import com.afa.devicer.back.validators.CustomerServiceValidator;
 import jakarta.validation.constraints.NotNull;
@@ -83,13 +83,11 @@ public class CustomerService {
             company = iCompany.save(company);
 
         } else if (request.getPerson() != null) {
-
-            person = Person.builder()
-                    .firstName(request.getPerson().getFirstName())
-                    .middleName(request.getPerson().getMiddleName())
-                    .lastName(request.getPerson().getLastName())
-                    .country(country)
-                    .build();
+            person = new Person();
+            person.setCountry(country);
+            person.setFirstName(request.getPerson().getFirstName());
+            person.setMiddleName(request.getPerson().getMiddleName());
+            person.setLastName(request.getPerson().getLastName());
         }
 
         final Customer customer = new Customer();
@@ -104,14 +102,14 @@ public class CustomerService {
 
                 Person contact = personService.findByPhoneNumber(c.getPerson().getPhoneNumber());
                 if (contact == null) {
-                    contact = personService.create(Person.builder()
-                            .country(country)
-                            .firstName(c.getPerson().getFirstName())
-                            .middleName(c.getPerson().getMiddleName())
-                            .lastName(c.getPerson().getLastName())
-                            .phoneNumber(c.getPerson().getPhoneNumber())
-                            .email(c.getPerson().getEmail())
-                            .build());
+                    final Person contactPerson = new Person();
+                    contactPerson.setCountry(country);
+                    contactPerson.setFirstName(c.getPerson().getFirstName());
+                    contactPerson.setMiddleName(c.getPerson().getMiddleName());
+                    contactPerson.setLastName(c.getPerson().getLastName());
+                    contactPerson.setPhoneNumber(c.getPerson().getPhoneNumber());
+                    contactPerson.setEmail(c.getPerson().getEmail());
+                    contact = personService.create(contactPerson);
                 }
                 contacts.add(CustomerContact.builder()
                         .type(c.getType())

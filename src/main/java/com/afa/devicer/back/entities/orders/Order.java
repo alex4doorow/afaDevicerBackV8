@@ -114,11 +114,9 @@ public class Order {
     private BigDecimal postpayAmount = BigDecimal.ZERO;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL)
-    @EqualsAndHashCode.Exclude
     private Set<OrderItem> items;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL)
-    @EqualsAndHashCode.Exclude
     private Set<OrderCrm> crms;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, optional = false)
@@ -126,7 +124,6 @@ public class Order {
 
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    @EqualsAndHashCode.Exclude
     private Set<OrderStatusHistory> statusHistory = new HashSet<>();
 
     @NotNull
@@ -171,6 +168,15 @@ public class Order {
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void preUpdate() {
         this.dateModified = Instant.now();
+    }
+
+    public void addItem(final OrderItem item) {
+        items.add(item);
+        item.setOrder(this);
+    }
+
+    public void clearItems() {
+        items.clear();
     }
 
     public CrmTypes getExternalCrm() {

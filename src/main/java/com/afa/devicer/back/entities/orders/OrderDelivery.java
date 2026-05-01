@@ -1,11 +1,11 @@
 package com.afa.devicer.back.entities.orders;
 
-import com.afa.devicer.back.entities.dictionaries.Address;
-import com.afa.devicer.back.entities.people.Person;
+import com.afa.core.enums.DeliveryPaymentTypes;
 import com.afa.core.enums.DeliveryPriceTypes;
 import com.afa.core.enums.DeliveryTypes;
-import com.afa.core.enums.DeliveryPaymentTypes;
 import com.afa.core.utils.DefaultConstants;
+import com.afa.devicer.back.entities.dictionaries.Address;
+import com.afa.devicer.back.entities.people.Person;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +18,6 @@ import java.time.LocalTime;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -59,7 +58,6 @@ public class OrderDelivery {
      * Значение, которое ввел оператор
      */
     @NotNull
-    @Builder.Default
     @Column(name = "price", nullable = false)
     private BigDecimal price = BigDecimal.ZERO;
 
@@ -67,7 +65,6 @@ public class OrderDelivery {
      * Сколько платит покупатель - доставка за счет покупателя
      */
     @NotNull
-    @Builder.Default
     @Column(name = "customer_price", nullable = false)
     private BigDecimal factCustomerPrice = BigDecimal.ZERO;
 
@@ -75,7 +72,6 @@ public class OrderDelivery {
      * Сколько платит продавец - доставка за счет продавца
      */
     @NotNull
-    @Builder.Default
     @Column(name = "seller_price", nullable = false)
     private BigDecimal factSellerPrice = BigDecimal.ZERO;
 
@@ -109,12 +105,10 @@ public class OrderDelivery {
     private LocalTime timeOut;
 
     @NotNull
-    @Builder.Default
     @Column(name = "rec_status", nullable = false)
     private Character recStatus = DefaultConstants.ACTIVE;
 
     @NotNull
-    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 

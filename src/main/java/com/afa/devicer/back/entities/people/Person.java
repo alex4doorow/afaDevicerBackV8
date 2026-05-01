@@ -14,7 +14,6 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -63,12 +62,10 @@ public class Person {
     private String email;
 
     @NotNull
-    @Builder.Default
     @Column(name = "rec_status", nullable = false)
     private Character recStatus = DefaultConstants.ACTIVE;
 
     @NotNull
-    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 
