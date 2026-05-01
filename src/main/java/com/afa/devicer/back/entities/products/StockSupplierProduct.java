@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -49,17 +48,14 @@ public class StockSupplierProduct {
     private Product product;
 
     @NotNull
-    @Builder.Default
     @Column(name = "supplier_price", nullable = false)
     private BigDecimal supplierPrice = BigDecimal.ZERO;
 
     @NotNull
-    @Builder.Default
     @Column(name = "supplier_quantity", nullable = false)
     private Integer supplierQuantity = 0;
 
     @NotNull
-    @Builder.Default
     @Column(name = "quantity", nullable = false)
     private Integer quantity = 0;
 

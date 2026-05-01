@@ -18,7 +18,6 @@ import java.util.Set;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -84,37 +83,31 @@ public class Order {
     private Customer customer;
 
     @NotNull
-    @Builder.Default
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
     @NotNull
-    @Builder.Default
     @Column(name = "total_with_delivery_amount", nullable = false)
     private BigDecimal totalWithDeliveryAmount = BigDecimal.ZERO;
 
     @NotNull
-    @Builder.Default
     @Column(name = "bill_amount", nullable = false)
     private BigDecimal billAmount = BigDecimal.ZERO;
 
     @NotNull
-    @Builder.Default
     @Column(name = "supplier_amount", nullable = false)
     private BigDecimal supplierAmount = BigDecimal.ZERO;
 
     @NotNull
-    @Builder.Default
     @Column(name = "margin_amount", nullable = false)
     private BigDecimal marginAmount = BigDecimal.ZERO;
 
     @NotNull
-    @Builder.Default
     @Column(name = "postpay_amount", nullable = false)
     private BigDecimal postpayAmount = BigDecimal.ZERO;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL)
-    private Set<OrderItem> items;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<OrderItem> items = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL)
     private Set<OrderCrm> crms;
@@ -122,7 +115,6 @@ public class Order {
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, optional = false)
     private OrderDelivery delivery;
 
-    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderStatusHistory> statusHistory = new HashSet<>();
 
@@ -145,7 +137,6 @@ public class Order {
     private String annotation;
 
     @NotNull
-    @Builder.Default
     @Column(name = "rec_status", nullable = false)
     private Character recStatus = DefaultConstants.ACTIVE;
 
@@ -157,7 +148,6 @@ public class Order {
     private Person userAdded;
 
     @NotNull
-    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 

@@ -13,12 +13,13 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -126,7 +127,6 @@ public class Product {
     private Integer sortKey;
 
     @NotNull
-    @Builder.Default
     @Column(name = "deactivated", nullable = false)
     private Boolean deactivated = false;
 
@@ -135,15 +135,15 @@ public class Product {
     private Character recStatus;
 
     @NotNull
-    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 
     @Column(name = "date_modified", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateModified;
 
-    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "master", cascade = CascadeType.ALL, orphanRemoval = true)
-    @EqualsAndHashCode.Exclude
     private Set<ProductComposite> kitComponents = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL)
+    private List<StockSupplierProduct> stockSupplierProducts = new ArrayList<>();
 }

@@ -18,6 +18,8 @@ import com.afa.devicer.back.entities.people.Person;
 import com.afa.devicer.back.entities.people.Person_;
 import com.afa.devicer.back.entities.products.Product;
 import com.afa.devicer.back.mappers.OrderMapper;
+import com.afa.devicer.back.utils.calc.AnyOrderTotalAmountsCalculator;
+import com.afa.devicer.back.utils.calc.OrderTotalAmountsCalculatorFactory;
 import com.afa.devicer.back.validators.OrderServiceValidator;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.constraints.NotNull;
@@ -177,8 +179,21 @@ public class OrderService {
         iOrder.flush();
 
         saveOrderItemsDataFromRequest(order, request, originator);
+        saveTotalAmounts(order);
 
         return iOrder.saveAndFlush(order);
+    }
+
+    private void saveTotalAmounts(final Order order) {
+        final AnyOrderTotalAmountsCalculator calculator = OrderTotalAmountsCalculatorFactory.createCalculator(order);
+        final Map<AmountTypes, BigDecimal> amounts = calculator.calc();
+
+        order.setBillAmount(amounts.get(AmountTypes.BILL));
+        order.setTotalAmount(amounts.get(AmountTypes.TOTAL));
+        order.setTotalWithDeliveryAmount(amounts.get(AmountTypes.TOTAL_WITH_DELIVERY));
+        order.setMarginAmount(amounts.get(AmountTypes.MARGIN));
+        order.setPostpayAmount(amounts.get(AmountTypes.POSTPAY));
+        order.setSupplierAmount(amounts.get(AmountTypes.SUPPLIER));
     }
 
 
@@ -584,6 +599,12 @@ public class OrderService {
         if (request.getItems() != null) {
             for (final OrderItemSaveRequest ir : request.getItems()) {
                 final Product product = productService.findByIdOrThrow(ir.getProductId());
+                final BigDecimal supplierPrice;
+                if (product.getStockSupplierProducts().isEmpty()) {
+                    supplierPrice = BigDecimal.ZERO;
+                } else {
+                    supplierPrice = product.getStockSupplierProducts().getFirst().getSupplierPrice();
+                }
 
                 final OrderItem item = new OrderItem();
                 item.setItemNum(ir.getItemNum());
@@ -591,6 +612,16 @@ public class OrderService {
                 item.setPrice(ir.getPrice());
                 item.setQuantity(ir.getQuantity());
                 item.setDiscountRate(ir.getDiscountRate());
+
+                final BigDecimal quantity = BigDecimal.valueOf(ir.getQuantity());
+                final BigDecimal baseAmount = ir.getPrice().multiply(quantity);
+                final BigDecimal discount = baseAmount.multiply(ir.getDiscountRate()).divide(NumericHelper.ONE_HUNDRED,
+                        RoundingMode.HALF_UP);
+                final BigDecimal amount = baseAmount.subtract(discount);
+
+                item.setAmountSupplier(supplierPrice);
+                item.setAmount(amount);
+
                 item.setUserAdded(originator);
 
                 order.addItem(item);
