@@ -53,6 +53,10 @@ public class OrderItem {
     private BigDecimal price;
 
     @NotNull
+    @Column(name = "price_supplier", nullable = false)
+    private BigDecimal priceSupplier = BigDecimal.ZERO;
+
+    @NotNull
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 

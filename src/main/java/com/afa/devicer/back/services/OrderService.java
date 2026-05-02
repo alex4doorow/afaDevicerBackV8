@@ -148,7 +148,6 @@ public class OrderService {
 
         final OrderDelivery delivery = new OrderDelivery();
         saveOrderDeliveryDataFromRequest(delivery, deliveryAddress, recipient, order, request.getDelivery());
-        order.setDelivery(delivery);
 
         order.setItems(new HashSet<>());
         saveOrderItemsDataFromRequest(order, request, originator);
@@ -164,13 +163,19 @@ public class OrderService {
                       final OrderSaveRequest request) {
 
         final Order order = findByIdOrThrow(orderId);
+        final Person originator = userInfoService.findByIdOrThrow(userInfo.getPersonId());
         validator.validateOrderEditing(orderId, request);
 
-        final Country deliveryCountry = dictionaryCountryService.findByIdOrThrow(request.getDelivery().getAddress().getCountryId());
-        final Person originator = userInfoService.findByIdOrThrow(userInfo.getPersonId());
-
         final Address deliveryAddress = order.getDelivery().getAddress();
+        final Country deliveryCountry = dictionaryCountryService.findByIdOrThrow(request.getDelivery().getAddress().getCountryId());
+
         saveAddressDataFromRequest(deliveryAddress, deliveryCountry, request.getDelivery().getAddress());
+        saveOrderDeliveryDataFromRequest(
+                order.getDelivery(),
+                deliveryAddress,
+                order.getDelivery().getRecipient(),
+                order,
+                request.getDelivery());
 
         saveOrderDataFromRequest(order, request);
         order.setDateModified(Instant.now());
@@ -600,28 +605,28 @@ public class OrderService {
             for (final OrderItemSaveRequest ir : request.getItems()) {
                 final Product product = productService.findByIdOrThrow(ir.getProductId());
                 final BigDecimal supplierPrice;
-                if (product.getStockSupplierProducts().isEmpty()) {
+                if (product.getStockSupplierProduct() == null) {
                     supplierPrice = BigDecimal.ZERO;
                 } else {
-                    supplierPrice = product.getStockSupplierProducts().getFirst().getSupplierPrice();
+                    supplierPrice = product.getStockSupplierProduct().getSupplierPrice();
                 }
-
-                final OrderItem item = new OrderItem();
-                item.setItemNum(ir.getItemNum());
-                item.setProduct(product);
-                item.setPrice(ir.getPrice());
-                item.setQuantity(ir.getQuantity());
-                item.setDiscountRate(ir.getDiscountRate());
 
                 final BigDecimal quantity = BigDecimal.valueOf(ir.getQuantity());
                 final BigDecimal baseAmount = ir.getPrice().multiply(quantity);
                 final BigDecimal discount = baseAmount.multiply(ir.getDiscountRate()).divide(NumericHelper.ONE_HUNDRED,
                         RoundingMode.HALF_UP);
                 final BigDecimal amount = baseAmount.subtract(discount);
+                final BigDecimal supplierAmount = supplierPrice.multiply(quantity);
 
-                item.setAmountSupplier(supplierPrice);
+                final OrderItem item = new OrderItem();
+                item.setItemNum(ir.getItemNum());
+                item.setProduct(product);
+                item.setPrice(ir.getPrice());
+                item.setPriceSupplier(supplierPrice);
+                item.setQuantity(ir.getQuantity());
+                item.setDiscountRate(ir.getDiscountRate());
+                item.setAmountSupplier(supplierAmount);
                 item.setAmount(amount);
-
                 item.setUserAdded(originator);
 
                 order.addItem(item);

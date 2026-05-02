@@ -18,6 +18,9 @@
             <column name="price" type="numeric(15, 4)">
                 <constraints nullable="false"/>
             </column>
+            <column name="price_supplier" type="numeric(15, 4)">
+                <constraints nullable="false"/>
+            </column>
             <column name="quantity" type="INTEGER">
                 <constraints nullable="false"/>
             </column>

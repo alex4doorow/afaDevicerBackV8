@@ -18,7 +18,7 @@ import java.math.BigDecimal;
         indexes = {
                 @Index(name = "idx_bp_stock_supplier_products_stock", columnList = "stock"),
                 @Index(name = "idx_bp_stock_supplier_products_supplier", columnList = "supplier"),
-                @Index(name = "idx_bp_stock_supplier_products_product_id", columnList = "product_id")
+                @Index(name = "idx_bp_stock_supplier_products_product_id", columnList = "product_id", unique = true),
         })
 @SuppressWarnings({"PMD.TooManyFields", "PMD.AvoidDuplicateLiterals", "PMD.LawOfDemeter"})
 public class StockSupplierProduct {
@@ -41,8 +41,8 @@ public class StockSupplierProduct {
     private SupplierTypes supplier;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "product_id", nullable = false, unique = true)
     @ToString.Exclude
     @JsonIgnore
     private Product product;
@@ -61,4 +61,6 @@ public class StockSupplierProduct {
 
     @Column(name = "comment")
     private String comment;
+
+
 }

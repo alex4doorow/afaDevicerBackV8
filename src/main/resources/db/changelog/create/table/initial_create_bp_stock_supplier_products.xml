@@ -41,7 +41,7 @@
     </changeSet>
 
     <changeSet author="al (generated)" id="1754837442376_bp_stock_supplier_products_4">
-        <createIndex indexName="idx_bp_stock_supplier_products_product_id" tableName="bp_stock_supplier_products">
+        <createIndex indexName="idx_bp_stock_supplier_products_product_id" tableName="bp_stock_supplier_products" unique="true">
             <column name="product_id"/>
         </createIndex>
     </changeSet>

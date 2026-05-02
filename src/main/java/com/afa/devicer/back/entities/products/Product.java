@@ -144,6 +144,14 @@ public class Product {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "master", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductComposite> kitComponents = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL)
-    private List<StockSupplierProduct> stockSupplierProducts = new ArrayList<>();
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, optional = true)
+    private StockSupplierProduct stockSupplierProduct;
+
+    public void setStockSupplierProduct(StockSupplierProduct stockSupplierProduct) {
+        this.stockSupplierProduct = stockSupplierProduct;
+
+        if (stockSupplierProduct != null) {
+            stockSupplierProduct.setProduct(this);
+        }
+    }
 }
