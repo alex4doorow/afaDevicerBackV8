@@ -605,10 +605,10 @@ public class OrderService {
             for (final OrderItemSaveRequest ir : request.getItems()) {
                 final Product product = productService.findByIdOrThrow(ir.getProductId());
                 final BigDecimal supplierPrice;
-                if (product.getStockSupplierProduct() == null) {
+                if (product.getStock() == null) {
                     supplierPrice = BigDecimal.ZERO;
                 } else {
-                    supplierPrice = product.getStockSupplierProduct().getSupplierPrice();
+                    supplierPrice = product.getStock().getSupplierPrice();
                 }
 
                 final BigDecimal quantity = BigDecimal.valueOf(ir.getQuantity());

@@ -2,8 +2,6 @@ package com.afa.devicer.back.services;
 
 import com.afa.core.dto.dictionaries.CountryDto;
 import com.afa.core.dto.dictionaries.CountryFilter;
-import com.afa.core.dto.products.ProductCategoryDto;
-import com.afa.core.dto.products.ProductCategoryFilter;
 import com.afa.devicer.back.config.CacheConfig;
 import com.afa.devicer.back.entities.dictionaries.Country;
 import com.afa.devicer.back.entities.dictionaries.Country_;

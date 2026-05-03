@@ -9,6 +9,7 @@ public final class ControllerConstants {
 
     public static final String BASE_API = "/api/v8";
 
+    public static final String INTEGRATIONS = BASE_API + "/integrations";
     public static final String DICTIONARIES = BASE_API + "/dictionaries";
     public static final String PRODUCTS = BASE_API + "/products";
     public static final String EMPLOYEES = BASE_API + "/employees";

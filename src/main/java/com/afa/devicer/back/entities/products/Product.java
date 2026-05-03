@@ -13,9 +13,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -144,14 +142,7 @@ public class Product {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "master", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductComposite> kitComponents = new HashSet<>();
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, optional = true)
-    private StockSupplierProduct stockSupplierProduct;
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private StockSupplierProduct stock;
 
-    public void setStockSupplierProduct(StockSupplierProduct stockSupplierProduct) {
-        this.stockSupplierProduct = stockSupplierProduct;
-
-        if (stockSupplierProduct != null) {
-            stockSupplierProduct.setProduct(this);
-        }
-    }
 }

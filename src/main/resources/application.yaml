@@ -60,3 +60,9 @@ cache:
   v2:
     ttl:
       hours: 6
+integrations:
+  cdek:
+    protocol: https
+    host: ${INTEGRATION_CDEK_HOST}
+    account: ${INTEGRATION_CDEK_ACCOUNT}
+    secure: ${INTEGRATION_SECURE}

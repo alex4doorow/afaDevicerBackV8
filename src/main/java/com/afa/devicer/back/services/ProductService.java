@@ -1,17 +1,23 @@
 package com.afa.devicer.back.services;
 
+import com.afa.core.dto.products.ProductFilter;
+import com.afa.core.dto.products.ProductShortDto;
 import com.afa.core.dto.products.Result4UpdateProductStock;
 import com.afa.core.enums.CrmTypes;
 import com.afa.core.enums.DevicerErrors;
 import com.afa.core.enums.OrderStatusTypes;
 import com.afa.core.exceptions.DevicerException;
 import com.afa.devicer.back.entities.products.*;
+import com.afa.devicer.back.mappers.ProductMapper;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -20,6 +26,7 @@ public class ProductService {
 
     private final IProduct iProduct;
     private final IStockSupplierProduct iStockSupplierProduct;
+    private final ProductMapper productMapper;
 
     public Optional<Product> findByIdOptional(final Long id) {
         return iProduct.findById(id);
@@ -29,6 +36,78 @@ public class ProductService {
         return findByIdOptional(id).orElseThrow(() ->
                 new DevicerException(DevicerErrors.DB_ENTITY_NOT_FOUND, Product_.class_, id)
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductShortDto> getProductsSuggest(final ProductFilter filter) {
+        if (filter.getNameContext() == null || filter.getNameContext().trim().length() < 3) {
+            return Collections.emptyList();
+        }
+        List<Product> products;
+        final ProductFilter skuFilter = ProductFilter.builder()
+                .sku(filter.getNameContext())
+                .build();
+        products = iProduct.findAll(fillProductSpecification(skuFilter));
+        if (products.isEmpty()) {
+            final ProductFilter longNameFilter = ProductFilter.builder()
+                    .longName(filter.getNameContext())
+                    .build();
+            products = iProduct.findAll(fillProductSpecification(longNameFilter));
+        }
+        if (products.isEmpty()) {
+            final ProductFilter shortNameFilter = ProductFilter.builder()
+                    .shortName(filter.getNameContext())
+                    .build();
+            products = iProduct.findAll(fillProductSpecification(shortNameFilter));
+        }
+        if (products.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return products.stream()
+                .map(productMapper::fromProduct)
+                .sorted(Comparator.comparing(ProductShortDto::getId))
+                .limit(10)
+                .toList();
+    }
+
+    private Specification<Product> fillProductSpecification(final ProductFilter filter) {
+
+        return (root, query, builder) -> {
+
+            final List<Predicate> predicates = new ArrayList<>();
+
+            if (StringUtils.isNotBlank(filter.getSku())) {
+                final String search = "%" + filter.getSku().toLowerCase() + "%";
+                predicates.add(builder.like(builder.lower(root.get(Product_.SKU)), search));
+            }
+            if (StringUtils.isNotBlank(filter.getLongName())) {
+                final String search = "%" + filter.getLongName().toLowerCase() + "%";
+                predicates.add(builder.like(builder.lower(root.get(Product_.LONG_NAME)), search));
+            }
+            if (StringUtils.isNotBlank(filter.getShortName())) {
+                final String search = "%" + filter.getShortName().toLowerCase() + "%";
+                predicates.add(builder.like(builder.lower(root.get(Product_.SHORT_NAME)), search));
+            }
+            if (StringUtils.isNotBlank(filter.getNameContext())) {
+
+                final String search = "%" + filter.getNameContext().trim().toLowerCase() + "%";
+                predicates.add(
+                        builder.or(
+                                builder.like(builder.lower(root.get(Product_.SKU)), search),
+                                builder.like(
+                                        builder.lower(root.get(Product_.SHORT_NAME)),
+                                        search
+                                ),
+                                builder.like(
+                                        builder.lower(root.get(Product_.LONG_NAME)),
+                                        search
+                                )
+                        )
+                );
+            }
+
+            return builder.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     /**
