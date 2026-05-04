@@ -51,10 +51,16 @@ public class StockSupplierProduct {
     @Column(name = "supplier_price", nullable = false)
     private BigDecimal supplierPrice = BigDecimal.ZERO;
 
+    /**
+     * остаток на складе поставщика - обновляем по фиду
+     */
     @NotNull
     @Column(name = "supplier_quantity", nullable = false)
     private Integer supplierQuantity = 0;
 
+    /**
+     * остаток на нашем складе
+     */
     @NotNull
     @Column(name = "quantity", nullable = false)
     private Integer quantity = 0;

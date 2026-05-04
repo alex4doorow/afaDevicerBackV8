@@ -30,6 +30,7 @@ public class PersonService {
         return iPerson.findById(id);
     }
 
+    @Transactional(readOnly = true)
     public Optional<Person> findByOptionalKeycloakId(final UUID keycloakId) {
         return iPerson.findByKeycloakUuid(keycloakId);
     }
@@ -41,17 +42,19 @@ public class PersonService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public Optional<Person> findByPhoneNumberOptional(final String phoneNumber) {
+        return iPerson.findByPhoneNumber(phoneNumber);
+    }
+
+    @Transactional(readOnly = true)
     public Person findByIdOrThrow(final Long id) {
         return findByIdOptional(id).orElseThrow(() ->
                 new DevicerException(DevicerErrors.DB_ENTITY_NOT_FOUND, Person_.class_, id)
         );
     }
 
-    public Person findByPhoneNumber(final String phoneNumber) {
-        final Optional<Person> result = iPerson.findByPhoneNumber(phoneNumber);
-        return result.orElse(null);
-    }
-
+    @Transactional
     public Person create(final Person person) {
         return iPerson.save(person);
     }

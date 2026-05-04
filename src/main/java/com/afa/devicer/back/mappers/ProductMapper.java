@@ -1,6 +1,6 @@
 package com.afa.devicer.back.mappers;
 
-import com.afa.core.dto.products.ProductShortDto;
+import com.afa.core.dto.products.ProductDto;
 import com.afa.devicer.back.entities.products.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -9,7 +9,7 @@ import org.mapstruct.ReportingPolicy;
 @SuppressWarnings({"PMD.LawOfDemeter"})
 public interface ProductMapper {
 
-    ProductShortDto fromProduct(Product entity);
+    ProductDto fromProduct(Product entity);
 
 
 }

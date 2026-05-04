@@ -37,10 +37,9 @@ public class CustomerController {
     @Secured({ROLE_ADMIN})
     @Operation(summary = "Customer по идентификатору")
     public ResponseEntity<CustomerSingleResponse> getCustomer(
-            @AuthenticationPrincipal final Jwt principal,
             @NotNull @Valid @PathVariable final Long customerId
     ) {
-        return ResponseEntity.ok(service.getCustomer(userInfoService.fillUserInfo(principal), customerId));
+        return ResponseEntity.ok(service.getCustomer(customerId));
     }
 
     @PostMapping()

@@ -54,10 +54,9 @@ public class OrderController {
     @GetMapping("/{orderId}")
     @Operation(summary = "Order по идентификатору")
     public ResponseEntity<OrderSingleResponse> getOrder(
-            @AuthenticationPrincipal final Jwt principal,
             @NotNull @Valid @PathVariable final Long orderId
     ) {
-        return ResponseEntity.ok(service.getOrder(userInfoService.fillUserInfo(principal), orderId));
+        return ResponseEntity.ok(service.getOrder(orderId));
     }
 
     @PostMapping()

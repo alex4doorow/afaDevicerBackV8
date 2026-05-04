@@ -3,12 +3,12 @@ package com.afa.devicer.back.services;
 import com.afa.core.dto.UserInfoDto;
 import com.afa.core.dto.dictionaries.AddressSaveRequest;
 import com.afa.core.dto.orders.*;
-import com.afa.core.dto.people.PersonSaveRequest;
 import com.afa.core.enums.*;
 import com.afa.core.exceptions.DevicerException;
 import com.afa.core.utils.DateHelper;
 import com.afa.core.utils.NumericHelper;
 import com.afa.devicer.back.entities.companies.Company_;
+import com.afa.devicer.back.entities.customers.Customer;
 import com.afa.devicer.back.entities.customers.Customer_;
 import com.afa.devicer.back.entities.dictionaries.Address;
 import com.afa.devicer.back.entities.dictionaries.Address_;
@@ -72,7 +72,6 @@ public class OrderService {
     }
 
     public OrderSingleResponse getOrder(
-            @NotNull final UserInfoDto user,
             @NotNull final Long orderId) {
 
         final Order order = findByIdOrThrow(orderId);
@@ -117,7 +116,6 @@ public class OrderService {
                 Collections.emptyMap());
     }
 
-
     @Transactional
     public Order create(
             final UserInfoDto userInfo,
@@ -126,15 +124,11 @@ public class OrderService {
         validator.validateOrderCreating(request);
 
         final Country deliveryCountry = dictionaryCountryService.findByIdOrThrow(request.getDelivery().getAddress().getCountryId());
+        final Customer customer = customerService.findByIdOrThrow(request.getCustomerId());
         final Person originator = userInfoService.findByIdOrThrow(userInfo.getPersonId());
-        Person recipient = personService.findByPhoneNumber(request.getDelivery().getRecipient().getPhoneNumber());
-        if (recipient == null) {
 
-            final PersonSaveRequest recipientRequest = request.getDelivery().getRecipient();
-            final Person recipientPerson = new Person();
-            savePersonDataFromRequest(recipientPerson, recipientRequest, deliveryCountry);
-            recipient = personService.create(recipientPerson);
-        }
+        final Person recipient = findOrCreateRecipient(customer, deliveryCountry, request);
+        validator.validateOrderRecipient(recipient, request);
 
         Address deliveryAddress = new Address();
         saveAddressDataFromRequest(deliveryAddress, deliveryCountry, request.getDelivery().getAddress());
@@ -157,23 +151,30 @@ public class OrderService {
         return iOrder.saveAndFlush(order);
     }
 
+
+
     @Transactional
     public Order edit(final UserInfoDto userInfo,
                       final Long orderId,
                       final OrderSaveRequest request) {
 
         final Order order = findByIdOrThrow(orderId);
-        final Person originator = userInfoService.findByIdOrThrow(userInfo.getPersonId());
-        validator.validateOrderEditing(orderId, request);
-
         final Address deliveryAddress = order.getDelivery().getAddress();
         final Country deliveryCountry = dictionaryCountryService.findByIdOrThrow(request.getDelivery().getAddress().getCountryId());
+        final Customer customer = customerService.findByIdOrThrow(request.getCustomerId());
+        final Person originator = userInfoService.findByIdOrThrow(userInfo.getPersonId());
+
+        validator.validateOrderEditing(orderId, customer, request);
+
+        final Person recipient = findOrCreateRecipient(customer, deliveryCountry, request);
+
+        validator.validateOrderRecipient(recipient, request);
 
         saveAddressDataFromRequest(deliveryAddress, deliveryCountry, request.getDelivery().getAddress());
         saveOrderDeliveryDataFromRequest(
                 order.getDelivery(),
                 deliveryAddress,
-                order.getDelivery().getRecipient(),
+                recipient,
                 order,
                 request.getDelivery());
 
@@ -200,7 +201,6 @@ public class OrderService {
         order.setPostpayAmount(amounts.get(AmountTypes.POSTPAY));
         order.setSupplierAmount(amounts.get(AmountTypes.SUPPLIER));
     }
-
 
     @SuppressWarnings("PMD")
     @Transactional
@@ -448,8 +448,7 @@ public class OrderService {
         return results;
     }
 
-    private Map<AmountTypes, BigDecimal> calcTotalOrdersPostpayAmountByConditions(
-            @NotNull final UserInfoDto user) {
+    private Map<AmountTypes, BigDecimal> calcTotalOrdersPostpayAmountByConditions(final UserInfoDto user) {
 
         LocalDate minOrderDate = iOrder.findMinOrderDateWithPostpayExcludingStatuses(List.of(
                 OrderStatusTypes.UNKNOWN,
@@ -525,16 +524,28 @@ public class OrderService {
         return postpayAmounts;
     }
 
-    private void savePersonDataFromRequest(
-            final Person person,
-            final PersonSaveRequest request,
-            final Country country) {
-        person.setCountry(country);
-        person.setFirstName(request.getFirstName());
-        person.setMiddleName(request.getMiddleName());
-        person.setLastName(request.getLastName());
-        person.setPhoneNumber(request.getPhoneNumber());
-        person.setEmail(request.getEmail());
+    private Person findOrCreateRecipient(
+            final Customer customer,
+            final Country deliveryCountry,
+            final OrderSaveRequest request) {
+
+        if (request.getDelivery().isCustomerEqualsRecipient()) {
+            return customer.getMainContact();
+        } else {
+            final Optional<Person> findingPerson = personService.findByPhoneNumberOptional(request.getDelivery().getRecipient().getPhoneNumber());
+            if (findingPerson.isEmpty()) {
+                final Person recipientPerson = new Person();
+                recipientPerson.setCountry(deliveryCountry);
+                recipientPerson.setFirstName(request.getDelivery().getRecipient().getFirstName());
+                recipientPerson.setMiddleName(request.getDelivery().getRecipient().getMiddleName());
+                recipientPerson.setLastName(request.getDelivery().getRecipient().getLastName());
+                recipientPerson.setPhoneNumber(request.getDelivery().getRecipient().getPhoneNumber());
+                recipientPerson.setEmail(request.getDelivery().getRecipient().getEmail());
+                return personService.create(recipientPerson);
+            } else {
+                return findingPerson.get();
+            }
+        }
     }
 
     private void saveAddressDataFromRequest(
@@ -622,10 +633,10 @@ public class OrderService {
                 item.setItemNum(ir.getItemNum());
                 item.setProduct(product);
                 item.setPrice(ir.getPrice());
-                item.setPriceSupplier(supplierPrice);
+                item.setSupplierPrice(supplierPrice);
                 item.setQuantity(ir.getQuantity());
                 item.setDiscountRate(ir.getDiscountRate());
-                item.setAmountSupplier(supplierAmount);
+                item.setSupplierAmount(supplierAmount);
                 item.setAmount(amount);
                 item.setUserAdded(originator);
 

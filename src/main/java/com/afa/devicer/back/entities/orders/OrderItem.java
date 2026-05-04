@@ -53,8 +53,8 @@ public class OrderItem {
     private BigDecimal price;
 
     @NotNull
-    @Column(name = "price_supplier", nullable = false)
-    private BigDecimal priceSupplier = BigDecimal.ZERO;
+    @Column(name = "supplier_price", nullable = false)
+    private BigDecimal supplierPrice = BigDecimal.ZERO;
 
     @NotNull
     @Column(name = "quantity", nullable = false)
@@ -69,8 +69,8 @@ public class OrderItem {
     private BigDecimal amount = BigDecimal.ZERO;
 
     @NotNull
-    @Column(name = "amount_supplier", nullable = false)
-    private BigDecimal amountSupplier = BigDecimal.ZERO;
+    @Column(name = "supplier_amount", nullable = false)
+    private BigDecimal supplierAmount = BigDecimal.ZERO;
 
     @NotNull
     @Column(name = "rec_status", nullable = false)

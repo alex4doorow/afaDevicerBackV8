@@ -1,7 +1,7 @@
 package com.afa.devicer.back.services;
 
 import com.afa.core.dto.products.ProductFilter;
-import com.afa.core.dto.products.ProductShortDto;
+import com.afa.core.dto.products.ProductDto;
 import com.afa.core.dto.products.Result4UpdateProductStock;
 import com.afa.core.enums.CrmTypes;
 import com.afa.core.enums.DevicerErrors;
@@ -39,7 +39,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductShortDto> getProductsSuggest(final ProductFilter filter) {
+    public List<ProductDto> getProductsSuggest(final ProductFilter filter) {
         if (filter.getNameContext() == null || filter.getNameContext().trim().length() < 3) {
             return Collections.emptyList();
         }
@@ -65,7 +65,7 @@ public class ProductService {
         }
         return products.stream()
                 .map(productMapper::fromProduct)
-                .sorted(Comparator.comparing(ProductShortDto::getId))
+                .sorted(Comparator.comparing(ProductDto::getId))
                 .limit(10)
                 .toList();
     }

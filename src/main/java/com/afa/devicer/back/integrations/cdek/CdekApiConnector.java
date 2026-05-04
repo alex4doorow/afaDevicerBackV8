@@ -69,6 +69,21 @@ public class CdekApiConnector {
         }
     }
 
+    public String widgetProxy(String body) {
+//        серверная часть этой запчасти
+//        var widjet = new ISDEKWidjet({
+//                path: 'https://pribormaster.ru/catalog/view/theme/zemez808/js/cdek-pvzwidget/scripts/',
+//                servicepath: 'https://pribormaster.ru/catalog/controller/extension/shipping/cdek/service.php'
+        // тут:
+        // 1. получить OAuth token СДЭК
+        // 2. понять method/action из body
+        // 3. сходить в CDEK API
+        // 4. вернуть JSON обратно виджету
+
+        //throw new UnsupportedOperationException("TODO implement CDEK widget proxy");
+        return "{}";
+    }
+
     private CdekAccessDto authorization() {
 
         final MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();

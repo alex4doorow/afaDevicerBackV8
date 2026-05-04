@@ -55,6 +55,9 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
+    /**
+     * остаток на витрине
+     */
     @NotNull
     @Column(name = "quantity")
     private Integer quantity;

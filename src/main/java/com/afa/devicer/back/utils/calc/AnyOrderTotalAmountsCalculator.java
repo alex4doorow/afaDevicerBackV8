@@ -30,8 +30,8 @@ public abstract class AnyOrderTotalAmountsCalculator {
 			if (item.getAmount() != null) {
 				bill = bill.add(item.getAmount());
 			}	
-			if (item.getAmountSupplier() != null) {
-				supplier = supplier.add(item.getPriceSupplier().multiply(BigDecimal.valueOf(item.getQuantity())));
+			if (item.getSupplierAmount() != null) {
+				supplier = supplier.add(item.getSupplierPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
 			}
 		}
 		result.put(AmountTypes.BILL, bill);

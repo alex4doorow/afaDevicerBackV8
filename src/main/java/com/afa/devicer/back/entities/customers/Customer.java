@@ -1,5 +1,6 @@
 package com.afa.devicer.back.entities.customers;
 
+import com.afa.core.enums.ContactTypes;
 import com.afa.devicer.back.entities.companies.Company;
 import com.afa.devicer.back.entities.people.Person;
 import com.afa.core.enums.CustomerTypes;
@@ -83,5 +84,21 @@ public class Customer {
 
     public String getViewShortName() {
         return isCompany() ? company.getShortName() : person.getShortName();
+    }
+
+    public Person getMainContact() {
+        if (isPerson()) {
+            return person;
+        }
+
+        if (!isCompany() || getContacts() == null) {
+            return null;
+        }
+
+        return getContacts().stream()
+                .filter(contact -> contact.getType() == ContactTypes.MAIN)
+                .map(CustomerContact::getPerson)
+                .findFirst()
+                .orElse(null);
     }
 }

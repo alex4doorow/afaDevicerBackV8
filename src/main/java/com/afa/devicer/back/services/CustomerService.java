@@ -26,7 +26,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.CouplingBetweenObjects", "PMD.ExcessiveImports", "PMD.TooManyMethods",
-        "PMD.GodClass", "PMD.CyclomaticComplexity"})
+        "PMD.GodClass", "PMD.CyclomaticComplexity", "PMD.NcssCount"})
 public class CustomerService {
 
     private final ICustomer iCustomer;
@@ -44,6 +44,12 @@ public class CustomerService {
         return iCustomer.findById(id);
     }
 
+    @Transactional(readOnly = true)
+    public Optional<Company> findByInnOrOptional(final String inn) {
+        return iCompany.findAllByInn(inn);
+    }
+
+    @Transactional(readOnly = true)
     public Customer findByIdOrThrow(final Long id) {
         return findByIdOptional(id).orElseThrow(() ->
                 new DevicerException(DevicerErrors.DB_ENTITY_NOT_FOUND, Customer_.class_, id)
@@ -52,7 +58,6 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public CustomerSingleResponse getCustomer(
-            @NotNull final UserInfoDto user,
             @NotNull final Long customerId) {
 
         final Customer customer = findByIdOrThrow(customerId);
@@ -72,18 +77,20 @@ public class CustomerService {
         Person person = null;
         if (request.getCompany() != null) {
 
-            company = Company.builder()
-                    .inn(request.getCompany().getInn())
-                    .shortName(request.getCompany().getShortName())
-                    .longName(request.getCompany().getLongName())
-                    .email(request.getCompany().getEmail())
-                    .phoneNumber(request.getCompany().getPhoneNumber())
-                    .country(country)
-                    .build();
+            final Optional<Company> findingCompany = findByInnOrOptional(request.getCompany().getInn());
+            company = findingCompany.orElseGet(Company::new);
+
+            company.setInn(request.getCompany().getInn());
+            company.setShortName(request.getCompany().getShortName());
+            company.setLongName(request.getCompany().getLongName());
+            company.setEmail(request.getCompany().getEmail());
+            company.setPhoneNumber(request.getCompany().getPhoneNumber());
+            company.setCountry(country);
             company = iCompany.save(company);
 
         } else if (request.getPerson() != null) {
-            person = new Person();
+            final Optional<Person> findingPerson = personService.findByPhoneNumberOptional(request.getPerson().getPhoneNumber());
+            person = findingPerson.orElseGet(Person::new);
             person.setCountry(country);
             person.setFirstName(request.getPerson().getFirstName());
             person.setMiddleName(request.getPerson().getMiddleName());
@@ -100,22 +107,22 @@ public class CustomerService {
         if (request.getContacts() != null) {
             for (final CustomerContactSaveRequest c : request.getContacts()) {
 
-                Person contact = personService.findByPhoneNumber(c.getPerson().getPhoneNumber());
-                if (contact == null) {
-                    final Person contactPerson = new Person();
-                    contactPerson.setCountry(country);
-                    contactPerson.setFirstName(c.getPerson().getFirstName());
-                    contactPerson.setMiddleName(c.getPerson().getMiddleName());
-                    contactPerson.setLastName(c.getPerson().getLastName());
-                    contactPerson.setPhoneNumber(c.getPerson().getPhoneNumber());
-                    contactPerson.setEmail(c.getPerson().getEmail());
-                    contact = personService.create(contactPerson);
-                }
+                final Optional<Person> findingPerson = personService.findByPhoneNumberOptional(c.getPerson().getPhoneNumber());
+                Person contactPerson = findingPerson.orElseGet(Person::new);
+
+                contactPerson.setCountry(country);
+                contactPerson.setFirstName(c.getPerson().getFirstName());
+                contactPerson.setMiddleName(c.getPerson().getMiddleName());
+                contactPerson.setLastName(c.getPerson().getLastName());
+                contactPerson.setPhoneNumber(c.getPerson().getPhoneNumber());
+                contactPerson.setEmail(c.getPerson().getEmail());
+                contactPerson = personService.create(contactPerson);
+
                 contacts.add(CustomerContact.builder()
                         .type(c.getType())
                         .customer(customer)
                         .userAdded(originator)
-                        .person(contact)
+                        .person(contactPerson)
                         .build());
             }
         }
@@ -125,21 +132,22 @@ public class CustomerService {
 
             for (final CustomerAddressSaveRequest a : request.getAddresses()) {
 
-                final Address address = addressService.create(Address.builder()
-                        .country(country)
-                        .type(a.getAddress().getType())
-                        .postCode(a.getAddress().getPostCode())
-                        .street(a.getAddress().getStreet())
-                        .house(a.getAddress().getHouse())
-                        .flat(a.getAddress().getFlat())
-                        .addressLine(a.getAddress().getAddressLine())
-                        .userAdded(originator)
-                        .build());
-                addresses.add(CustomerAddress.builder()
-                        .customer(customer)
-                        .address(address)
-                        .userAdded(originator)
-                        .build());
+                Address address = new Address();
+                address.setCountry(country);
+                address.setType(a.getAddress().getType());
+                address.setPostCode(a.getAddress().getPostCode());
+                address.setStreet(a.getAddress().getStreet());
+                address.setHouse(a.getAddress().getHouse());
+                address.setFlat(a.getAddress().getFlat());
+                address.setAddressLine(a.getAddress().getAddressLine());
+                address.setUserAdded(originator);
+                address = addressService.create(address);
+
+                final CustomerAddress customerAddress = new CustomerAddress();
+                customerAddress.setCustomer(customer);
+                customerAddress.setAddress(address);
+                customerAddress.setUserAdded(originator);
+                addresses.add(customerAddress);
             }
         }
 

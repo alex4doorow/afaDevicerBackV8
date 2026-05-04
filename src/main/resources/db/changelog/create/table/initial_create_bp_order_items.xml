@@ -18,7 +18,7 @@
             <column name="price" type="numeric(15, 4)">
                 <constraints nullable="false"/>
             </column>
-            <column name="price_supplier" type="numeric(15, 4)">
+            <column name="supplier_price" type="numeric(15, 4)">
                 <constraints nullable="false"/>
             </column>
             <column name="quantity" type="INTEGER">
@@ -30,7 +30,7 @@
             <column name="amount" type="numeric(15, 4)">
                 <constraints nullable="false"/>
             </column>
-            <column name="amount_supplier" type="numeric(15, 4)">
+            <column name="supplier_amount" type="numeric(15, 4)">
                 <constraints nullable="false"/>
             </column>
             <column name="rec_status" type="CHAR(1)">
