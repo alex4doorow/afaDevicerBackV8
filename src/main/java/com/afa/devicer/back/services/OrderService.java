@@ -3,7 +3,7 @@ package com.afa.devicer.back.services;
 import com.afa.core.dto.UserInfoDto;
 import com.afa.core.dto.dictionaries.AddressSaveRequest;
 import com.afa.core.dto.orders.*;
-import com.afa.core.dto.persons.PersonSaveRequest;
+import com.afa.core.dto.people.PersonSaveRequest;
 import com.afa.core.enums.*;
 import com.afa.core.exceptions.DevicerException;
 import com.afa.core.utils.DateHelper;

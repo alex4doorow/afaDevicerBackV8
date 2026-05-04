@@ -1,8 +1,8 @@
 package com.afa.devicer.back.controllers;
 
 import com.afa.core.dto.BaseResponse;
-import com.afa.core.dto.persons.PersonSettingsResponse;
-import com.afa.core.dto.persons.PersonSettingsSaveRequest;
+import com.afa.core.dto.people.PersonSettingsResponse;
+import com.afa.core.dto.people.PersonSettingsSaveRequest;
 import com.afa.devicer.back.services.PersonService;
 import com.afa.devicer.back.services.UserInfoService;
 import jakarta.validation.Valid;

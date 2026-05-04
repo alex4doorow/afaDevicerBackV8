@@ -27,16 +27,16 @@ public class CdekController {
 
     private final CdekApiConnector cdekApiService;
 
-    // https://api.edu.cdek.ru/v2/location/cities
-    // https://api/v8/integrations/cdek/location/cities
-    // https://web/wiki/integrations/cdek/location/cities
+    // cdek api https://api.edu.cdek.ru/v2/location/cities
+    // backend https://api/v8/integrations/cdek/location/cities
+    // web https://web/wiki/integrations/cdek/location/cities
     @GetMapping("/cdek/location/cities")
     public ResponseEntity<BaseResponse> getLocationCities(
             @NotNull @Valid final CdekCityFilter filter
     ) {
 
         final List<CdekCityDto> cities = cdekApiService.getCities("RU", "Москва");
-        log.debug("getCities(): {}", cities);
+        log.info("getCities(): {}", cities);
 
         return ResponseEntity.ok(
                 new BaseResponse()

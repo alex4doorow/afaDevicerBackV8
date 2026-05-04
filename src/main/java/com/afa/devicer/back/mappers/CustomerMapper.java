@@ -1,9 +1,9 @@
 package com.afa.devicer.back.mappers;
 
 import com.afa.core.dto.customers.CustomerDto;
-import com.afa.core.dto.persons.PersonShortDto;
+import com.afa.core.dto.people.PersonShortDto;
 import com.afa.devicer.back.entities.customers.Customer;
-import com.afa.devicer.back.utils.persons.PersonHelper;
+import com.afa.devicer.back.utils.PersonHelper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

@@ -1,7 +1,7 @@
 package com.afa.devicer.back.services;
 
-import com.afa.core.dto.persons.PersonSettingsDto;
-import com.afa.core.dto.persons.PersonSettingsSaveRequest;
+import com.afa.core.dto.people.PersonSettingsDto;
+import com.afa.core.dto.people.PersonSettingsSaveRequest;
 import com.afa.core.enums.DevicerErrors;
 import com.afa.core.exceptions.DevicerException;
 import com.afa.devicer.back.entities.people.*;

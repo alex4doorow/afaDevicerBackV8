@@ -1,6 +1,6 @@
-package com.afa.devicer.back.utils.persons;
+package com.afa.devicer.back.utils;
 
-import com.afa.core.dto.persons.PersonShortDto;
+import com.afa.core.dto.people.PersonShortDto;
 import com.afa.devicer.back.entities.people.Person;
 
 @SuppressWarnings({"PMD.UseUtilityClass", "PMD.LawOfDemeter"})
