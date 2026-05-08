@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.CouplingBetweenObjects", "PMD.ExcessiveImports", "PMD.TooManyMethods",
         "PMD.GodClass", "PMD.CyclomaticComplexity"})
-public class OrderServiceValidator {
+public class OrderValidator {
 
     private final CustomerService customerService;
     private final ProductCategoryService productCategoryService;

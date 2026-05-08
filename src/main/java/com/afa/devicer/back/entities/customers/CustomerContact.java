@@ -12,7 +12,6 @@ import java.time.Instant;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -50,7 +49,6 @@ public class CustomerContact {
     private ContactTypes type;
 
     @NotNull
-    @Builder.Default
     @Column(name = "rec_status", nullable = false)
     private Character recStatus = DefaultConstants.ACTIVE;
 
@@ -62,7 +60,6 @@ public class CustomerContact {
     private Person userAdded;
 
     @NotNull
-    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 

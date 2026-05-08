@@ -12,6 +12,8 @@ import java.util.List;
 @SuppressWarnings({"PMD.MethodNamingConventions"})
 public interface IOrder extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 
+    @Query("select max(o.orderNum) from Order o")
+    Long findMaxOrderNum();
     List<Order> findByOrderNum(Long orderNum);
 
     boolean existsByOrderNumAndIdNot(Long orderNum, Long id);

@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.afa.devicer.back.controllers.internal.ControllerConstants.INTEGRATIONS;
+import static com.afa.devicer.back.controllers.internal.ControllerConstants.INTEGRATIONS_CDEK;
 
 @Slf4j
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@RequestMapping(INTEGRATIONS)
+@RequestMapping(INTEGRATIONS_CDEK)
 public class CdekController {
 
     private final CdekApiConnector cdekApiService;
@@ -27,7 +27,7 @@ public class CdekController {
     // cdek api https://api.edu.cdek.ru/v2/location/cities
     // backend https://api/v8/integrations/cdek/location/cities
     // web https://web/wiki/integrations/cdek/location/cities
-    @GetMapping("/cdek/location/cities")
+    @GetMapping("/location/cities")
     public ResponseEntity<BaseResponse> getLocationCities(
             @NotNull @Valid final CdekCityFilter filter
     ) {

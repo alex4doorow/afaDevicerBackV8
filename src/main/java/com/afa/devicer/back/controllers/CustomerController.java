@@ -1,6 +1,5 @@
 package com.afa.devicer.back.controllers;
 
-import com.afa.core.dto.customers.CustomerDto;
 import com.afa.core.dto.customers.CustomerSaveRequest;
 import com.afa.core.dto.customers.CustomerSingleResponse;
 import com.afa.devicer.back.mappers.CustomerMapper;
@@ -45,10 +44,25 @@ public class CustomerController {
     @PostMapping()
     @Secured({ROLE_ADMIN})
     @Operation(summary = "Save new customer")
-    public ResponseEntity<CustomerDto> create(
+    public ResponseEntity<CustomerSingleResponse> create(
             @AuthenticationPrincipal final Jwt principal,
             @NotNull @Valid @RequestBody final CustomerSaveRequest request
     ) {
-        return ResponseEntity.ok(mapper.fromCustomer(service.create(userInfoService.fillUserInfo(principal), request)));
+        return ResponseEntity.ok(
+                new CustomerSingleResponse(mapper.fromCustomer(service.create(userInfoService.fillUserInfo(principal), request)))
+        );
+    }
+
+    @PutMapping("/{customerId}")
+    @Secured({ROLE_ADMIN})
+    @Operation(summary = "Save customer data")
+    public ResponseEntity<CustomerSingleResponse> edit(
+            @AuthenticationPrincipal final Jwt principal,
+            @NotNull @Valid @PathVariable final Long customerId,
+            @NotNull @Valid @RequestBody final CustomerSaveRequest request
+    ) {
+        return ResponseEntity.ok(new CustomerSingleResponse(
+                mapper.fromCustomer(service.edit(userInfoService.fillUserInfo(principal), customerId, request)))
+        );
     }
 }

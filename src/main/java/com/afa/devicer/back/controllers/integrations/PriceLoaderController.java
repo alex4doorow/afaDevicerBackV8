@@ -10,20 +10,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.afa.devicer.back.controllers.internal.ControllerConstants.INTEGRATIONS;
+import static com.afa.devicer.back.controllers.internal.ControllerConstants.INTEGRATIONS_SUPPLIERS;
 
 @Slf4j
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@RequestMapping(INTEGRATIONS)
+@RequestMapping(INTEGRATIONS_SUPPLIERS)
 public class PriceLoaderController {
 
     private final PricesLoaderService allPricerService;
 
     //http://localhost:8000/api/v8/integrations/suppliers/feed/all
     //http://localhost:8000/api/v8/integrations/suppliers/feed/sititek
-    @PostMapping("suppliers/feed/all")
+    @PostMapping("/feed/all")
     public ResponseEntity<BaseResponse> loadPrices() {
 
         allPricerService.run();

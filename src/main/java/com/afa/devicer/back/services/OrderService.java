@@ -20,7 +20,7 @@ import com.afa.devicer.back.entities.products.Product;
 import com.afa.devicer.back.mappers.OrderMapper;
 import com.afa.devicer.back.utils.calc.AnyOrderTotalAmountsCalculator;
 import com.afa.devicer.back.utils.calc.OrderTotalAmountsCalculatorFactory;
-import com.afa.devicer.back.validators.OrderServiceValidator;
+import com.afa.devicer.back.validators.OrderValidator;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +57,7 @@ public class OrderService {
 
     private final DictionaryCountryService dictionaryCountryService;
     private final PeriodTotalAmountService periodTotalAmountService;
-    private final OrderServiceValidator validator;
+    private final OrderValidator validator;
 
     private final OrderMapper mapper;
 
@@ -65,12 +65,20 @@ public class OrderService {
         return iOrder.findById(id);
     }
 
+    @Transactional(readOnly = true)
     public Order findByIdOrThrow(final Long id) {
         return findByIdOptional(id).orElseThrow(() ->
                 new DevicerException(DevicerErrors.DB_ENTITY_NOT_FOUND, Order_.class_, id)
         );
     }
 
+    @Transactional(readOnly = true)
+    public Long findNexOrderNum() {
+        final Long maxOrderNum = iOrder.findMaxOrderNum();
+        return maxOrderNum == null ? 1 :  maxOrderNum + 1;
+    }
+
+    @Transactional(readOnly = true)
     public OrderSingleResponse getOrder(
             @NotNull final Long orderId) {
 
@@ -79,6 +87,7 @@ public class OrderService {
         return new OrderSingleResponse(result);
     }
 
+    @Transactional(readOnly = true)
     @SuppressWarnings("PMD.UnnecessaryLocalBeforeReturn")
     public OrderPagedResponse getFiltered(
             final UserInfoDto user,
@@ -88,7 +97,7 @@ public class OrderService {
         validator.validateFilterByList(filter);
 
         final Page<Order> page = iOrder.findAll(fillOrderSpecification(user, filter),
-                request.createPageRequest(request.isSortedByEmpty() ? "id desc" : request.getSortedBy(),
+                request.createPageRequest(request.isSortedByEmpty() ? "orderNum desc, orderDate desc" : request.getSortedBy(),
                         Order_.class.getDeclaredFields()));
 
         final List<OrderDto> orderDtos = mapper.fromOrders(page.getContent());
@@ -99,6 +108,7 @@ public class OrderService {
                 calcTotalOrdersAmounts(user, page.getContent(), filter.getPeriod()));
     }
 
+    @Transactional(readOnly = true)
     @SuppressWarnings("PMD.UnnecessaryLocalBeforeReturn")
     public OrderPagedResponse getSimpleFiltered(
             final UserInfoDto user,
@@ -151,8 +161,6 @@ public class OrderService {
         return iOrder.saveAndFlush(order);
     }
 
-
-
     @Transactional
     public Order edit(final UserInfoDto userInfo,
                       final Long orderId,
@@ -190,17 +198,6 @@ public class OrderService {
         return iOrder.saveAndFlush(order);
     }
 
-    private void saveTotalAmounts(final Order order) {
-        final AnyOrderTotalAmountsCalculator calculator = OrderTotalAmountsCalculatorFactory.createCalculator(order);
-        final Map<AmountTypes, BigDecimal> amounts = calculator.calc();
-
-        order.setBillAmount(amounts.get(AmountTypes.BILL));
-        order.setTotalAmount(amounts.get(AmountTypes.TOTAL));
-        order.setTotalWithDeliveryAmount(amounts.get(AmountTypes.TOTAL_WITH_DELIVERY));
-        order.setMarginAmount(amounts.get(AmountTypes.MARGIN));
-        order.setPostpayAmount(amounts.get(AmountTypes.POSTPAY));
-        order.setSupplierAmount(amounts.get(AmountTypes.SUPPLIER));
-    }
 
     @SuppressWarnings("PMD")
     @Transactional
@@ -355,7 +352,12 @@ public class OrderService {
             }
 
             // customer
-            if (filterConditions.getCustomerConditions() != null && filterConditions.getCustomerConditions().getCustomerTypes() != null && !filterConditions.getCustomerConditions().getCustomerTypes().isEmpty()) {
+            if (filterConditions.getCustomerConditions() != null && filterConditions.getCustomerConditions().getId() != null
+                    && filterConditions.getCustomerConditions().getId() > 0) {
+                predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.ID), filterConditions.getCustomerConditions().getId()));
+            }
+            if (filterConditions.getCustomerConditions() != null && filterConditions.getCustomerConditions().getCustomerTypes() != null
+                    && !filterConditions.getCustomerConditions().getCustomerTypes().isEmpty()) {
                 predicates.add(builder.equal(root.get(Order_.CUSTOMER).get(Customer_.TYPE), filterConditions.getCustomerConditions().getCustomerTypes()));
             }
             // customer - person
@@ -403,6 +405,10 @@ public class OrderService {
             final Pair<LocalDate, LocalDate> period) {
 
         final Map<AmountTypes, BigDecimal> results = new HashMap<>();
+
+        if (period == null) {
+            return results;
+        }
 
         BigDecimal billAmount = BigDecimal.ZERO;
         BigDecimal supplierAmount = BigDecimal.ZERO;
@@ -645,5 +651,15 @@ public class OrderService {
         }
     }
 
+    private void saveTotalAmounts(final Order order) {
+        final AnyOrderTotalAmountsCalculator calculator = OrderTotalAmountsCalculatorFactory.createCalculator(order);
+        final Map<AmountTypes, BigDecimal> amounts = calculator.calc();
 
+        order.setBillAmount(amounts.get(AmountTypes.BILL));
+        order.setTotalAmount(amounts.get(AmountTypes.TOTAL));
+        order.setTotalWithDeliveryAmount(amounts.get(AmountTypes.TOTAL_WITH_DELIVERY));
+        order.setMarginAmount(amounts.get(AmountTypes.MARGIN));
+        order.setPostpayAmount(amounts.get(AmountTypes.POSTPAY));
+        order.setSupplierAmount(amounts.get(AmountTypes.SUPPLIER));
+    }
 }

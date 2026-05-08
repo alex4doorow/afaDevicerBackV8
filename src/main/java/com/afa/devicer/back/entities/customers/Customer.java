@@ -11,11 +11,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -46,16 +46,15 @@ public class Customer {
     @JsonIgnore
     private Person person;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
-    private Set<CustomerAddress> addresses;
+    private Set<CustomerAddress> addresses = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     private Set<CustomerContact> contacts;
 
     @NotNull
-    @Builder.Default
     @Column(name = "rec_status", nullable = false)
     private Character recStatus = DefaultConstants.ACTIVE;
 
@@ -67,7 +66,6 @@ public class Customer {
     private Person userAdded;
 
     @NotNull
-    @Builder.Default
     @Column(name = "date_added", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant dateAdded = Instant.now();
 

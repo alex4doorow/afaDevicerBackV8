@@ -14,17 +14,17 @@ import java.util.List;
 @SuppressWarnings({"PMD.LawOfDemeter"})
 public interface CustomerMapper {
 
-    @Mapping(target = "userAdded", expression = "java(getUserAdded(customer))")
-    CustomerDto fromCustomer(Customer customer);
+    @Mapping(target = "userAdded", expression = "java(getUserAdded(entity))")
+    CustomerDto fromCustomer(Customer entity);
 
     default List<CustomerDto> fromCustomers(
-            final List<Customer> customers) {
-        return customers.stream()
+            final List<Customer> entities) {
+        return entities.stream()
                 .map(this::fromCustomer)
                 .toList();
     }
 
-    default PersonShortDto getUserAdded(final Customer customer) {
-        return PersonHelper.fromPerson(customer.getUserAdded());
+    default PersonShortDto getUserAdded(final Customer entity) {
+        return PersonHelper.fromPerson(entity.getUserAdded());
     }
 }

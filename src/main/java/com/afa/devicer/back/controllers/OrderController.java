@@ -33,6 +33,11 @@ public class OrderController {
     private final OrderService service;
     private final OrderMapper mapper;
 
+    @GetMapping("/next-order-num")
+    public ResponseEntity<Long> findNexOrderNum() {
+        return ResponseEntity.ok(service.findNexOrderNum());
+    }
+
     @PostMapping("/full-filtered")
     @Operation(summary = "orders filtered & paged")
     public ResponseEntity<OrderPagedResponse> getFiltered(

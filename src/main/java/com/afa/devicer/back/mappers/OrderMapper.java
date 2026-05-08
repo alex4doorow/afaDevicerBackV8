@@ -2,7 +2,6 @@ package com.afa.devicer.back.mappers;
 
 import com.afa.core.dto.orders.OrderDto;
 import com.afa.core.dto.orders.OrderItemDto;
-import com.afa.core.dto.orders.OrderPresentationStatusDto;
 import com.afa.core.dto.orders.OrderStatusHistoryDto;
 import com.afa.core.dto.people.PersonShortDto;
 import com.afa.core.enums.AmountTypes;
@@ -60,7 +59,6 @@ public interface OrderMapper {
             final List<Order> orders) {
         return orders.stream()
                 .map(this::fromOrder)
-                .peek(dto -> dto.setPresentation(OrderPresentationStatusDto.createOrderPresentationStatusDto(dto)))
                 .toList();
     }
 
@@ -79,9 +77,5 @@ public interface OrderMapper {
         amounts.put(AmountTypes.POSTPAY, entity.getPostpayAmount());
 
         return amounts;
-    }
-
-    default OrderPresentationStatusDto getPresentationStatus(final OrderDto orderDto) {
-        return OrderPresentationStatusDto.createOrderPresentationStatusDto(orderDto);
     }
 }
