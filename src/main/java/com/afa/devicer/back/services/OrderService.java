@@ -18,7 +18,7 @@ import com.afa.devicer.back.entities.people.Person;
 import com.afa.devicer.back.entities.people.Person_;
 import com.afa.devicer.back.entities.products.Product;
 import com.afa.devicer.back.mappers.OrderMapper;
-import com.afa.devicer.back.utils.calc.AnyOrderTotalAmountsCalculator;
+import com.afa.devicer.back.utils.calc.BaseOrderTotalAmountsCalculator;
 import com.afa.devicer.back.utils.calc.OrderTotalAmountsCalculatorFactory;
 import com.afa.devicer.back.validators.OrderValidator;
 import jakarta.persistence.criteria.Predicate;
@@ -399,6 +399,12 @@ public class OrderService {
 
     }
 
+    public Map<AmountTypes, BigDecimal> calcTotalAmounts(final Order order) {
+
+        final BaseOrderTotalAmountsCalculator calculator = OrderTotalAmountsCalculatorFactory.createCalculator(order);
+        return calculator.calc();
+    }
+
     private Map<AmountTypes, BigDecimal> calcTotalOrdersAmounts(
             @NotNull final UserInfoDto user,
             final List<Order> orders,
@@ -652,8 +658,7 @@ public class OrderService {
     }
 
     private void saveTotalAmounts(final Order order) {
-        final AnyOrderTotalAmountsCalculator calculator = OrderTotalAmountsCalculatorFactory.createCalculator(order);
-        final Map<AmountTypes, BigDecimal> amounts = calculator.calc();
+        final Map<AmountTypes, BigDecimal> amounts = calcTotalAmounts(order);
 
         order.setBillAmount(amounts.get(AmountTypes.BILL));
         order.setTotalAmount(amounts.get(AmountTypes.TOTAL));
@@ -662,4 +667,6 @@ public class OrderService {
         order.setPostpayAmount(amounts.get(AmountTypes.POSTPAY));
         order.setSupplierAmount(amounts.get(AmountTypes.SUPPLIER));
     }
+
+
 }

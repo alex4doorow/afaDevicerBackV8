@@ -1,9 +1,6 @@
 package com.afa.devicer.back.entities.products;
 
-import com.afa.core.enums.LengthClasses;
-import com.afa.core.enums.ProductTypes;
-import com.afa.core.enums.StockStatusTypes;
-import com.afa.core.enums.WeightClasses;
+import com.afa.core.enums.*;
 import com.afa.devicer.back.entities.dictionaries.Manufacture;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -147,5 +144,9 @@ public class Product {
 
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private StockSupplierProduct stock;
+
+    public DeliveryPaymentMethods getDeliveryPaymentMethod() {
+        return stock == null ? DeliveryPaymentMethods.FULL : stock.getDeliveryPaymentMethod();
+    }
 
 }

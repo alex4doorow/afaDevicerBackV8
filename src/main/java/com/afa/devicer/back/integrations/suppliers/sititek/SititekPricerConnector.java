@@ -21,7 +21,7 @@ import java.nio.file.Paths;
 @Slf4j
 @Service
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.SingularField"})
-public class SititekPricerService implements PricerServiceIF {
+public class SititekPricerConnector implements PricerServiceIF {
 
     @Value("${integrations.suppliers.sititek.feed.url}")
     private String feedUrl;

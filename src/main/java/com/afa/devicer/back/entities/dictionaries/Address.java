@@ -38,6 +38,15 @@ public class Address {
     @JsonIgnore
     private Country country;
 
+    @Column(name = "city_code")
+    private String cityCode;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "delivery_point_code")
+    private String deliveryPointCode;
+
     @Column(name = "post_code", length = 6)
     private String postCode;
 
@@ -73,6 +82,8 @@ public class Address {
     private Instant dateModified;
 }
 /*
+city_code cityCode TEXT
+delivery_point_code deliveryPointCode TEXT
 CREATE TABLE `sr_address` (
         `id` int NOT NULL AUTO_INCREMENT,
   `type` tinyint NOT NULL DEFAULT '1',

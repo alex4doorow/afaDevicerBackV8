@@ -1,8 +1,6 @@
 package com.afa.devicer.back.controllers.integrations;
 
-import com.afa.core.dto.BaseResponse;
-import com.afa.core.dto.integrations.cdek.CdekCityDto;
-import com.afa.core.dto.integrations.cdek.CdekCityFilter;
+import com.afa.core.dto.integrations.cdek.*;
 import com.afa.devicer.back.integrations.cdek.CdekApiConnector;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -10,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import static com.afa.devicer.back.controllers.internal.ControllerConstants.INTEGRATIONS_CDEK;
 
@@ -28,15 +24,20 @@ public class CdekController {
     // backend https://api/v8/integrations/cdek/location/cities
     // web https://web/wiki/integrations/cdek/location/cities
     @GetMapping("/location/cities")
-    public ResponseEntity<BaseResponse> getLocationCities(
+    public ResponseEntity<CdekCityResponse> getLocationCities(
             @NotNull @Valid final CdekCityFilter filter
     ) {
-
-        final List<CdekCityDto> cities = cdekApiService.getCities("RU", "Москва");
-        log.info("getCities(): {}", cities);
-
         return ResponseEntity.ok(
-                new BaseResponse()
+                new CdekCityResponse(cdekApiService.getLocationCities(filter))
+        );
+    }
+
+    @GetMapping("/deliveryPoints")
+    public ResponseEntity<CdekDeliveryPointResponse> getDeliveryPoints(
+            @NotNull @Valid final CdekDeliveryPointFilter filter
+    ) {
+        return ResponseEntity.ok(
+                new CdekDeliveryPointResponse(cdekApiService.getDeliveryPoints(filter))
         );
     }
 
@@ -44,6 +45,5 @@ public class CdekController {
     public ResponseEntity<String> widget(@RequestBody final String body) {
         return ResponseEntity.ok(cdekApiService.widgetProxy(body));
     }
-
 
 }

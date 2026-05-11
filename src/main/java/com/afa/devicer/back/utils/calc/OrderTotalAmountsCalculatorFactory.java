@@ -9,7 +9,7 @@ public final class OrderTotalAmountsCalculatorFactory {
     private OrderTotalAmountsCalculatorFactory() {
     }
 
-    public static AnyOrderTotalAmountsCalculator createCalculator(final Order order) {
+    public static BaseOrderTotalAmountsCalculator createCalculator(final Order order) {
 
 		if (order.getType() == OrderTypes.BILL || order.getType() == OrderTypes.KP) {
             return new BillTotalAmountsCalculator(order);

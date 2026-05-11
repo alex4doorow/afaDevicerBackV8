@@ -19,6 +19,7 @@ public final class ControllerConstants {
     public static final String PERSONS = BASE_API + "/persons";
     public static final String CUSTOMERS = BASE_API + "/customers";
     public static final String ORDERS = BASE_API + "/orders";
+    public static final String DELIVERY = BASE_API + "/delivery";
 
     public static final String FILES = BASE_API + "/files";
 

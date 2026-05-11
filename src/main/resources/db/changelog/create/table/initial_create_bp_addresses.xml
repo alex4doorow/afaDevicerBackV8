@@ -10,6 +10,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="country_id" type="UUID"/>
+            <column name="city_code" type="TEXT"/>
+            <column name="city" type="TEXT"/>
+            <column name="delivery_point_code" type="TEXT"/>
             <column name="post_code" type="VARCHAR(6)"/>
             <column name="street" type="VARCHAR(255)"/>
             <column name="house" type="VARCHAR(128)"/>

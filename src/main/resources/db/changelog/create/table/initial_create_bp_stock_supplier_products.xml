@@ -24,6 +24,9 @@
             <column name="quantity" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
+            <column name="delivery_payment_method" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="comment" type="TEXT"/>
         </createTable>
     </changeSet>

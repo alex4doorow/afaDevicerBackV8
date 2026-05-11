@@ -9,7 +9,7 @@ import java.math.RoundingMode;
 import java.util.Map;
 
 @SuppressWarnings({"PMD.LawOfDemeter"})
-public class CdekOrderTotalAmountsCalculator extends AnyOrderTotalAmountsCalculator {
+public class CdekOrderTotalAmountsCalculator extends BaseOrderTotalAmountsCalculator {
 
 	public CdekOrderTotalAmountsCalculator(final Order order) {
 		super(order);
@@ -49,7 +49,10 @@ public class CdekOrderTotalAmountsCalculator extends AnyOrderTotalAmountsCalcula
 		orderAmounts.put(AmountTypes.MARGIN, margin);
 		orderAmounts.put(AmountTypes.SUPPLIER, supplier);
 		orderAmounts.put(AmountTypes.POSTPAY, postpay);
-				
-		return orderAmounts;		
+        orderAmounts.put(AmountTypes.TOTAL_WEIGHT_GRAM, subTotals.get(AmountTypes.TOTAL_WEIGHT_GRAM));
+        orderAmounts.put(AmountTypes.TOTAL_WIDTH_CM, subTotals.get(AmountTypes.TOTAL_WIDTH_CM));
+        orderAmounts.put(AmountTypes.TOTAL_LENGTH_CM, subTotals.get(AmountTypes.TOTAL_LENGTH_CM));
+        orderAmounts.put(AmountTypes.TOTAL_HEIGHT_CM, subTotals.get(AmountTypes.TOTAL_HEIGHT_CM));
+		return orderAmounts;
 	}
 }

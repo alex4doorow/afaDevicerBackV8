@@ -8,7 +8,7 @@ import java.math.RoundingMode;
 import java.util.Map;
 
 @SuppressWarnings({"PMD.LawOfDemeter"})
-public class BillTotalAmountsCalculator extends AnyOrderTotalAmountsCalculator {
+public class BillTotalAmountsCalculator extends BaseOrderTotalAmountsCalculator {
 
 	public BillTotalAmountsCalculator(final Order order) {
 		super(order);

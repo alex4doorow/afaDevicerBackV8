@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 @SuppressWarnings({"PMD.LawOfDemeter"})
-public class EmptyTotalAmountsCalculator extends AnyOrderTotalAmountsCalculator {
+public class EmptyTotalAmountsCalculator extends BaseOrderTotalAmountsCalculator {
 	
 	public EmptyTotalAmountsCalculator(final Order order) {
 		super(order);

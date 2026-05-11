@@ -61,11 +61,23 @@ cache:
     ttl:
       hours: 6
 integrations:
+  geonames:
+    url: http://api.geonames.org/timezoneJSON
+    user: ${INTEGRATION_GEONAMES_USER}
+  yandex:
+    geocode:
+      maps:
+        url: https://geocode-maps.yandex.ru/1.x/
+        key: ${INTEGRATION_YANDEX_GEOCODE_KEY}
   cdek:
     protocol: https
     host: ${INTEGRATION_CDEK_HOST}
     account: ${INTEGRATION_CDEK_ACCOUNT}
-    secure: ${INTEGRATION_SECURE}
+    secure: ${INTEGRATION_CDEK_SECURE}
+    from:
+      location:
+        city:
+          code: 44
   ozon:
     market:
       host: ${INTEGRATION_OZON_MARKET_HOST}

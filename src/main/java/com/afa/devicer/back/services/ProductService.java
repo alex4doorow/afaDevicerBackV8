@@ -7,12 +7,15 @@ import com.afa.core.enums.CrmTypes;
 import com.afa.core.enums.DevicerErrors;
 import com.afa.core.enums.OrderStatusTypes;
 import com.afa.core.exceptions.DevicerException;
+import com.afa.devicer.back.config.CacheConfig;
 import com.afa.devicer.back.entities.products.*;
 import com.afa.devicer.back.mappers.ProductMapper;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,12 +35,19 @@ public class ProductService {
         return iProduct.findById(id);
     }
 
+    @Cacheable(cacheNames = CacheConfig.CACHE_PRODUCT)
     public Product findByIdOrThrow(final Long id) {
         return findByIdOptional(id).orElseThrow(() ->
                 new DevicerException(DevicerErrors.DB_ENTITY_NOT_FOUND, Product_.class_, id)
         );
     }
 
+    @Cacheable(
+            cacheNames = CacheConfig.CACHE_PRODUCT_SUGGEST,
+            key = "#filter.nameContext.trim().toLowerCase()",
+            condition = "#filter.nameContext != null && #filter.nameContext.trim().length() >= 3",
+            sync = true
+    )
     @Transactional(readOnly = true)
     public List<ProductDto> getProductsSuggest(final ProductFilter filter) {
         if (filter.getNameContext() == null || filter.getNameContext().trim().length() < 3) {
@@ -118,6 +128,13 @@ public class ProductService {
      * @param crmType       [CrmTypes.YANDEX_MARKET, CrmTypes.OZON, обычный лид]
      * @param phase         [заявка маркета, OrderStatuses.BID, OrderStatuses.APPROVED]
      */
+    @CacheEvict(
+            value = {
+                    CacheConfig.CACHE_PRODUCT,
+                    CacheConfig.CACHE_PRODUCT_SUGGEST
+            },
+            allEntries = true
+    )
     public void updateDeltaQuantityProduct(final Product product,
                                            final int deltaQuantity,
                                            final CrmTypes crmType,
@@ -127,12 +144,26 @@ public class ProductService {
         updateDeltaQuantityProduct(product, deltaQuantity, result4UpdateProductStock);
     }
 
+    @CacheEvict(
+            value = {
+                    CacheConfig.CACHE_PRODUCT,
+                    CacheConfig.CACHE_PRODUCT_SUGGEST
+            },
+            allEntries = true
+    )
     public void updateDbProductQuantityByDelta(final Long productId, final int deltaQuantity) {
         final Product product = findByIdOrThrow(productId);
         product.setQuantity(product.getQuantity() - deltaQuantity);
         iProduct.saveAndFlush(product);
     }
 
+    @CacheEvict(
+            value = {
+                    CacheConfig.CACHE_PRODUCT,
+                    CacheConfig.CACHE_PRODUCT_SUGGEST
+            },
+            allEntries = true
+    )
     public void updateDbProductStock(final StockSupplierProduct supplierStockProduct,
                                      final int deltaQuantity) {
 

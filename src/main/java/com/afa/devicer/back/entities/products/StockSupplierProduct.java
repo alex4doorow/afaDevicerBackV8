@@ -1,5 +1,6 @@
 package com.afa.devicer.back.entities.products;
 
+import com.afa.core.enums.DeliveryPaymentMethods;
 import com.afa.core.enums.StockTypes;
 import com.afa.core.enums.SupplierTypes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -65,8 +66,11 @@ public class StockSupplierProduct {
     @Column(name = "quantity", nullable = false)
     private Integer quantity = 0;
 
+    @NotNull
+    @Column(name = "delivery_payment_method", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private DeliveryPaymentMethods deliveryPaymentMethod;
+
     @Column(name = "comment")
     private String comment;
-
-
 }
