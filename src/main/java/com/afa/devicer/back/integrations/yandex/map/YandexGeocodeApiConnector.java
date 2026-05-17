@@ -9,13 +9,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class YandexGeocodeConnector {
+public class YandexGeocodeApiConnector {
 
     @Value("${integrations.yandex.geocode.maps.url}")
     private String url;
@@ -34,13 +37,15 @@ public class YandexGeocodeConnector {
                             city)
                     .retrieve()
                     .bodyToMono(YandexGeocodeResponseDto.class)
+                    .timeout(Duration.ofSeconds(5))
                     .block();
-        } catch (RuntimeException e) {
+        } catch (WebClientResponseException | WebClientRequestException e) {
             log.error(DevicerErrors.INTEGRATION_YANDEX_GEOCODE_MAPS_CONNECTION_ERRORS.getErrorMessage(), e);
             return YandexGeocodeResponseDto.createEmpty();
         }
     }
 
+    @SuppressWarnings({"PMD.AvoidLiteralsInIfCondition"})
     public YandexGeocodeBriefDto getPositionByCity(final String city) {
         final YandexGeocodeResponseDto response = getGeocodeByCity(city);
 

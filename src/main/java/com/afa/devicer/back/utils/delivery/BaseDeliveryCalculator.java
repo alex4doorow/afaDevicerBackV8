@@ -15,7 +15,7 @@ public class BaseDeliveryCalculator<CONNECTOR> {
     protected final Map<AmountTypes, BigDecimal> amounts;
     protected final GeoNamesTimezoneResponseDto toLocationTimezone;
     /**
-     * Интеграция, коннектор к внешнему API - получение данных, выполнение расчетов, сохранение заказов, прочая
+     * Интеграция, коннектор к внешнему API - получение данных, выполнение расчетов
      */
     protected final CONNECTOR connector;
 

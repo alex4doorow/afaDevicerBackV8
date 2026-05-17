@@ -222,8 +222,12 @@ public class CdekDeliveryCalculator extends BaseDeliveryCalculator<CdekApiConnec
                 deliveryFullPrice = deliveryCustomerSummary;
             }
         } else {
-            deliveryCustomerSummary = deliveryPrice.add(deliveryInsurance);
-            deliverySellerSummary = deliveryPrice.add(deliveryInsurance).round(new MathContext(0, RoundingMode.HALF_UP)).setScale(0, RoundingMode.CEILING);
+            deliveryCustomerSummary = deliveryPrice.add(deliveryInsurance)
+                    .round(new MathContext(0, RoundingMode.HALF_UP))
+                    .setScale(0, RoundingMode.CEILING);
+            deliverySellerSummary = deliveryPrice.add(deliveryInsurance)
+                    .round(new MathContext(0, RoundingMode.HALF_UP))
+                    .setScale(0, RoundingMode.CEILING);
             deliveryFullPrice = deliveryCustomerSummary;
         }
 
@@ -244,8 +248,10 @@ public class CdekDeliveryCalculator extends BaseDeliveryCalculator<CdekApiConnec
         } else {
             result.setTermText(deliveryPeriodMin + "-" + deliveryPeriodMax + " дн.");
         }
-        result.setParcelType("tariffId: " + cdekTariffId);
-        result.setTo("receiverCityCode: " + order.getDelivery().getAddress().getCityCode());
+        result.setParcelType(order.getDelivery().getDeliveryType().getAnnotation());
+        result.setTo(order.getDelivery().getAddress().getAddressLine());
+        //result.setParcelType("tariffId: " + cdekTariffId);
+        //result.setTo("receiverCityCode: " + order.getDelivery().getAddress().getCityCode());
         result.setWeightText(NumericHelper.weightG2Kg(amounts.get(AmountTypes.TOTAL_WEIGHT_GRAM).intValue()) + " кг.");
         result.setErrorText(errorText);
 

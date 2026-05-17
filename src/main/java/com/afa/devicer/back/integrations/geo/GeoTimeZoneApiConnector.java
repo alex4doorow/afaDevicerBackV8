@@ -8,13 +8,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class GeoTimeZoneConnector implements BaseConnector {
+public class GeoTimeZoneApiConnector implements BaseConnector {
 
     @Value("${integrations.geonames.url}")
     private String url;
@@ -34,9 +37,10 @@ public class GeoTimeZoneConnector implements BaseConnector {
                             userName)
                     .retrieve()
                     .bodyToMono(GeoNamesTimezoneResponseDto.class)
+                    .timeout(Duration.ofSeconds(5))
                     .block();
 
-        } catch (RuntimeException e) {
+        } catch (WebClientResponseException | WebClientRequestException e) {
             log.error(DevicerErrors.INTEGRATION_GEONAMES_CONNECTION_ERRORS.getErrorMessage(), e);
             return GeoNamesTimezoneResponseDto.createEmpty();
         }

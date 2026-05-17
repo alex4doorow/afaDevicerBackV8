@@ -19,6 +19,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -109,6 +110,7 @@ public class CdekApiConnector implements BaseConnector {
                     .retrieve()
                     .bodyToMono(CdekCalculatorTariffResponse.class)
                     .log()
+                    .timeout(Duration.ofSeconds(5))
                     .block();
         } catch (URISyntaxException | WebClientResponseException | WebClientRequestException e) {
             throw new DevicerException(DevicerErrors.INTEGRATION_CDEK_CALC_TARIFF_ERRORS, e);

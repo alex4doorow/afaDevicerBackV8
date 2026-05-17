@@ -8,6 +8,7 @@ import com.afa.core.exceptions.DevicerException;
 import com.afa.devicer.back.entities.orders.Order;
 import com.afa.devicer.back.integrations.BaseConnector;
 import com.afa.devicer.back.integrations.cdek.CdekApiConnector;
+import com.afa.devicer.back.integrations.post.PostCalcApiConnector;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -37,7 +38,10 @@ public final class DeliveryCalculatorFactory {
         } else if (deliveryType == DeliveryTypes.DELLIN) {
             return new DellinDeliveryCalculator(order, amounts, toAddressTimezone);
         } else if (deliveryType.isPost()) {
-            return new PostDeliveryCalculator(order, amounts, toAddressTimezone);
+            return new PostDeliveryCalculator(order,
+                    amounts,
+                    toAddressTimezone,
+                    requirePostCalcConnector(connector));
         } else if (deliveryType.isCdek()) {
             return new CdekDeliveryCalculator(
                     order,
@@ -54,6 +58,17 @@ public final class DeliveryCalculatorFactory {
         if (connector instanceof CdekApiConnector cdekApiConnector) {
             return cdekApiConnector;
         }
-        throw new DevicerException(DevicerErrors.UNKNOWN_ILLEGAL_ARGUMENT_ERROR);
+        throw new DevicerException(DevicerErrors.UNKNOWN_ILLEGAL_ARGUMENT_ERROR,
+                connector == null ? "null" : connector.getClass().getName(),
+                CdekApiConnector.class.getName());
+    }
+
+    private static PostCalcApiConnector requirePostCalcConnector(final BaseConnector connector) {
+        if (connector instanceof PostCalcApiConnector postCalcApiConnector) {
+            return postCalcApiConnector;
+        }
+        throw new DevicerException(DevicerErrors.UNKNOWN_ILLEGAL_ARGUMENT_ERROR,
+                connector == null ? "null" : connector.getClass().getName(),
+                PostCalcApiConnector.class.getName());
     }
 }

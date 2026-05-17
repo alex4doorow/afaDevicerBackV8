@@ -6,8 +6,9 @@ import com.afa.core.enums.AmountTypes;
 import com.afa.devicer.back.entities.orders.Order;
 import com.afa.devicer.back.integrations.BaseConnector;
 import com.afa.devicer.back.integrations.cdek.CdekApiConnector;
-import com.afa.devicer.back.integrations.geo.GeoTimeZoneConnector;
-import com.afa.devicer.back.integrations.yandex.map.YandexGeocodeConnector;
+import com.afa.devicer.back.integrations.geo.GeoTimeZoneApiConnector;
+import com.afa.devicer.back.integrations.post.PostCalcApiConnector;
+import com.afa.devicer.back.integrations.yandex.map.YandexGeocodeApiConnector;
 import com.afa.devicer.back.utils.delivery.DeliveryCalculator;
 import com.afa.devicer.back.utils.delivery.DeliveryCalculatorFactory;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,9 @@ import java.util.Map;
 public class DeliveryService {
 
     private final CdekApiConnector cdekApiConnector;
-    private final YandexGeocodeConnector yandexGeocodeConnector;
-    private final GeoTimeZoneConnector geoTimeZoneConnector;
+    private final PostCalcApiConnector postCalcApiConnector;
+    private final YandexGeocodeApiConnector yandexGeocodeApiConnector;
+    private final GeoTimeZoneApiConnector geoTimeZoneApiConnector;
 
     public DeliveryCalcParcelDto calc(
             final Order order,
@@ -41,6 +43,8 @@ public class DeliveryService {
     private BaseConnector getDeliveryCalculatorAdapter(final Order order) {
         if (order.getDelivery().getDeliveryType().isCdek()) {
             return cdekApiConnector;
+        } if (order.getDelivery().getDeliveryType().isPost()) {
+            return postCalcApiConnector;
         } else {
             return null;
         }
@@ -50,8 +54,8 @@ public class DeliveryService {
         if (StringUtils.isBlank(city)) {
             return null;
         }
-        final Map<String, String> position = yandexGeocodeConnector.getPositionByCity(city).getPosition();
-        return geoTimeZoneConnector.getLocalTimeByCity(position);
+        final Map<String, String> position = yandexGeocodeApiConnector.getPositionByCity(city).getPosition();
+        return geoTimeZoneApiConnector.getLocalTimeByCity(position);
     }
 
 }
