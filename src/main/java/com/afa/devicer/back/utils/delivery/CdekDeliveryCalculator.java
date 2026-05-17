@@ -5,6 +5,7 @@ import com.afa.core.dto.integrations.cdek.CdekCalcPackageRequestDto;
 import com.afa.core.dto.integrations.cdek.CdekCalculatorLocationDto;
 import com.afa.core.dto.integrations.cdek.CdekCalculatorTariffRequest;
 import com.afa.core.dto.integrations.cdek.CdekCalculatorTariffResponse;
+import com.afa.core.dto.integrations.geo.GeoNamesTimezoneResponseDto;
 import com.afa.core.enums.*;
 import com.afa.core.exceptions.DevicerException;
 import com.afa.core.utils.NumericHelper;
@@ -29,13 +30,14 @@ public class CdekDeliveryCalculator extends BaseDeliveryCalculator<CdekApiConnec
     public CdekDeliveryCalculator(
             final Order order,
             final Map<AmountTypes, BigDecimal> amounts,
+            final GeoNamesTimezoneResponseDto toAddressTimezone,
             final CdekApiConnector anyConnector) {
-        super(order, amounts, anyConnector);
+        super(order, amounts, toAddressTimezone, anyConnector);
     }
 
     @Override
     public DeliveryCalcParcelDto calc() {
-        final DeliveryPaymentMethods deliveryPaymentMethod = getDeliveryPaymentMethod(order);
+        final DeliveryPaymentMethods deliveryPaymentMethod = getDeliveryPaymentMethod();
         final BigDecimal totalAmount = amounts.get(AmountTypes.TOTAL);
 
         boolean isDmcPvz;
@@ -61,9 +63,7 @@ public class CdekDeliveryCalculator extends BaseDeliveryCalculator<CdekApiConnec
         }
         try {
             final DeliveryCalcParcelDto result = calcCdekByApiTariff(order, amounts, order.getDelivery().getDeliveryType());
-
-            //GeoNamesApi.GeoNamesBean geoNamesBean = geoNamesApi.getLocalTimeByCity(to.getAddress(), new Date());
-            //result.setLocalTimeText(geoNamesBean.textLocalTime());
+            result.setLocalTimeText(this.toLocationTimezone.getTextLocalTime());
 
             BigDecimal deliveryPrice = result.getDeliverySellerSummary();
             if (order.getDelivery().getDeliveryPaymentType() == DeliveryPaymentTypes.CUSTOMER) {

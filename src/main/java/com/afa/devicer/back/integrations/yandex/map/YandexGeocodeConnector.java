@@ -27,14 +27,6 @@ public class YandexGeocodeConnector {
 
     public YandexGeocodeResponseDto getGeocodeByCity(final String city) {
         try {
-            String response1 = webClient.get()
-                    .uri(url + "?format={format}&apikey={apikey}&geocode={city}",
-                            "json",
-                            apiKey,
-                            city).retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-
             return webClient.get()
                     .uri(url + "?format={format}&apikey={apikey}&geocode={city}",
                             "json",
