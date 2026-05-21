@@ -8,7 +8,7 @@ import com.afa.devicer.back.entities.dictionaries.Country_;
 import com.afa.devicer.back.entities.dictionaries.ICountry;
 import com.afa.core.enums.DevicerErrors;
 import com.afa.core.exceptions.DevicerException;
-import com.afa.devicer.back.mappers.CountryMapper;
+import com.afa.devicer.back.mappers.dictionaries.CountryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

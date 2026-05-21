@@ -8,7 +8,7 @@ import com.afa.devicer.back.entities.products.ProductCategory;
 import com.afa.devicer.back.entities.products.ProductCategory_;
 import com.afa.core.enums.DevicerErrors;
 import com.afa.core.exceptions.DevicerException;
-import com.afa.devicer.back.mappers.ProductCategoryMapper;
+import com.afa.devicer.back.mappers.dictionaries.ProductCategoryMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;

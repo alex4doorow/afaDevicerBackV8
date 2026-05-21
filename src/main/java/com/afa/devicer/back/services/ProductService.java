@@ -9,7 +9,7 @@ import com.afa.core.enums.OrderStatusTypes;
 import com.afa.core.exceptions.DevicerException;
 import com.afa.devicer.back.config.CacheConfig;
 import com.afa.devicer.back.entities.products.*;
-import com.afa.devicer.back.mappers.ProductMapper;
+import com.afa.devicer.back.mappers.dictionaries.ProductMapper;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

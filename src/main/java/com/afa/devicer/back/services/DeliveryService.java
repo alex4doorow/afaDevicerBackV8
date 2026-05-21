@@ -1,14 +1,18 @@
 package com.afa.devicer.back.services;
 
 import com.afa.core.dto.delivery.DeliveryCalcParcelDto;
+import com.afa.core.dto.delivery.DeliveryPriceDto;
+import com.afa.core.dto.delivery.DeliveryPricesRequest;
 import com.afa.core.dto.integrations.geo.GeoNamesTimezoneResponseDto;
 import com.afa.core.enums.AmountTypes;
+import com.afa.core.enums.DeliveryPriceTypes;
 import com.afa.devicer.back.entities.orders.Order;
 import com.afa.devicer.back.integrations.BaseConnector;
 import com.afa.devicer.back.integrations.cdek.CdekApiConnector;
 import com.afa.devicer.back.integrations.geo.GeoTimeZoneApiConnector;
 import com.afa.devicer.back.integrations.post.PostCalcApiConnector;
 import com.afa.devicer.back.integrations.yandex.map.YandexGeocodeApiConnector;
+import com.afa.devicer.back.mappers.dictionaries.DeliveryPriceTypesMapper;
 import com.afa.devicer.back.utils.delivery.DeliveryCalculator;
 import com.afa.devicer.back.utils.delivery.DeliveryCalculatorFactory;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -30,6 +35,8 @@ public class DeliveryService {
     private final YandexGeocodeApiConnector yandexGeocodeApiConnector;
     private final GeoTimeZoneApiConnector geoTimeZoneApiConnector;
 
+    private final DeliveryPriceTypesMapper deliveryPriceTypesMapper;
+
     public DeliveryCalcParcelDto calc(
             final Order order,
             final Map<AmountTypes, BigDecimal> amounts) {
@@ -38,6 +45,12 @@ public class DeliveryService {
                 getGeocodeByCity(order.getDelivery().getAddress().getCity()),
                 getDeliveryCalculatorAdapter(order));
         return deliveryCalculator.calc();
+    }
+
+    public List<DeliveryPriceDto> findPricesByDeliveryType(final DeliveryPricesRequest request) {
+        return deliveryPriceTypesMapper.fromDeliveryPriceTypes(DeliveryPriceTypes.findAllByDeliveryType(
+                request.getDeliveryType())
+        );
     }
 
     private BaseConnector getDeliveryCalculatorAdapter(final Order order) {

@@ -1,4 +1,4 @@
-package com.afa.devicer.back.mappers;
+package com.afa.devicer.back.mappers.dictionaries;
 
 import com.afa.core.dto.dictionaries.CountryDto;
 import com.afa.devicer.back.entities.dictionaries.Country;
