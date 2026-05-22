@@ -163,6 +163,7 @@ public class CdekDeliveryCalculator extends BaseDeliveryCalculator<CdekApiConnec
         return String.valueOf(connector.getFromLocationCityCode()).equals(order.getDelivery().getAddress().getCityCode());
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private DeliveryCalcParcelDto convertCdekTariffDataToDeliveryServiceResult(
             final CdekCalculatorTariffResponse tariffResponse,
             final Integer cdekTariffId) {

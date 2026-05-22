@@ -28,3 +28,7 @@ TODO devops
 деплой на удаленный сервер
 voult
 https
+
+TODO front
+images
+videos

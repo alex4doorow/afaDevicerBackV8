@@ -68,7 +68,7 @@ public class OrderController {
     @Operation(summary = "Сохранить заявку нового заказа")
     public ResponseEntity<OrderSingleResponse> create(
             @AuthenticationPrincipal final Jwt principal,
-            @NotNull @Valid @RequestBody final OrderSaveRequest request
+            @Valid @RequestBody final OrderSaveRequest request
     ) {
         return ResponseEntity.ok(
                 new OrderSingleResponse(mapper.fromOrder(service.create(userInfoService.fillUserInfo(principal), request)))

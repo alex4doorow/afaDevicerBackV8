@@ -143,7 +143,7 @@ public class Product {
     private Set<ProductComposite> kitComponents = new HashSet<>();
 
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private StockSupplierProduct stock;
+    private ProductSupplierPrice stock;
 
     public DeliveryPaymentMethods getDeliveryPaymentMethod() {
         return stock == null ? DeliveryPaymentMethods.FULL : stock.getDeliveryPaymentMethod();

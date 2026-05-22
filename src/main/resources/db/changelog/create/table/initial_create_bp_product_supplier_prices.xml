@@ -1,10 +1,10 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet author="al (generated)" id="1754837442376_bp_stock_supplier_products_1">
-        <createTable tableName="bp_stock_supplier_products">
+    <changeSet author="al (generated)" id="1754837442376_bp_product_supplier_prices_1">
+        <createTable tableName="bp_product_supplier_prices">
             <column name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_stock_supplier_products"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_product_supplier_prices"/>
             </column>
             <column name="product_id" type="BIGINT">
                 <constraints nullable="false"/>
@@ -31,26 +31,26 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="al (generated)" id="1754837442376_bp_stock_supplier_products_2">
-        <createIndex indexName="idx_bp_stock_supplier_products_stock" tableName="bp_stock_supplier_products">
+    <changeSet author="al (generated)" id="1754837442376_bp_product_supplier_prices_2">
+        <createIndex indexName="idx_bp_product_supplier_prices_stock" tableName="bp_product_supplier_prices">
             <column name="stock"/>
         </createIndex>
     </changeSet>
 
-    <changeSet author="al (generated)" id="1754837442376_bp_stock_supplier_products_3">
-        <createIndex indexName="idx_bp_stock_supplier_products_supplier" tableName="bp_stock_supplier_products">
+    <changeSet author="al (generated)" id="1754837442376_bp_product_supplier_prices_3">
+        <createIndex indexName="idx_bp_product_supplier_prices_supplier" tableName="bp_product_supplier_prices">
             <column name="supplier"/>
         </createIndex>
     </changeSet>
 
-    <changeSet author="al (generated)" id="1754837442376_bp_stock_supplier_products_4">
-        <createIndex indexName="idx_bp_stock_supplier_products_product_id" tableName="bp_stock_supplier_products" unique="true">
+    <changeSet author="al (generated)" id="1754837442376_bp_product_supplier_prices_4">
+        <createIndex indexName="idx_bp_product_supplier_prices_product_id" tableName="bp_product_supplier_prices" unique="true">
             <column name="product_id"/>
         </createIndex>
     </changeSet>
 
-    <changeSet author="al (generated)" id="1754837442376_bp_stock_supplier_products_5">
-        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="bp_stock_supplier_products" constraintName="fk_bp_stock_supplier_products_product_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_products" validate="true"/>
+    <changeSet author="al (generated)" id="1754837442376_bp_product_supplier_prices_5">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="bp_product_supplier_prices" constraintName="fk_bp_product_supplier_prices_product_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_products" validate="true"/>
     </changeSet>
 
 </databaseChangeLog>

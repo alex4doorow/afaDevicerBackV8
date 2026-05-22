@@ -9,16 +9,13 @@ import com.afa.devicer.back.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import static com.afa.devicer.back.controllers.internal.ControllerConstants.*;
+import static com.afa.devicer.back.controllers.internal.ControllerConstants.PRODUCTS;
+import static com.afa.devicer.back.controllers.internal.ControllerConstants.ROLE_ADMIN;
 
 @RestController
 @CrossOrigin
@@ -34,7 +31,7 @@ public class ProductController {
     @GetMapping("/productCategories")
     @Operation(summary = "Find all product categories")
     public ResponseEntity<ProductCategoryResponse> getProductCategoryFiltered(
-            @NotNull @Valid final ProductCategoryFilter filter
+            @Valid @ModelAttribute final ProductCategoryFilter filter
     ) {
         return ResponseEntity.ok(
                 new ProductCategoryResponse(productCategoryService.getFiltered(filter))
@@ -44,7 +41,7 @@ public class ProductController {
     @GetMapping("/suggest")
     @Operation(summary = "Find all products")
     public ResponseEntity<ProductResponse> getProductsSuggest(
-            @NotNull @Valid final ProductFilter filter
+            @Valid @ModelAttribute final ProductFilter filter
     ) {
         return ResponseEntity.ok(
                 new ProductResponse(productService.getProductsSuggest(filter))

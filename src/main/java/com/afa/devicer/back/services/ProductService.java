@@ -28,7 +28,7 @@ import java.util.*;
 public class ProductService {
 
     private final IProduct iProduct;
-    private final IStockSupplierProduct iStockSupplierProduct;
+    private final IProductSupplierProduct iProductSupplierProduct;
     private final ProductMapper productMapper;
 
     public Optional<Product> findByIdOptional(final Long id) {
@@ -75,7 +75,7 @@ public class ProductService {
         }
         return products.stream()
                 .map(productMapper::fromProduct)
-                .sorted(Comparator.comparing(ProductDto::getId))
+                .sorted(Comparator.comparing(ProductDto::getShortName))
                 .limit(10)
                 .toList();
     }
@@ -164,13 +164,13 @@ public class ProductService {
             },
             allEntries = true
     )
-    public void updateDbProductStock(final StockSupplierProduct supplierStockProduct,
+    public void updateDbProductStock(final ProductSupplierPrice productSupplierPrice,
                                      final int deltaQuantity) {
 
-        final int newQuantity = supplierStockProduct.getQuantity() - deltaQuantity;
-        supplierStockProduct.setQuantity(newQuantity);
-        iStockSupplierProduct.save(supplierStockProduct);
-        iStockSupplierProduct.flush();
+        final int newQuantity = productSupplierPrice.getQuantity() - deltaQuantity;
+        productSupplierPrice.setQuantity(newQuantity);
+        iProductSupplierProduct.save(productSupplierPrice);
+        iProductSupplierProduct.flush();
     }
 
     /**
@@ -185,11 +185,11 @@ public class ProductService {
                                             final int deltaQuantity,
                                             final Result4UpdateProductStock result4UpdateProductStock) {
 
-        final List<StockSupplierProduct> list = iStockSupplierProduct.findByProductId(product.getId());
+        final List<ProductSupplierPrice> list = iProductSupplierProduct.findByProductId(product.getId());
 
 
         if (!list.isEmpty()) {
-            final StockSupplierProduct supplierStockProduct = list.getFirst();
+            final ProductSupplierPrice supplierStockProduct = list.getFirst();
 
             if (result4UpdateProductStock.isProductFront()) {
                 int newWikiQuantity = supplierStockProduct.getProduct().getQuantity();
@@ -208,8 +208,8 @@ public class ProductService {
                     final Product slave = kitComponent.getSlave();
 
                     if (result4UpdateProductStock.isSlaveBack()) {
-                        final List<StockSupplierProduct> list2 = iStockSupplierProduct.findByProductId(slave.getId());
-                        final StockSupplierProduct stockSupplierSlaveProduct = list2.getFirst();
+                        final List<ProductSupplierPrice> list2 = iProductSupplierProduct.findByProductId(slave.getId());
+                        final ProductSupplierPrice stockSupplierSlaveProduct = list2.getFirst();
 
                         int slaveQuantity = stockSupplierSlaveProduct.getSupplierQuantity();
                         final int deltaSlaveQuantity = stockSupplierSlaveProduct.getSupplierQuantity() * deltaQuantity;
@@ -249,11 +249,11 @@ public class ProductService {
 
 
         final Result4UpdateProductStock result4UpdateProductStock = new Result4UpdateProductStock();
-        final List<StockSupplierProduct> list = iStockSupplierProduct.findByProductId(product.getId());
+        final List<ProductSupplierPrice> list = iProductSupplierProduct.findByProductId(product.getId());
         if (list.isEmpty()) {
             return null;
         }
-        final StockSupplierProduct stockSupplierProduct = iStockSupplierProduct.findByProductId(product.getId()).getFirst();
+        final ProductSupplierPrice stockSupplierProduct = iProductSupplierProduct.findByProductId(product.getId()).getFirst();
 
         if (stockSupplierProduct.getProduct().getComposite()) {
 

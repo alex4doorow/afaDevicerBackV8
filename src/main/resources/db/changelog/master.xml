@@ -14,7 +14,7 @@
     <!-- BUSINESS TABLES -->
     <include file="/db/changelog/create/table/initial_create_bp_products.xml" relativeToChangelogFile="false"/>
     <include file="/db/changelog/create/table/initial_create_bp_product_descriptions.xml" relativeToChangelogFile="false"/>
-    <include file="/db/changelog/create/table/initial_create_bp_stock_supplier_products.xml" relativeToChangelogFile="false"/>
+    <include file="/db/changelog/create/table/initial_create_bp_product_supplier_prices.xml" relativeToChangelogFile="false"/>
 
     <include file="/db/changelog/create/table/initial_create_bp_persons.xml" relativeToChangelogFile="false"/>
     <include file="/db/changelog/create/table/initial_create_bp_employees.xml" relativeToChangelogFile="false"/>

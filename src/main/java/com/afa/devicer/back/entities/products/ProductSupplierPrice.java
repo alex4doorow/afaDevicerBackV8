@@ -15,14 +15,14 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "bp_stock_supplier_products",
+@Table(name = "bp_product_supplier_prices",
         indexes = {
-                @Index(name = "idx_bp_stock_supplier_products_stock", columnList = "stock"),
-                @Index(name = "idx_bp_stock_supplier_products_supplier", columnList = "supplier"),
-                @Index(name = "idx_bp_stock_supplier_products_product_id", columnList = "product_id", unique = true),
+                @Index(name = "idx_bp_product_supplier_prices_stock", columnList = "stock"),
+                @Index(name = "idx_bp_product_supplier_prices_supplier", columnList = "supplier"),
+                @Index(name = "idx_bp_product_supplier_prices_product_id", columnList = "product_id", unique = true),
         })
 @SuppressWarnings({"PMD.TooManyFields", "PMD.AvoidDuplicateLiterals", "PMD.LawOfDemeter"})
-public class StockSupplierProduct {
+public class ProductSupplierPrice {
 
     @Id
     @NotNull
