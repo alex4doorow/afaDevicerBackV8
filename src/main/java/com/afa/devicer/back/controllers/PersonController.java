@@ -46,4 +46,6 @@ public class PersonController {
         service.saveSettings(userInfoService.fillUserInfo(principal).getKeycloakUuid(), request);
         return ResponseEntity.ok(new BaseResponse());
     }
+
+
 }

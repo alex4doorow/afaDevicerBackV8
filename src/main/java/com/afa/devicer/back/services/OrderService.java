@@ -198,8 +198,6 @@ public class OrderService {
         return iOrder.saveAndFlush(order);
     }
 
-
-    @SuppressWarnings("PMD")
     @Transactional
     public Order changeFullStatus(final UserInfoDto userInfo,
                                   final Long orderId,
@@ -214,31 +212,21 @@ public class OrderService {
         order.setProductCategory(productCategoryService.findByIdOrThrow(request.getProductCategoryId()));
         order.setStatus(request.getStatus());
         order.setAnnotation(request.getAnnotation());
-
         order.getDelivery().setTrackCode(request.getTrackCode());
 
         if (currentStatus != request.getStatus()) {
             addStatusHistory(order, request.getStatus(), originator);
-        }
 
-        if (request.getStatus() == OrderStatusTypes.APPROVED) {
-            operateSubstructProductQuantityOrder(order, OrderStatusTypes.APPROVED);
-        }
-
-        if (request.getStatus() == OrderStatusTypes.BID && currentStatus == OrderStatusTypes.CANCELED) {
-            if (order.getType() == OrderTypes.BILL) {
-
-//                final String sqlUpdateOrderOffer = "UPDATE sr_order"
-//                        + "  SET offer_date_start = ?"
-//                        + "  WHERE id = ?";
-//                this.jdbcTemplate.update(sqlUpdateOrderOffer, new Object[]{
-//                        DateTimeUtils.sysDate(),
-//                        order.getId()});
+            if (currentStatus.isConfirmationAllowed(request.getStatus())) {
+                // спишем остатки товаров
+                operateSubstructProductQuantityOrder(order, OrderStatusTypes.APPROVED);
             }
         }
 
         return iOrder.saveAndFlush(order);
     }
+
+
 
     @Transactional
     public void delete(final UserInfoDto userInfo, final Long orderId) {
@@ -307,7 +295,6 @@ public class OrderService {
 
             // 8) ищем по наименованию компании
 
-
             // ничего не нашли - возвращаем фильтр для пустого списка
             predicates.add(builder.lessThan(root.get(Order_.ID), 0L));
             return builder.and(predicates.toArray(new Predicate[0]));
@@ -316,7 +303,9 @@ public class OrderService {
     }
 
     @SuppressWarnings({"PMD.NPathComplexity", "PMD.UnusedFormalParameter", "PMD.EmptyControlStatement"})
-    private Specification<Order> fillOrderSpecification(final UserInfoDto user, final OrderConditionsDto filterConditions) {
+    private Specification<Order> fillOrderSpecification(
+            final UserInfoDto user,
+            final OrderConditionsDto filterConditions) {
 
         return (root, query, builder) -> {
 
@@ -396,7 +385,6 @@ public class OrderService {
         for (final OrderItem orderItem : order.getItems()) {
             productService.updateDeltaQuantityProduct(orderItem.getProduct(), orderItem.getQuantity(), order.getExternalCrm(), phase);
         }
-
     }
 
     public Map<AmountTypes, BigDecimal> calcTotalAmounts(final Order order) {
@@ -571,6 +559,10 @@ public class OrderService {
         deliveryAddress.setHouse(request.getHouse());
         deliveryAddress.setFlat(request.getFlat());
         deliveryAddress.setAddressLine(request.getAddressLine());
+        deliveryAddress.setCity(request.getCity());
+        deliveryAddress.setCityCode(request.getCityCode());
+        deliveryAddress.setDeliveryPointCode(request.getDeliveryPointCode());
+        deliveryAddress.setDateModified(Instant.now());
     }
 
     private void saveOrderDeliveryDataFromRequest(
@@ -667,6 +659,4 @@ public class OrderService {
         order.setPostpayAmount(amounts.get(AmountTypes.POSTPAY));
         order.setSupplierAmount(amounts.get(AmountTypes.SUPPLIER));
     }
-
-
 }

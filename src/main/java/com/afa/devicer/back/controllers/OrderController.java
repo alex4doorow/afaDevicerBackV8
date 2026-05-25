@@ -2,20 +2,25 @@ package com.afa.devicer.back.controllers;
 
 import com.afa.core.dto.BaseResponse;
 import com.afa.core.dto.orders.*;
+import com.afa.core.enums.ReportPeriodTypes;
 import com.afa.devicer.back.mappers.OrderMapper;
 import com.afa.devicer.back.services.OrderService;
 import com.afa.devicer.back.services.UserInfoService;
+import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 import static com.afa.devicer.back.controllers.internal.ControllerConstants.ORDERS;
 import static com.afa.devicer.back.controllers.internal.ControllerConstants.ROLE_ADMIN;
@@ -54,6 +59,27 @@ public class OrderController {
             @NotNull @RequestParam("dirtyConditions") final String dirtyConditions) {
 
         return ResponseEntity.ok(service.getSimpleFiltered(userInfoService.fillUserInfo(principal), dirtyConditions));
+    }
+
+    @GetMapping("/conditions/period/{period}")
+    @Operation(summary = "orders filtered by period")
+    public ResponseEntity<OrderPagedResponse> getPeriodFiltered(
+            @NotNull @PathVariable("period") final String periodName,
+            @AuthenticationPrincipal final Jwt principal) {
+
+        if (StringUtils.isEmpty(periodName)) {
+            return ResponseEntity.ok(null);
+        }
+        final ReportPeriodTypes periodType = ReportPeriodTypes.valueOf(periodName);
+        final Pair<LocalDate, LocalDate> period = periodType.findPeriodByType();
+
+        final OrderPagedFilter filter = OrderPagedFilter.builder()
+                .conditions(OrderConditionsDto.builder()
+                        .periodExist(true)
+                        .period(period)
+                        .build())
+                .build();
+        return ResponseEntity.ok(service.getFiltered(userInfoService.fillUserInfo(principal), filter));
     }
 
     @GetMapping("/{orderId}")
@@ -108,5 +134,4 @@ public class OrderController {
         service.delete(userInfoService.fillUserInfo(principal), orderId);
         return ResponseEntity.ok(new BaseResponse());
     }
-
 }
