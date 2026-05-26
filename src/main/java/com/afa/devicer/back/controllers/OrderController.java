@@ -61,23 +61,25 @@ public class OrderController {
         return ResponseEntity.ok(service.getSimpleFiltered(userInfoService.fillUserInfo(principal), dirtyConditions));
     }
 
-    @GetMapping("/conditions/period/{period}")
+    @GetMapping("/period/{period}")
     @Operation(summary = "orders filtered by period")
     public ResponseEntity<OrderPagedResponse> getPeriodFiltered(
             @NotNull @PathVariable("period") final String periodName,
             @AuthenticationPrincipal final Jwt principal) {
 
         if (StringUtils.isEmpty(periodName)) {
-            return ResponseEntity.ok(null);
+            return ResponseEntity.ok(OrderPagedResponse.createEmpty());
         }
         final ReportPeriodTypes periodType = ReportPeriodTypes.valueOf(periodName);
         final Pair<LocalDate, LocalDate> period = periodType.findPeriodByType();
 
         final OrderPagedFilter filter = OrderPagedFilter.builder()
+                .resultsOnPage(100)
                 .conditions(OrderConditionsDto.builder()
                         .periodExist(true)
                         .period(period)
                         .build())
+                .periodType(periodType)
                 .build();
         return ResponseEntity.ok(service.getFiltered(userInfoService.fillUserInfo(principal), filter));
     }

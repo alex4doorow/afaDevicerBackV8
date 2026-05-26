@@ -105,7 +105,8 @@ public class OrderService {
                 page.getTotalElements(), page.getTotalPages(),
                 page.hasPrevious(), page.hasNext(),
                 orderDtos,
-                calcTotalOrdersAmounts(user, page.getContent(), filter.getPeriod()));
+                calcTotalOrdersAmounts(user, page.getContent(), filter.getPeriod()),
+                request.getPeriodType());
     }
 
     @Transactional(readOnly = true)
@@ -115,7 +116,7 @@ public class OrderService {
             final String dirtyConditions) {
 
         if (StringUtils.isEmpty(dirtyConditions)) {
-            return new OrderPagedResponse(0, 1, false, false, Collections.emptyList(), Collections.emptyMap());
+            return new OrderPagedResponse(0, 1, false, false, Collections.emptyList(), Collections.emptyMap(), null);
         }
         log.debug("getSimpleFiltered(): {}", dirtyConditions);
 
@@ -123,7 +124,7 @@ public class OrderService {
         final List<OrderDto> orderDtos = mapper.fromOrders(orders);
 
         return new OrderPagedResponse(orders.size(), 1, false, false, orderDtos,
-                Collections.emptyMap());
+                Collections.emptyMap(), null);
     }
 
     @Transactional
