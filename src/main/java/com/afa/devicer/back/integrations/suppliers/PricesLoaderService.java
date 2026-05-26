@@ -10,12 +10,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PricesLoaderService {
 
-    private final List<PricerServiceIF> pricerServices;
+    private final List<PricerLoaderIF> pricerLoaders;
 
     @Transactional
-    public void run(){
-        for (final PricerServiceIF pricerService : pricerServices) {
-            pricerService.run();
+    public void update(){
+        for (final PricerLoaderIF pricerLoader : pricerLoaders) {
+            pricerLoader.update();
         }
     }
 }

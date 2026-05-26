@@ -85,12 +85,16 @@ integrations:
       client:
         id: ${INTEGRATION_OZON_MARKET_CLIENT_ID}
         key: ${INTEGRATION_OZON_MARKET_CLIENT_KEY}
-suppliers:
-  sititek:
-    feed:
-      url: ${SUPPLIER_SITITEK_FEED_URL}
-      login: ${SUPPLIER_SITITEK_FEED_LOGIN}
-      password: ${SUPPLIER_SITITEK_FEED_PASSWORD}
-      file: Price.xls
-      dir:
-        in: ${SUPPLIER_SITITEK_FEED_DIR_IN}
+  suppliers:
+    sititek:
+      enabled: true
+      feed:
+        url: ${SUPPLIER_SITITEK_FEED_URL}
+        login: ${SUPPLIER_SITITEK_FEED_LOGIN}
+        password: ${SUPPLIER_SITITEK_FEED_PASSWORD}
+        file: Price.xls
+        dir:
+          in: ${SUPPLIER_SITITEK_FEED_DIR_IN}
+scheduler:
+  integrations:
+    suppliers: 0 20 * * * *

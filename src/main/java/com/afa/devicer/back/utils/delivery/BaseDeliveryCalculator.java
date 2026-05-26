@@ -9,7 +9,7 @@ import com.afa.devicer.back.entities.orders.Order;
 import java.math.BigDecimal;
 import java.util.Map;
 
-public class BaseDeliveryCalculator<CONNECTOR> {
+public abstract class BaseDeliveryCalculator<CONNECTOR> {
 
     protected final Order order;
     protected final Map<AmountTypes, BigDecimal> amounts;

@@ -2,7 +2,7 @@ package com.afa.devicer.back.integrations.suppliers.sititek;
 
 import com.afa.core.enums.DevicerErrors;
 import com.afa.core.exceptions.DevicerException;
-import com.afa.devicer.back.integrations.suppliers.PricerServiceIF;
+import com.afa.devicer.back.integrations.BaseConnector;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import java.nio.file.Paths;
 @Slf4j
 @Service
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.SingularField"})
-public class SititekPricerConnector implements PricerServiceIF {
+public class SititekPricerConnector implements BaseConnector {
 
     @Value("${integrations.suppliers.sititek.feed.url}")
     private String feedUrl;
@@ -33,6 +33,8 @@ public class SititekPricerConnector implements PricerServiceIF {
     private String fileName;
     @Value("${integrations.suppliers.sititek.feed.dir.in}")
     private String saveDirectory;
+    @Value("${integrations.suppliers.sititek.enabled}")
+    private Boolean enabled;
 
     private RestClient restClient;
 
@@ -44,8 +46,10 @@ public class SititekPricerConnector implements PricerServiceIF {
                 .build();
     }
 
-    @Override
-    public void run() {
+    public void download() {
+        if (!enabled) {
+            return;
+        }
         try {
             downloadFile();
         } catch (IOException e) {

@@ -142,6 +142,9 @@ public class Product {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "master", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductComposite> kitComponents = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProductMarketplace> markets = new HashSet<>();
+
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private ProductSupplierPrice stock;
 
@@ -149,4 +152,17 @@ public class Product {
         return stock == null ? DeliveryPaymentMethods.FULL : stock.getDeliveryPaymentMethod();
     }
 
+    public ProductMarketplace getMarket(final CrmTypes marketplace) {
+        return markets.stream()
+                .filter(m -> m.getMarketType() == marketplace)
+                .findFirst()
+                .orElse(ProductMarketplace.createEmpty(marketplace));
+    }
+
+    public boolean isMarketSeller() {
+        if (markets == null || markets.isEmpty()) {
+            return false;
+        }
+        return markets.stream().anyMatch(ProductMarketplace::isMarketSeller);
+    }
 }

@@ -1,0 +1,51 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="al (generated)" id="1754837442376_bp_product_marketplaces_1">
+        <createTable tableName="bp_product_marketplaces">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_bp_product_marketplaces"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sku" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="supplier_stock" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="marketplace_seller" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="marketplace_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="special_price" type="NUMERIC(15, 2)"/>
+            <column name="rec_status" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_added" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_modified" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_product_marketplaces_2">
+        <createIndex indexName="idx_bp_product_marketplaces_sku" tableName="bp_product_marketplaces">
+            <column name="sku"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_product_marketplaces_3">
+        <createIndex indexName="idx_bp_product_marketplaces_product_id" tableName="bp_product_marketplaces">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="al (generated)" id="1754837442376_bp_product_marketplaces_4">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="bp_product_marketplaces" constraintName="fk_bp_product_marketplaces_product_id" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bp_products" validate="true"/>
+    </changeSet>
+
+</databaseChangeLog>

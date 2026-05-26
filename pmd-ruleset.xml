@@ -13,6 +13,7 @@
 
     <rule ref="category/java/bestpractices.xml">
         <exclude name="GuardLogStatement"/>
+        <exclude name="AbstractClassWithoutAbstractMethod"/>
 
         <!-- JUnit noise -->
         <exclude name="JUnit5TestShouldBePackagePrivate"/>
@@ -26,11 +27,11 @@
         <exclude name="CognitiveComplexity"/>
         <exclude name="CyclomaticComplexity"/>
         <exclude name="NPathComplexity"/>
+        <exclude name="LoosePackageCoupling"/>
     </rule>
 
     <rule ref="category/java/codestyle.xml/UnnecessaryImport"/>
     <rule ref="category/java/codestyle.xml/LocalVariableCouldBeFinal"/>
     <rule ref="category/java/codestyle.xml/MethodArgumentCouldBeFinal"/>
-
 
 </ruleset>

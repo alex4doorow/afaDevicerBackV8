@@ -26,7 +26,7 @@ public class PriceLoaderController {
     @PostMapping("/feed/all")
     public ResponseEntity<BaseResponse> loadPrices() {
 
-        allPricerService.run();
+        allPricerService.update();
         return ResponseEntity.ok(new BaseResponse());
     }
 
